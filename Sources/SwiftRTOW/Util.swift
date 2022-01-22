@@ -1,8 +1,6 @@
-typealias C = float3
-
 let kInfinity = Float.infinity
-let kNear0 = 1.0e-8
-let kAcne0 = 1.0e-3
+let kNear0: Float = 1.0e-8
+let kAcne0: Float = 1.0e-3
 let kPi = Float.pi
 
 func rnd() -> Float {
