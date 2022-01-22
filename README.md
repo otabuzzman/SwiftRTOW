@@ -12,7 +12,7 @@ Apps used on Winos 10
 - [Swift on Windows](https://www.swift.org/blog/swift-on-windows/) 5.5
 
 ### Setup
-- Create repositoray on GitHub (default settings)
+- Create repository on GitHub (default settings)
 - Clone repository from GitHub
 
   **Cygwin command prompt (bash)**
