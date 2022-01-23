@@ -9,7 +9,9 @@ class Rtow {
 	}
 
 	private func scene() -> Things {
-		return Things()
+		let s = Things()
+
+		return s
 	}
 
 	func render() {

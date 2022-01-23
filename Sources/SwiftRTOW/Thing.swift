@@ -3,12 +3,12 @@ struct Binding {
 	var p: P
 	var normal: V
 	var facing: Bool
-	var optics: Optics
+	var optics: Optics?
 }
 
 protocol Thing {
-	var center: P! { get set }
-	var optics: Optics! { get set }
+	var center: P { get set }
+	var optics: Optics? { get set }
 
-	func hit(ray: Ray, tmin: Float, tmax: Float, binding: Binding) -> Bool
+	func hit(ray: Ray, tmin: Float, tmax: Float, binding: inout Binding) -> Bool
 }
