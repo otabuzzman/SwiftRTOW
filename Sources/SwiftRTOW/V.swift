@@ -27,14 +27,6 @@ class V {
 	func isnear0() -> Bool {
 		return abs(x)<kNear0 && abs(y)<kNear0 && abs(z)<kNear0
 	}
-
-	static func rNd() -> V {
-		return V(x: rnd(), y: rnd(), z: rnd())
-	}
-
-	static func rNd(min: Float, max: Float) -> V {
-		return V(x: rnd(min: min, max: max), y: rnd(min: min, max: max), z: rnd(min: min, max: max))
-	}
 }
 
 extension V {
@@ -82,6 +74,14 @@ extension V {
 	static func /=(lhs: inout V, rhs: Float) {
 		lhs = lhs/rhs
 	}
+
+	static func rNd() -> V {
+		return V(x: rnd(), y: rnd(), z: rnd())
+	}
+
+	static func rNd(min: Float, max: Float) -> V {
+		return V(x: rnd(min: min, max: max), y: rnd(min: min, max: max), z: rnd(min: min, max: max))
+	}
 }
 
 typealias P = V
@@ -101,7 +101,7 @@ func unitV(v: V) -> V {
 
 func rndVin1sphere() -> V {
 	while true {
-		let v = V.rNd(min: -1, max: 1 )
+		let v = V.rNd(min: -1, max: 1)
 		if (1>v.dot()) {
 			return v
 		}
@@ -109,7 +109,7 @@ func rndVin1sphere() -> V {
 }
 
 func rndVon1sphere() -> V {
-	return unitV(v: rndVin1sphere() )
+	return unitV(v: rndVin1sphere())
 }
 
 func rndVoppraydir(n: V) -> V {
@@ -128,10 +128,10 @@ func rndVin1disk() -> V {
 }
 
 func reflect(v: V, n: V) -> V {
-	return v-2*dot(a: v, b: n )*n
+	return v-2*dot(a: v, b: n)*n
 }
 
-func refract(v: V, n: V, ratio: Float ) -> V {
+func refract(v: V, n: V, ratio: Float) -> V {
 	let theta = min(dot(a: -v, b: n), 1.0)
 	let perpen = ratio*(v+theta*n)
 	let parall = -(abs(1.0-perpen.dot())).squareRoot()*n
