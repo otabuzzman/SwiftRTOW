@@ -1,7 +1,8 @@
 class Ray {
-	var ori = P(x: 0, y: 0, z: 0)
-	var dir = V(x: 0, y: 0, z: 0)
+	var ori = P()
+	var dir = V()
 
+	init() {}
 	init(ori: P, dir: V) {
 		self.ori = ori
 		self.dir = dir

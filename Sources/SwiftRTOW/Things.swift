@@ -1,5 +1,5 @@
 class Things: Thing {
-	var center = P(x: 0, y: 0, z: 0)
+	var center = P()
 	var optics: Optics? = nil
 
 	private var things: [Thing] = []
@@ -9,7 +9,7 @@ class Things: Thing {
 	}
 
 	func hit(ray: Ray, tmin: Float, tmax: Float, binding: inout Binding) -> Bool {
-		var buffer = Binding(t: 0, p: P(x: 0, y: 0, z: 0), normal: V(x: 0, y: 0, z: 0), facing: true, optics: nil)
+		var buffer = Binding(t: 0, p: P(), normal: V(), facing: true, optics: nil)
 		var shot = false
 		var tact = tmax
 

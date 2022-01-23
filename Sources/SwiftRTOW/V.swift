@@ -3,6 +3,7 @@ class V {
 	var y: Float = 0
 	var z: Float = 0
 
+	init() {}
 	init(x: Float, y: Float, z: Float) {
 		self.x = x
 		self.y = y

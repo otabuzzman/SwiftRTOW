@@ -1,13 +1,15 @@
 class Camera {
-	private var eye = P(x: 0, y: 0, z: 0)
+	private var eye = P()
 	private var aperture: Float = 0
 
-	var u = V(x: 0, y: 0, z: 0)
-	var v = V(x: 0, y: 0, z: 0)
-	var w = V(x: 0, y: 0, z: 0)
-	var hvec = V(x: 0, y: 0, z: 0)
-	var wvec = V(x: 0, y: 0, z: 0)
-	var dvec = V(x: 0, y: 0, z: 0)
+	var u = V()
+	var v = V()
+	var w = V()
+	var hvec = V()
+	var wvec = V()
+	var dvec = V()
+
+	init() {}
 
 	func set(eye: P, pat: P, vup: V, fov: Float, aspratio: Float, aperture: Float, fostance: Float) {
 		self.eye = eye
