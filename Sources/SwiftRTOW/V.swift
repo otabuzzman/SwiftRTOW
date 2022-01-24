@@ -38,22 +38,22 @@ extension V {
 
 	// Va + Vb
 	static func +(lhs: V, rhs: V) -> V {
-		return V(x: lhs.x+rhs.x, y: lhs.y+rhs.y, z: lhs.x+rhs.y)
+		return V(x: lhs.x+rhs.x, y: lhs.y+rhs.y, z: lhs.z+rhs.z)
 	}
 
 	// Va - Vb
 	static func -(lhs: V, rhs: V) -> V {
-		return V(x: lhs.x-rhs.x, y: lhs.y-rhs.y, z: lhs.x-rhs.y)
+		return V(x: lhs.x-rhs.x, y: lhs.y-rhs.y, z: lhs.z-rhs.z)
 	}
 
 	// Va * Vb
 	static func *(lhs: V, rhs: V) -> V {
-		return V(x: lhs.x*rhs.x, y: lhs.y*rhs.y, z: lhs.x*rhs.y)
+		return V(x: lhs.x*rhs.x, y: lhs.y*rhs.y, z: lhs.z￼*rhs.z)
 	}
 
 	// x * V
 	static func *(lhs: Float, rhs: V) -> V {
-		return V(x: lhs*rhs.x, y: lhs*rhs.y, z: lhs*rhs.y)
+		return V(x: lhs*rhs.x, y: lhs*rhs.y, z: lhs*rhs.z￼)
 	}
 
 	// x / V
