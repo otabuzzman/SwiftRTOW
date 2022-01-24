@@ -9,7 +9,7 @@ class Rtow {
 		g = g.squareRoot()
 		b = b.squareRoot()
 
-		let pp3 = "\(256*clamp(x: r, min: 0, max: 0.999)) \(256*clamp(x: g, min: 0, max: 0.999)) \(256*clamp(x: b, min: 0, max: 0.999))"
+		let pp3 = "\(Int(256*clamp(x: r, min: 0, max: 0.999))) \(Int(256*clamp(x: g, min: 0, max: 0.999))) \(Int(256*clamp(x: b, min: 0, max: 0.999)))"
 
 		return pp3
 	}
