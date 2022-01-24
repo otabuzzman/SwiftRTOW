@@ -15,7 +15,7 @@ class Rtow {
 	}
 
 	private func trace(ray: Ray, scene: Things, depth: Int) -> C {
-		var binding = Binding(t: 0, p: P(), normal: V(), facing: true, optics: nil)
+		var binding = Binding()
 		if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, binding: &binding) {
 			var sprayed = Ray()
 			var attened = C()
@@ -66,7 +66,8 @@ class Rtow {
 	func render() {
 		let things = Rtow.scene()
 
-		let aspratio: Float = 16.0/9.0
+		let aspratio: Float = 4.0/3.0
+		// let aspratio: Float = 16.0/9.0
 
 		let eye = P(x: 13.0, y: 2.0, z: 3.0)
 		let pat = P(x: 0, y: 0, z: 0)
@@ -77,10 +78,13 @@ class Rtow {
 		let camera = Camera()
 		camera.set(eye: eye, pat: pat, vup: vup, fov: 20.0, aspratio: aspratio, aperture: aperture, fostance: fostance)
 
-		let w = 1280
+		let w = 320
+		// let w = 1280
 		let h = Int(Float(w)/aspratio)
-		let spp = 10
-		let depth = 50
+		let spp = 1
+		let depth = 1
+		// let spp = 10
+		// let depth = 50
 
 		print("P3")
 		print("\(w) \(h)\n255")

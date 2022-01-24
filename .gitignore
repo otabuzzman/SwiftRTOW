@@ -5,5 +5,7 @@
 xcuserdata/
 DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+*.png
+*.ppm
 tmp/
 

@@ -9,7 +9,7 @@ class Things: Thing {
 	}
 
 	func hit(ray: Ray, tmin: Float, tmax: Float, binding: inout Binding) -> Bool {
-		var buffer = Binding(t: 0, p: P(), normal: V(), facing: true, optics: nil)
+		var buffer = Binding()
 		var shot = false
 		var tact = tmax
 

@@ -1,9 +1,9 @@
 struct Binding {
-	var t: Float
-	var p: P
-	var normal: V
-	var facing: Bool
-	var optics: Optics?
+	var t: Float = 0
+	var p = P()
+	var normal = V()
+	var facing = false
+	var optics: Optics? = nil
 }
 
 protocol Thing {
