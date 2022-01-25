@@ -1,6 +1,6 @@
 class Things: Thing {
 	var center = P()
-	var optics: Optics? = nil
+	var optics: Optics?
 
 	private var things: [Thing] = []
 

@@ -2,12 +2,12 @@ class Camera {
 	private var eye = P()
 	private var aperture: Float = 0
 
-	var u = V()
-	var v = V()
-	var w = V()
-	var hvec = V()
-	var wvec = V()
-	var dvec = V()
+	private var u = V()
+	private var v = V()
+	private var w = V()
+	private var hvec = V()
+	private var wvec = V()
+	private var dvec = V()
 
 	init() {}
 
@@ -15,9 +15,9 @@ class Camera {
 		self.eye = eye
 		self.aperture = aperture
 
-		w = unitV(v: eye-pat )
-		u = unitV(v: cross(a: vup, b: w))
-		v = cross(a: w, b: u)
+		w = (eye-pat).unitV()
+		u = (vup×w).unitV()
+		v = w×u
 
 		let h = 2.0*tan(0.5*fov*kPi/180.0)
 		let W = h*aspratio

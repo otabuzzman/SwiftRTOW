@@ -9,7 +9,7 @@ class Rtow {
 		g = g.squareRoot()
 		b = b.squareRoot()
 
-		let pp3 = "\(Int(256*clamp(x: r, min: 0, max: 0.999))) \(Int(256*clamp(x: g, min: 0, max: 0.999))) \(Int(256*clamp(x: b, min: 0, max: 0.999)))"
+		let pp3 = "\(Int(256*Util.clamp(x: r, min: 0, max: 0.999))) \(Int(256*Util.clamp(x: g, min: 0, max: 0.999))) \(Int(256*Util.clamp(x: b, min: 0, max: 0.999)))"
 
 		return pp3
 	}
@@ -26,7 +26,7 @@ class Rtow {
 			return C(x: 0, y: 0, z: 0)
 		}
 
-		let unit = unitV(v: ray.dir)
+		let unit = ray.dir.unitV()
 		let t = 0.5*(unit.y+1.0)
 
 		return (1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0)
@@ -39,15 +39,15 @@ class Rtow {
 
 		for a in -11..<11 {
 			for b in -11..<11 {
-				let select = rnd()
-				let center = P(x: Float(a)+0.9*rnd(), y: 0.2, z: Float(b)+0.9*rnd())
+				let select = Util.rnd()
+				let center = P(x: Float(a)+0.9*Util.rnd(), y: 0.2, z: Float(b)+0.9*Util.rnd())
 				if (center-P(x: 4.0, y: 0.2, z: 0)).len()>0.9 {
 					if select<0.8 {
-						let albedo = C.rNd()*C.rNd()
+						let albedo = C.rnd()*C.rnd()
 						s.add(thing: Sphere(center: center, radius: 0.2, optics: Diffuse(albedo: albedo)))
 					} else if select<0.95 {
-						let albedo = C.rNd(min: 0.5, max: 1.0)
-						let fuzz = rnd(min: 0, max: 0.5)
+						let albedo = C.rnd(min: 0.5, max: 1.0)
+						let fuzz = Util.rnd(min: 0, max: 0.5)
 						s.add(thing: Sphere(center: center, radius: 0.2, optics: Reflect(albedo: albedo, fuzz: fuzz)))
 					} else {
 						s.add(thing: Sphere(center: center, radius: 0.2, optics: Refract(index: 1.5)))
@@ -97,8 +97,8 @@ class Rtow {
 				var color = C(x: 0, y: 0, z: 0)
 				var k = 0
 				while k<spp {
-					let s = 2.0*(Float(x)+rnd())/(Float(w-1))-1.0
-					let t = 2.0*(Float(y)+rnd())/(Float(h-1))-1.0
+					let s = 2.0*(Float(x)+Util.rnd())/(Float(w-1))-1.0
+					let t = 2.0*(Float(y)+Util.rnd())/(Float(h-1))-1.0
 					let ray = camera.ray(s: s, t: t)
 					color += trace(ray: ray, scene: things, depth: depth)
 					k += 1
@@ -114,5 +114,7 @@ class Rtow {
 	static func main() {
 		let rtow = Rtow()
 		rtow.render()
+		#if os(Windows)
+		#endif
 	}
 }

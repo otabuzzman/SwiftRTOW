@@ -31,12 +31,12 @@ class Reflect: Optics {
 		self.fuzz = fuzz
 	}
 	func spray(ray: Ray, binding: Binding, attened: inout C, sprayed: inout Ray) -> Bool {
-		let r = reflect(v: unitV(v: ray.dir), n: binding.normal)
+		let r = reflect(v: ray.dir.unitV(), n: binding.normal)
 
 		sprayed = Ray(ori: binding.p, dir: r+fuzz*rndVin1sphere())
 		attened = albedo ;
 
-		return dot(a: sprayed.dir, b: binding.normal)>0
+		return sprayed.dir•binding.normal>0
 	}
 }
 
@@ -48,15 +48,15 @@ class Refract: Optics {
 	}
 
 	func spray(ray: Ray, binding: Binding, attened: inout C, sprayed: inout Ray) -> Bool {
-		let d1V = unitV(v: ray.dir)
-		let cos_theta = min(dot(a: -d1V, b: binding.normal), 1.0)
+		let d1V = ray.dir.unitV()
+		let cos_theta = min(-d1V•binding.normal, 1.0)
 		let sin_theta = (1.0-cos_theta*cos_theta).squareRoot()
 
 		let ratio = binding.facing ? 1.0/index : index
 		let cannot = ratio*sin_theta>1.0
 
 		var dir: V
-		if cannot || Refract.schlick(theta: cos_theta, ratio: ratio)>rnd() {
+		if cannot || Refract.schlick(theta: cos_theta, ratio: ratio)>Util.rnd() {
 			dir = reflect(v: d1V, n: binding.normal)
 		} else {
 			dir = refract(v: d1V, n: binding.normal, ratio: ratio)

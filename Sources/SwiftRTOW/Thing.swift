@@ -3,7 +3,7 @@ struct Binding {
 	var p = P()
 	var normal = V()
 	var facing = false
-	var optics: Optics? = nil
+	var optics: Optics?
 }
 
 protocol Thing {

@@ -1,6 +1,7 @@
 class Sphere: Thing {
 	var center: P
 	var optics: Optics?
+
 	private var radius: Float
 
 	init(center: P, radius: Float, optics: Optics) {
@@ -11,9 +12,9 @@ class Sphere: Thing {
 
 	func hit(ray: Ray, tmin: Float, tmax: Float, binding: inout Binding) -> Bool {
 		let o = ray.ori-center
-		let a = ray.dir.dot()
-		let b = dot(a: ray.dir, b: o)
-		let c = o.dot()-radius*radius
+		let a = ray.dir•ray.dir
+		let b = ray.dir•o
+		let c = o•o-radius*radius
 		let discriminant = b*b-a*c
 
 		if 0>discriminant {
@@ -33,7 +34,7 @@ class Sphere: Thing {
 		binding.t = t
 		binding.p = ray.at(t: binding.t)
 		let outward = (binding.p-center)/radius
-		binding.facing = 0>dot(a: ray.dir, b: outward)
+		binding.facing = 0>ray.dir•outward
 		binding.normal = binding.facing ? outward : -outward
 		binding.optics = optics
 
