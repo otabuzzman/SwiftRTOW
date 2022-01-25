@@ -1,6 +1,13 @@
-@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
 class Rtow {
-	private static func sRGB(color: C) -> String {
+	var imageWidth = 1200
+	var imageHeight = 800
+	var samplesPerPixel = 10
+	var traceDepth = 50
+	var camera = Camera()
+
+	private(set) var imageData: [C] = []
+
+	private static func sRGB(color: C) -> C {
 		var r = color.x
 		var g = color.y
 		var b = color.z
@@ -9,18 +16,16 @@ class Rtow {
 		g = g.squareRoot()
 		b = b.squareRoot()
 
-		let pp3 = "\(Int(256*Util.clamp(x: r, min: 0, max: 0.999))) \(Int(256*Util.clamp(x: g, min: 0, max: 0.999))) \(Int(256*Util.clamp(x: b, min: 0, max: 0.999)))"
-
-		return pp3
+		return C(x: r, y: g, z: b)
 	}
 
-	private func trace(ray: Ray, scene: Things, depth: Int) -> C {
+	private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
 		var binding = Binding()
 		if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, binding: &binding) {
 			var sprayed = Ray()
 			var attened = C()
-			if depth>0 && binding.optics!.spray(ray: ray, binding: binding, attened: &attened, sprayed: &sprayed) {
-				return attened*trace(ray: sprayed, scene: scene, depth: depth-1)
+			if traceDepth>0 && binding.optics!.spray(ray: ray, binding: binding, attened: &attened, sprayed: &sprayed) {
+				return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
 			}
 
 			return C(x: 0, y: 0, z: 0)
@@ -66,55 +71,57 @@ class Rtow {
 	func render() {
 		let things = Rtow.scene()
 
-		let aspratio: Float = 4.0/3.0
-		// let aspratio: Float = 16.0/9.0
+		var y = imageHeight
+		while y>0 {
+			y -= 1
+			var x = 0
+			while x<imageWidth {
+				var color = C(x: 0, y: 0, z: 0)
+				var k = 0
+				while k<samplesPerPixel {
+					let s = 2.0*(Float(x)+Util.rnd())/(Float(imageWidth-1))-1.0
+					let t = 2.0*(Float(y)+Util.rnd())/(Float(imageHeight-1))-1.0
+					let ray = camera.ray(s: s, t: t)
+					color += trace(ray: ray, scene: things, traceDepth: traceDepth)
+					k += 1
+				}
+				imageData.append(Rtow.sRGB(color: color/Float(samplesPerPixel)))
+				x += 1
+			}
+		}
+	}
+}
 
-		let eye = P(x: 13.0, y: 2.0, z: 3.0)
-		let pat = P(x: 0, y: 0, z: 0)
-		let vup = V(x: 0, y: 1.0, z: 0)
-		let aperture: Float = 0.1
-		let fostance: Float = 10.0
+#if os(Windows)
 
-		let camera = Camera()
-		camera.set(eye: eye, pat: pat, vup: vup, fov: 20.0, aspratio: aspratio, aperture: aperture, fostance: fostance)
-
+@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
+extension Rtow {
+	// https://www.swift.org/blog/argument-parser/
+	static func main() {
 		let w = 320
-		// let w = 1280
-		let h = Int(Float(w)/aspratio)
-		let spp = 1
-		let depth = 1
-		// let spp = 10
-		// let depth = 50
+		let h = 240
+
+		let rtow = Rtow()
+		rtow.imageWidth = w
+		rtow.imageHeight = h
+		rtow.samplesPerPixel = 1
+		rtow.traceDepth = 1
+		rtow.camera.set(aspratio: Float(w)/Float(h))
+
+		rtow.render()
 
 		print("P3")
 		print("\(w) \(h)\n255")
-
-		var y = h-1
-		while y>=0 {
-			// print("\r\(y)")
-			var x = 0
-			while x<w {
-				var color = C(x: 0, y: 0, z: 0)
-				var k = 0
-				while k<spp {
-					let s = 2.0*(Float(x)+Util.rnd())/(Float(w-1))-1.0
-					let t = 2.0*(Float(y)+Util.rnd())/(Float(h-1))-1.0
-					let ray = camera.ray(s: s, t: t)
-					color += trace(ray: ray, scene: things, depth: depth)
-					k += 1
-				}
-				print("\(Rtow.sRGB(color: color/Float(spp)))")
-				x += 1
-			}
-			y -= 1
+		var pixel = 0
+		while pixel<rtow.imageData.count {
+			let color = rtow.imageData[pixel]
+			let r = Int(256*Util.clamp(x: color.x, min: 0, max: 0.999))
+			let g = Int(256*Util.clamp(x: color.y, min: 0, max: 0.999))
+			let b = Int(256*Util.clamp(x: color.z, min: 0, max: 0.999))
+			print("\(r) \(g) \(b)")
+			pixel += 1
 		}
 	}
-
-	// https://www.swift.org/blog/argument-parser/
-	static func main() {
-		let rtow = Rtow()
-		rtow.render()
-		#if os(Windows)
-		#endif
-	}
 }
+
+#endif
