@@ -5,9 +5,16 @@ class Rtow {
 	var traceDepth = 50
 	var camera = Camera()
 
-	private(set) var imageData: [C] = []
+	private(set) var imageData: [RGBA8] = []
 
-	private static func sRGB(color: C) -> C {
+	struct RGBA8 {
+		var r: UInt8 = 0
+		var g: UInt8 = 0
+		var b: UInt8 = 0
+		var a: UInt8 = 1
+	}
+
+	private static func sRGB(color: C) -> RGBA8 {
 		var r = color.x
 		var g = color.y
 		var b = color.z
@@ -16,12 +23,20 @@ class Rtow {
 		g = g.squareRoot()
 		b = b.squareRoot()
 
-		return C(x: r, y: g, z: b)
+		r = Util.clamp(x: r, min: 0, max: 0.999)
+		g = Util.clamp(x: g, min: 0, max: 0.999)
+		b = Util.clamp(x: b, min: 0, max: 0.999)
+
+		let r8 = UInt8(256*Util.clamp(x: r, min: 0, max: 0.999))
+		let g8 = UInt8(256*Util.clamp(x: g, min: 0, max: 0.999))
+		let b8 = UInt8(256*Util.clamp(x: b, min: 0, max: 0.999))
+
+		return RGBA8(r: r8, g: g8, b: b8, a: 255)
 	}
 
 	private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
 		var binding = Binding()
-		if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, binding: &binding) {
+		if scene.hit(ray: ray, tmin: Util.kAcne0, tmax: Util.kInfinity, binding: &binding) {
 			var sprayed = Ray()
 			var attened = C()
 			if traceDepth>0 && binding.optics!.spray(ray: ray, binding: binding, attened: &attened, sprayed: &sprayed) {
@@ -91,37 +106,3 @@ class Rtow {
 		}
 	}
 }
-
-#if os(Windows)
-
-@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
-extension Rtow {
-	// https://www.swift.org/blog/argument-parser/
-	static func main() {
-		let w = 320
-		let h = 240
-
-		let rtow = Rtow()
-		rtow.imageWidth = w
-		rtow.imageHeight = h
-		rtow.samplesPerPixel = 1
-		rtow.traceDepth = 1
-		rtow.camera.set(aspratio: Float(w)/Float(h))
-
-		rtow.render()
-
-		print("P3")
-		print("\(w) \(h)\n255")
-		var pixel = 0
-		while pixel<rtow.imageData.count {
-			let color = rtow.imageData[pixel]
-			let r = Int(256*Util.clamp(x: color.x, min: 0, max: 0.999))
-			let g = Int(256*Util.clamp(x: color.y, min: 0, max: 0.999))
-			let b = Int(256*Util.clamp(x: color.z, min: 0, max: 0.999))
-			print("\(r) \(g) \(b)")
-			pixel += 1
-		}
-	}
-}
-
-#endif

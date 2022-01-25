@@ -28,7 +28,7 @@ extension V {
 	}
 
 	func isnear0() -> Bool {
-		return abs(x)<kNear0 && abs(y)<kNear0 && abs(z)<kNear0
+		return abs(x)<Util.kNear0 && abs(y)<Util.kNear0 && abs(z)<Util.kNear0
 	}
 
 	// -V

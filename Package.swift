@@ -19,6 +19,7 @@ let package = Package(
             name: "SwiftRTOW",
             dependencies: [],
             sources: [
+                "Main.swift",
                 "Rtow.swift",
                 "Thing.swift",
                 "Sphere.swift",
