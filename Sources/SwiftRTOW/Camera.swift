@@ -1,6 +1,11 @@
 class Camera {
-	private var eye = P()
-	private var aperture: Float = 0
+	private(set) var eye: P
+	private(set) var pat: P
+	private(set) var vup: V
+	private(set) var fov: Float
+	private(set) var aspratio: Float
+	private(set) var aperture: Float
+	private(set) var fostance: Float
 
 	private var u = V()
 	private var v = V()
@@ -9,21 +14,51 @@ class Camera {
 	private var wvec = V()
 	private var dvec = V()
 
-	init() {}
+	init() {
+		// RTOW default values
+		eye = P(x: 13.0, y: 2.0, z: 3.0)
+		pat = P(x: 0, y: 0, z: 0)
+		vup = V(x: 0, y: 1.0, z: 0)
+		fov = 20.0
+		aspratio = 16.0/9.0
+		aperture = 0.1
+		fostance = 10.0
 
-	func set(eye: P, pat: P, vup: V, fov: Float, aspratio: Float, aperture: Float, fostance: Float) {
-		self.eye = eye
-		self.aperture = aperture
+		set()
+	}
 
-		w = (eye-pat).unitV()
-		u = (vup×w).unitV()
+	func set(eye: P? = nil, pat: P? = nil, vup: V? = nil, fov: Float? = nil, aspratio: Float? = nil, aperture: Float? = nil, fostance: Float? = nil) {
+		if eye != nil {
+			self.eye = eye!
+		}
+		if pat != nil {
+			self.pat = pat!
+		}
+		if vup != nil {
+			self.vup = vup!
+		}
+		if fov != nil {
+			self.fov = fov!
+		}
+		if aspratio != nil {
+			self.aspratio = aspratio!
+		}
+		if aperture != nil {
+			self.aperture = aperture!
+		}
+		if fostance != nil {
+			self.fostance = fostance!
+		}
+
+		w = (self.eye-self.pat).unitV()
+		u = (self.vup×w).unitV()
 		v = w×u
 
-		let h = 2.0*tan(0.5*fov*kPi/180.0)
-		let W = h*aspratio
-		hvec = fostance*h/2.0*v
-		wvec = fostance*W/2.0*u
-		dvec = fostance*w
+		let fovHeight = 2.0*tan(0.5*self.fov*kPi/180.0)
+		let fovWidth = fovHeight*self.aspratio
+		hvec = self.fostance*fovHeight/2.0*v
+		wvec = self.fostance*fovWidth/2.0*u
+		dvec = self.fostance*w
 	}
 
 	func ray(s: Float, t: Float) -> Ray {
