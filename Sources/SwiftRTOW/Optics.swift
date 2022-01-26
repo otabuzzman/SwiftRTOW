@@ -75,16 +75,3 @@ class Refract: Optics {
 		return r0+(1.0-r0)*(1.0-theta)*(1.0-theta)*(1.0-theta)*(1.0-theta)*(1.0-theta)
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,18 +1,20 @@
-class Rtow {
-	var imageWidth = 1200
-	var imageHeight = 800
-	var samplesPerPixel = 10
-	var traceDepth = 50
-	var camera = Camera()
+public class Rtow {
+	public var imageWidth = 1200
+	public var imageHeight = 800
+	public var samplesPerPixel = 10
+	public var traceDepth = 50
+	public var camera = Camera()
 
 	private(set) var imageData: [RGBA8] = []
 
-	struct RGBA8 {
+	public struct RGBA8 {
 		var r: UInt8 = 0
 		var g: UInt8 = 0
 		var b: UInt8 = 0
 		var a: UInt8 = 1
 	}
+
+	public init() {}
 
 	private static func sRGB(color: C) -> RGBA8 {
 		var r = color.x
@@ -83,7 +85,7 @@ class Rtow {
 		return s
 	}
 
-	func render() {
+	public func render() {
 		let things = Rtow.scene()
 
 		var y = imageHeight

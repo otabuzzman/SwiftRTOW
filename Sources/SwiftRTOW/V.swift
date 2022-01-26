@@ -1,9 +1,15 @@
-﻿infix operator •: MultiplicationPrecedence
+﻿public struct float3 {
+	var x: Float
+	var y: Float
+	var z: Float
+}
+
+infix operator •: MultiplicationPrecedence
 infix operator ×: MultiplicationPrecedence
 
-typealias V = float3
-typealias P = V
-typealias C = V
+public typealias V = float3
+public typealias P = V
+public typealias C = V
 
 extension V {
 	init() {
