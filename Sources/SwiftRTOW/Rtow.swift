@@ -5,7 +5,7 @@ public class Rtow {
 	public var traceDepth = 50
 	public var camera = Camera()
 
-	private(set) var imageData: [RGBA8] = []
+	public var imageData: [RGBA8] = []
 
 	public struct RGBA8 {
 		var r: UInt8 = 0

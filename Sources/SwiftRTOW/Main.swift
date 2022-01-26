@@ -3,18 +3,18 @@
 import SwiftUI
 
 extension UIImage {
-	convenience init?(imageData: [RGBA8], imageWidth: Int, imageHeight: Int) {
+	convenience init?(imageData: [Rtow.RGBA8], imageWidth: Int, imageHeight: Int) {
 		guard imageWidth>0 && imageHeight>0, imageData.count == imageWidth*imageHeight else {
 			return nil
 		}
 
 		var imageData_ = imageData
 		let dataPointee = UnsafeRawPointer(&imageData_)
-		guard let dataProvider = CGDataProvider(data: Data(bytes: dataPointee, count: imageData.count*MemoryLayout<RGBA8>.size) as CFData) else {
+		guard let dataProvider = CGDataProvider(data: Data(bytes: dataPointee, count: imageData.count*MemoryLayout<Rtow.RGBA8>.size) as CFData) else {
 			return nil
 		}
 
-		guard let image = CGImage( width: imageWidth, height: imageHeight, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: imageWidth*MemoryLayout<RGBA8>.size, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue), provider: dataProvider, decode: nil, shouldInterpolate: true, intent: .defaultIntent) else {
+		guard let image = CGImage( width: imageWidth, height: imageHeight, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: imageWidth*MemoryLayout<Rtow.RGBA8>.size, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue), provider: dataProvider, decode: nil, shouldInterpolate: true, intent: .defaultIntent) else {
 			return nil
 		}
 
@@ -50,7 +50,7 @@ extension Rtow {
 			p += 1
 		}
 		#else
-		guard let image = UIIimage(imageData: rtow.imageData, imageWidth: rtow.imageWidth, imageHeight: rtow.imageHeight) else {
+		guard let image = UIImage(imageData: rtow.imageData, imageWidth: rtow.imageWidth, imageHeight: rtow.imageHeight) else {
 			fatalError("UIImage failed")
 		}
 		#endif
