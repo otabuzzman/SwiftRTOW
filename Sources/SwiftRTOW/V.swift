@@ -1,23 +1,15 @@
-﻿public struct float3 {
-	var x: Float
-	var y: Float
-	var z: Float
-}
+﻿#if !os(Windows)
+import simd
+#endif
 
 infix operator •: MultiplicationPrecedence
 infix operator ×: MultiplicationPrecedence
 
-public typealias V = float3
+public typealias V = SIMD3<Float>
 public typealias P = V
 public typealias C = V
 
 extension V {
-	init() {
-		x = 0
-		y = 0
-		z = 0
-	}
-
 	// V[0], V[1], V[2]
 	subscript(index: Int) -> Float {
 		let i = index%3
