@@ -7,7 +7,7 @@ extension UIImage {
 		}
 
 		guard let dataProvider = (imageData.withUnsafeBytes { (dataPointee: UnsafeRawBufferPointer) -> CGDataProvider? in
-			return CGDataProvider(data: Data(bytes: dataPointee.baseAddress!, count: imageData.count*MemoryLayout<Rtow.RGBA8>.size)
+			return CGDataProvider(data: Data(bytes: dataPointee.baseAddress!, count: imageData.count*MemoryLayout<Rtow.RGBA8>.size) as CFData)
 		}) else {
 			return nil
 		}
