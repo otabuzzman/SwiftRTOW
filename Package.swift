@@ -18,8 +18,9 @@ let package = Package(
         .executableTarget(
             name: "SwiftRTOW",
             dependencies: [],
+            exclude: [
+                "UIImage.swift"],
             sources: [
-                "Main.swift",
                 "Rtow.swift",
                 "Thing.swift",
                 "Sphere.swift",

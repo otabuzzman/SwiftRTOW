@@ -5,7 +5,7 @@ public class Rtow {
 	public var traceDepth = 50
 	public var camera = Camera()
 
-	public var imageData: [RGBA8] = []
+	private(set) var imageData: [RGBA8] = []
 
 	public struct RGBA8 {
 		var r: UInt8 = 0
@@ -108,3 +108,34 @@ public class Rtow {
 		}
 	}
 }
+
+#if os(Windows)
+
+@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
+extension Rtow {
+	// https://www.swift.org/blog/argument-parser/
+	static func main() {
+		let w = 320
+		let h = 240
+
+		let rtow = Rtow()
+		rtow.imageWidth = w
+		rtow.imageHeight = h
+		rtow.samplesPerPixel = 1
+		rtow.traceDepth = 1
+		rtow.camera.set(aspratio: Float(w)/Float(h))
+
+		rtow.render()
+
+		print("P3")
+		print("\(w) \(h)\n255")
+		var p = 0
+		while p<rtow.imageData.count {
+			let pixel = rtow.imageData[p]
+			print("\(pixel.r) \(pixel.g) \(pixel.b)")
+			p += 1
+		}
+	}
+}
+
+#endif
