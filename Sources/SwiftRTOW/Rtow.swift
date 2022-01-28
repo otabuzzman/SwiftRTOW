@@ -5,13 +5,13 @@ public class Rtow {
 	public var traceDepth = 50
 	public var camera = Camera()
 
-	private(set) var imageData: [RGBA8] = []
+	private(set) var imageData: [RGBA8]?
 
 	public struct RGBA8 {
 		var r: UInt8 = 0
 		var g: UInt8 = 0
 		var b: UInt8 = 0
-		var a: UInt8 = 1
+		var a: UInt8 = 255
 	}
 
 	public init() {}
@@ -86,6 +86,8 @@ public class Rtow {
 	}
 
 	public func render() {
+		imageData = .init(repeating: .init(r: 0, g: 0, b: 0, a: 255), count: imageWidth*imageHeight)
+
 		let things = Rtow.scene()
 
 		var y = imageHeight
@@ -102,7 +104,7 @@ public class Rtow {
 					color += trace(ray: ray, scene: things, traceDepth: traceDepth)
 					k += 1
 				}
-				imageData.append(Rtow.sRGB(color: color/Float(samplesPerPixel)))
+				imageData![y*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
 				x += 1
 			}
 		}
@@ -130,8 +132,8 @@ extension Rtow {
 		print("P3")
 		print("\(w) \(h)\n255")
 		var p = 0
-		while p<rtow.imageData.count {
-			let pixel = rtow.imageData[p]
+		while p<rtow.imageData!.count {
+			let pixel = rtow.imageData![p]
 			print("\(pixel.r) \(pixel.g) \(pixel.b)")
 			p += 1
 		}
