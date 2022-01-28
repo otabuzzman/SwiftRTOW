@@ -90,6 +90,7 @@ public class Rtow {
 
 		let things = Rtow.scene()
 
+		var i = 0
 		var y = imageHeight
 		while y>0 {
 			y -= 1
@@ -104,7 +105,8 @@ public class Rtow {
 					color += trace(ray: ray, scene: things, traceDepth: traceDepth)
 					k += 1
 				}
-				imageData![y*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
+				imageData![i] = Rtow.sRGB(color: color/Float(samplesPerPixel))
+				i += 1
 				x += 1
 			}
 		}
