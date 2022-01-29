@@ -30,11 +30,11 @@ public class Rtow {
 	}
 
 	private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
-		var binding = Binding()
-		if scene.hit(ray: ray, tmin: Util.kAcne0, tmax: Util.kInfinity, binding: &binding) {
+		var rayload = Rayload()
+		if scene.hit(ray: ray, tmin: Util.kAcne0, tmax: Util.kInfinity, rayload: &rayload) {
 			var sprayed = Ray()
 			var attened = C()
-			if traceDepth>0 && binding.optics!.spray(ray: ray, binding: binding, attened: &attened, sprayed: &sprayed) {
+			if traceDepth>0 && rayload.optics!.spray(ray: ray, rayload: rayload, attened: &attened, sprayed: &sprayed) {
 				return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
 			}
 

@@ -1,5 +1,5 @@
 protocol Optics {
-	func spray(ray: Ray, binding: Binding, attened: inout C, sprayed: inout Ray) -> Bool
+	func spray(ray: Ray, rayload: Rayload, attened: inout C, sprayed: inout Ray) -> Bool
 }
 
 class Diffuse: Optics {
@@ -9,13 +9,13 @@ class Diffuse: Optics {
 		self.albedo = albedo
 	}
 
-	func spray(ray: Ray, binding: Binding, attened: inout C, sprayed: inout Ray) -> Bool {
-		var dir = binding.normal+rndVon1sphere()
+	func spray(ray: Ray, rayload: Rayload, attened: inout C, sprayed: inout Ray) -> Bool {
+		var dir = rayload.normal+rndVon1sphere()
 		if dir.isnear0() {
-			dir = binding.normal
+			dir = rayload.normal
 		}
 
-		sprayed = Ray(ori: binding.p, dir: dir) ;
+		sprayed = Ray(ori: rayload.p, dir: dir) ;
 		attened = albedo ;
 
 		return true ;
@@ -30,13 +30,13 @@ class Reflect: Optics {
 		self.albedo = albedo
 		self.fuzz = fuzz
 	}
-	func spray(ray: Ray, binding: Binding, attened: inout C, sprayed: inout Ray) -> Bool {
-		let r = reflect(v: ray.dir.unitV(), n: binding.normal)
+	func spray(ray: Ray, rayload: Rayload, attened: inout C, sprayed: inout Ray) -> Bool {
+		let r = reflect(v: ray.dir.unitV(), n: rayload.normal)
 
-		sprayed = Ray(ori: binding.p, dir: r+fuzz*rndVin1sphere())
+		sprayed = Ray(ori: rayload.p, dir: r+fuzz*rndVin1sphere())
 		attened = albedo ;
 
-		return sprayed.dir•binding.normal>0
+		return sprayed.dir•rayload.normal>0
 	}
 }
 
@@ -47,22 +47,22 @@ class Refract: Optics {
 		self.index = index
 	}
 
-	func spray(ray: Ray, binding: Binding, attened: inout C, sprayed: inout Ray) -> Bool {
+	func spray(ray: Ray, rayload: Rayload, attened: inout C, sprayed: inout Ray) -> Bool {
 		let d1V = ray.dir.unitV()
-		let cos_theta = min(-d1V•binding.normal, 1.0)
+		let cos_theta = min(-d1V•rayload.normal, 1.0)
 		let sin_theta = (1.0-cos_theta*cos_theta).squareRoot()
 
-		let ratio = binding.facing ? 1.0/index : index
+		let ratio = rayload.facing ? 1.0/index : index
 		let cannot = ratio*sin_theta>1.0
 
 		var dir: V
 		if cannot || Refract.schlick(theta: cos_theta, ratio: ratio)>Util.rnd() {
-			dir = reflect(v: d1V, n: binding.normal)
+			dir = reflect(v: d1V, n: rayload.normal)
 		} else {
-			dir = refract(v: d1V, n: binding.normal, ratio: ratio)
+			dir = refract(v: d1V, n: rayload.normal, ratio: ratio)
 		}
 
-		sprayed = Ray(ori: binding.p, dir: dir)
+		sprayed = Ray(ori: rayload.p, dir: dir)
 		attened = C(x: 1.0, y: 1.0, z: 1.1)
 
 		return true

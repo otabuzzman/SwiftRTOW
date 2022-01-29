@@ -10,7 +10,7 @@ class Sphere: Thing {
 		self.optics = optics ;
 	}
 
-	func hit(ray: Ray, tmin: Float, tmax: Float, binding: inout Binding) -> Bool {
+	func hit(ray: Ray, tmin: Float, tmax: Float, rayload: inout Rayload) -> Bool {
 		let o = ray.ori-center
 		let a = ray.dir•ray.dir
 		let b = ray.dir•o
@@ -31,12 +31,12 @@ class Sphere: Thing {
 			}
 		}
 
-		binding.t = t
-		binding.p = ray.at(t: binding.t)
-		let outward = (binding.p-center)/radius
-		binding.facing = 0>ray.dir•outward
-		binding.normal = binding.facing ? outward : -outward
-		binding.optics = optics
+		rayload.t = t
+		rayload.p = ray.at(t: rayload.t)
+		let outward = (rayload.p-center)/radius
+		rayload.facing = 0>ray.dir•outward
+		rayload.normal = rayload.facing ? outward : -outward
+		rayload.optics = optics
 
 		return true
 	}

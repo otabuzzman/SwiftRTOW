@@ -8,16 +8,16 @@ class Things: Thing {
 		things.append(thing)
 	}
 
-	func hit(ray: Ray, tmin: Float, tmax: Float, binding: inout Binding) -> Bool {
-		var buffer = Binding()
+	func hit(ray: Ray, tmin: Float, tmax: Float, rayload: inout Rayload) -> Bool {
+		var buffer = Rayload()
 		var shot = false
 		var tact = tmax
 
 		for thing in things {
-			if thing.hit(ray: ray, tmin: tmin, tmax: tact, binding: &buffer) {
+			if thing.hit(ray: ray, tmin: tmin, tmax: tact, rayload: &buffer) {
 				shot = true
 				tact = buffer.t
-				binding = buffer
+				rayload = buffer
 			}
 		}
 
