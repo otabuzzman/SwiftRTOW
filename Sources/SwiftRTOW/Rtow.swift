@@ -1,3 +1,5 @@
+public typealias Pixel = SIMD4<UInt8>
+
 public class Rtow {
 	public var imageWidth = 1200
 	public var imageHeight = 800
@@ -5,18 +7,9 @@ public class Rtow {
 	public var traceDepth = 50
 	public var camera = Camera()
 
-	private(set) var imageData: [RGBA8]?
-
-	public struct RGBA8 {
-		var r: UInt8 = 0
-		var g: UInt8 = 0
-		var b: UInt8 = 0
-		var a: UInt8 = 255
-	}
-
 	public init() {}
 
-	private static func sRGB(color: C) -> RGBA8 {
+	private static func sRGB(color: C) -> Pixel {
 		var r = color.x
 		var g = color.y
 		var b = color.z
@@ -33,7 +26,7 @@ public class Rtow {
 		let g8 = UInt8(256*Util.clamp(x: g, min: 0, max: 0.999))
 		let b8 = UInt8(256*Util.clamp(x: b, min: 0, max: 0.999))
 
-		return RGBA8(r: r8, g: g8, b: b8, a: 255)
+		return Pixel(x: r8, y: g8, z: b8, w: 255)
 	}
 
 	private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
@@ -85,10 +78,12 @@ public class Rtow {
 		return s
 	}
 
-	public func render() {
-		imageData = .init(repeating: .init(r: 0, g: 0, b: 0, a: 255), count: imageWidth*imageHeight)
-
+	public func render(tiles: UInt = 1, range: Range<UInt> = 0..<1) -> [Pixel] {
 		let things = Rtow.scene()
+
+		var imageData: [Pixel] = .init(
+			repeating: .init(x: 0, y: 0, z: 0, w: 255),
+			count: imageWidth*imageHeight)
 
 		var i = 0
 		var y = imageHeight
@@ -105,11 +100,13 @@ public class Rtow {
 					color += trace(ray: ray, scene: things, traceDepth: traceDepth)
 					k += 1
 				}
-				imageData![i] = Rtow.sRGB(color: color/Float(samplesPerPixel))
+				imageData[i] = Rtow.sRGB(color: color/Float(samplesPerPixel))
 				i += 1
 				x += 1
 			}
 		}
+
+		return imageData
 	}
 }
 
@@ -129,14 +126,14 @@ extension Rtow {
 		rtow.traceDepth = 1
 		rtow.camera.set(aspratio: Float(w)/Float(h))
 
-		rtow.render()
+		let imageData = rtow.render()
 
 		print("P3")
 		print("\(w) \(h)\n255")
 		var p = 0
-		while p<rtow.imageData!.count {
-			let pixel = rtow.imageData![p]
-			print("\(pixel.r) \(pixel.g) \(pixel.b)")
+		while p<imageData.count {
+			let pixel = imageData[p]
+			print("\(pixel.x) \(pixel.y) \(pixel.z)")
 			p += 1
 		}
 	}

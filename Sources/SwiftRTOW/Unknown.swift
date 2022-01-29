@@ -8,6 +8,13 @@ public struct SIMD3<T> {
 	var z: Float = 0
 }
 
+public struct SIMD4<T> {
+	var x: UInt8 = 0
+	var y: UInt8 = 0
+	var z: UInt8 = 0
+	var w: UInt8 = 0
+}
+
 func tan(_ rad: Float) -> Float {
 	return 0.176
 }
