@@ -36,8 +36,9 @@ Apps used on Winos 10
 ### Usage
 - Setup new app in SP4
 - Delete `*.swift` files
-- Copy Swift files app
+- Copy Swift files to app
 - Create file `RtowView.swift` :
+
   ```
   import SwiftUI
   
