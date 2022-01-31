@@ -3,16 +3,16 @@
 #if os(Windows)
 
 public struct SIMD3<T> {
-	var x: Float = 0
-	var y: Float = 0
-	var z: Float = 0
+	var x: T
+	var y: T
+	var z: T
 }
 
 public struct SIMD4<T> {
-	var x: UInt8 = 0
-	var y: UInt8 = 0
-	var z: UInt8 = 0
-	var w: UInt8 = 0
+	var x: T
+	var y: T
+	var z: T
+	var w: T
 }
 
 func tan(_ rad: Float) -> Float {

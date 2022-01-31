@@ -35,7 +35,7 @@ public class Rtow {
         var rayload = Rayload()
         if scene.hit(ray: ray, tmin: Util.kAcne0, tmax: Util.kInfinity, rayload: &rayload) {
             var sprayed = Ray()
-            var attened = C()
+            var attened = C(x: 0,y: 0, z: 0)
             if traceDepth>0 && rayload.optics!.spray(ray: ray, rayload: rayload, attened: &attened, sprayed: &sprayed) {
                 return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
             }
@@ -126,13 +126,13 @@ extension Rtow {
         rtow.traceDepth = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
-        let imageData = rtow.render()
+        rtow.render()
         
         print("P3")
         print("\(w) \(h)\n255")
         var p = 0
-        while p<imageData.count {
-            let pixel = imageData[p]
+        while p<rtow.imageData!.count {
+            let pixel = rtow.imageData![p]
             print("\(pixel.x) \(pixel.y) \(pixel.z)")
             p += 1
         }

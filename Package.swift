@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftRTOW",
     platforms: [
-        .iOS(.v13), // .v15 requires Swift 5.5
+        .iOS(.v15),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.

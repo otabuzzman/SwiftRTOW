@@ -11,12 +11,12 @@ public class Camera {
 	private(set) var aperture: Float
 	private(set) var fostance: Float
 
-	private var u = V()
-	private var v = V()
-	private var w = V()
-	private var hvec = V()
-	private var wvec = V()
-	private var dvec = V()
+	private var u = V(x: 0,y: 0, z: 0)
+	private var v = V(x: 0,y: 0, z: 0)
+	private var w = V(x: 0,y: 0, z: 0)
+	private var hvec = V(x: 0,y: 0, z: 0)
+	private var wvec = V(x: 0,y: 0, z: 0)
+	private var dvec = V(x: 0,y: 0, z: 0)
 
 	public init() {
 		// RTOW default values

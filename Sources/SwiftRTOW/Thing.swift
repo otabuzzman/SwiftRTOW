@@ -1,7 +1,7 @@
 struct Rayload {
 	var t: Float = 0
-	var p = P()
-	var normal = V()
+	var p = P(x: 0,y: 0, z: 0)
+	var normal = V(x: 0,y: 0, z: 0)
 	var facing = false
 	var optics: Optics?
 }

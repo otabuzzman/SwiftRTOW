@@ -1,5 +1,5 @@
 class Things: Thing {
-	var center = P()
+	var center = P(x: 0,y: 0, z: 0)
 	var optics: Optics?
 
 	private var things: [Thing] = []
