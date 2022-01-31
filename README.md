@@ -10,6 +10,7 @@ Apps used on iPad
 
 Apps used on Winos 10
 - [Swift on Windows](https://www.swift.org/blog/swift-on-windows/) 5.5
+- [ImageMagick](https://imagemagick.org/script/download.php) 7
 
 ### Setup
 - Create repository on GitHub (default settings)
@@ -33,7 +34,25 @@ Apps used on Winos 10
   swift run
   ```
 
-### Usage
+### Usage on Windows
+- Clone repository from GitHub
+- Run commands in top-level directory
+
+```
+# run (background) implies build
+swift run >rtow.ppm
+
+# foreground run
+.build\debug\SwiftRTOW.exe >rtow.ppm
+
+# convert result to PNG
+magick rtow.ppm rtow.png
+
+# show result
+cmd /c rtow.png
+```
+
+### Usage in Swift Playgrounds 4
 - Setup new app in SP4
 - Delete `*.swift` files
 - Copy Swift files to app
@@ -84,7 +103,6 @@ Apps used on Winos 10
                   raycer.imageWidth = 320
                   raycer.imageHeight = 240
                   raycer.samplesPerPixel = 1
-                  raycer.traceDepth = 1
                   raycer.camera.set(aspratio: 320.0/240.0)
                   
                   raycer.render()
