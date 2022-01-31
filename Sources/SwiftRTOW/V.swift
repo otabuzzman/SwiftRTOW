@@ -79,6 +79,11 @@ extension V {
 		lhs = rhs*lhs
 	}
 
+	// Va *= Vb
+	static func *=(lhs: inout V, rhs: V) {
+		lhs = rhs*lhs
+	}
+
 	// Va /= x
 	static func /=(lhs: inout V, rhs: Float) {
 		lhs = lhs/rhs

@@ -33,6 +33,7 @@ public class Rtow {
     
     private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
         var rayload = Rayload()
+        #if RECURSIVE
         if scene.hit(ray: ray, tmin: Util.kAcne0, tmax: Util.kInfinity, rayload: &rayload) {
             var sprayed = Ray()
             var attened = C(x: 0,y: 0, z: 0)
@@ -47,6 +48,27 @@ public class Rtow {
         let t = 0.5*(unit.y+1.0)
         
         return (1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0)
+        #else // ITERATIVE
+        var sprayed = ray
+        var attened = C(x: 1.0, y: 1.0, z: 1.0)
+        var d = 0
+        while d<traceDepth {
+            if !scene.hit(ray: sprayed, tmin: Util.kAcne0, tmax: Util.kInfinity, rayload: &rayload) {
+                let unit = sprayed.dir.unitV()
+                let t = 0.5*(unit.y+1.0)
+                
+                return attened*((1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0))
+            }
+            var c = C(x: 0, y: 0, z: 0)
+            if !rayload.optics!.spray(ray: sprayed, rayload: rayload, attened: &c, sprayed: &sprayed) {
+                return C(x: 0, y: 0, z: 0)
+            }
+            attened *= c
+            d += 1
+        }
+        
+        return attened
+        #endif // RECURSIVE
     }
     
     private static func scene() -> Things {
@@ -123,7 +145,6 @@ extension Rtow {
         rtow.imageWidth = w
         rtow.imageHeight = h
         rtow.samplesPerPixel = 1
-        rtow.traceDepth = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
         rtow.render()

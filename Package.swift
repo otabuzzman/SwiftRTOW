@@ -30,7 +30,9 @@ let package = Package(
                 "Ray.swift",
                 "Util.swift",
                 "V.swift",
-                "Unknown.swift"]),
+                "Unknown.swift"],
+            swiftSettings: [
+                .define("ITERATIVE")]), // RECURSIVE
         .testTarget(
             name: "SwiftRTOWTests",
             dependencies: ["SwiftRTOW"]),
