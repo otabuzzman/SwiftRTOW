@@ -12,7 +12,7 @@ Apps used on Winos 10
 - [Swift on Windows](https://www.swift.org/blog/swift-on-windows/) 5.6[^1]
 - [ImageMagick](https://imagemagick.org/script/download.php) 7
 
-[^1] Swift concurrency does not work in 5.5 ([post](https://forums.swift.org/t/swift-concurrency-dep-access-violation-on-task-deallocation/54224))
+[^1]: Swift concurrency does not work in 5.5 ([post](https://forums.swift.org/t/swift-concurrency-dep-access-violation-on-task-deallocation/54224))
 
 ### Setup
 - Create repository on GitHub (default settings)
@@ -58,6 +58,7 @@ cmd /c rtow.png
 - Setup new app in SP4
 - Delete `*.swift` files
 - Copy Swift files to app
+
   The tedious approach to getting the files into the app is to manually build each file (except `Unknown.swift`) found in `Sources/SwiftaRROW` in SP4, leave them empty for now, and then copy&paste the contents file by file. For instance, one could open the repository in Safari, click on each file, copy its contents, switch to SP4, create the file and paste the clipboard into it.
 
   The much easier approach is to just copy the files from one folder to another. Unfortunately *hides* SP4 the project folders and launches the app when trying to open them using *Files*. Accessing the repository folder on iPad is a little hurdle as well.
