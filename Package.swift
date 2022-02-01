@@ -19,7 +19,8 @@ let package = Package(
             name: "SwiftRTOW",
             dependencies: [],
             exclude: [
-                "UIImage.swift"],
+                "UIImage.swift",
+                "RtowView.swift"],
             sources: [
                 "Rtow.swift",
                 "Thing.swift",
@@ -28,8 +29,8 @@ let package = Package(
                 "Optics.swift",
                 "Camera.swift",
                 "Ray.swift",
-                "Util.swift",
                 "V.swift",
+                "Util.swift",
                 "Unknown.swift"],
             swiftSettings: [
                 .define("ITERATIVE")]), // RECURSIVE
