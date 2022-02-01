@@ -1,4 +1,4 @@
-class Things: Thing {
+class Things: Thing, @unchecked Sendable {
 	var center = P(x: 0,y: 0, z: 0)
 	var optics: Optics?
 

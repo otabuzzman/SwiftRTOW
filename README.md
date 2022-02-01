@@ -9,8 +9,10 @@ Apps used on iPad
 - [GitHub](https://apps.apple.com/us/app/github/id1477376905)
 
 Apps used on Winos 10
-- [Swift on Windows](https://www.swift.org/blog/swift-on-windows/) 5.5
+- [Swift on Windows](https://www.swift.org/blog/swift-on-windows/) 5.6[^1]
 - [ImageMagick](https://imagemagick.org/script/download.php) 7
+
+[^1] Swift concurrency does not work in 5.5 ([post](https://forums.swift.org/t/swift-concurrency-dep-access-violation-on-task-deallocation/54224))
 
 ### Setup
 - Create repository on GitHub (default settings)

@@ -1,6 +1,6 @@
 public typealias Pixel = SIMD4<UInt8>
 
-public class Rtow {
+public class Rtow: @unchecked Sendable {
     public var imageWidth = 1200
     public var imageHeight = 800
     public var samplesPerPixel = 10
@@ -107,7 +107,62 @@ public class Rtow {
         return s
     }
     
-    public func render() {
+    public func render(numRowsAtOnce threads: Int = 1) async {
+        let things = Rtow.scene()
+        
+        imageData = .init(
+            repeating: .init(x: 0, y: 0, z: 0, w: 255),
+            count: imageWidth*imageHeight)
+        
+        var threadGroupSize = max(threads, 1)
+        
+        var y = 0
+        while y<imageHeight {
+            let rowsRemaining = -1+imageHeight-1
+            if threadGroupSize>rowsRemaining {
+                threadGroupSize = rowsRemaining
+            }
+            
+            var devNull = DevNull()
+            dump("", to: &devNull)
+            
+            await withTaskGroup(of: Void.self) { threadGroup in
+                let baseRow = y
+                for rowIndex in 0..<threadGroupSize {
+                    threadGroup.addTask {
+                        let y = baseRow+rowIndex
+                        var x = 0
+                        while x<self.imageWidth {
+                            var color = C(x: 0, y: 0, z: 0)
+                            var k = 0
+                            while k<self.samplesPerPixel {
+                                let s = 2.0*(Float(x)+Util.rnd())/(Float(self.imageWidth-1))-1.0
+                                let t = 2.0*(Float(y)+Util.rnd())/(Float(self.imageHeight-1))-1.0
+                                let ray = self.camera.ray(s: s, t: t)
+                                color += self.trace(ray: ray, scene: things, traceDepth: self.traceDepth)
+                                k += 1
+                            }
+                            self.imageData![(-1+self.imageHeight-y)*self.imageWidth+x] = Rtow.sRGB(color: color/Float(self.samplesPerPixel))
+                            x += 1
+                        }
+                    }
+                }
+            }
+            y += threadGroupSize
+        }
+    }
+}
+
+struct DevNull: TextOutputStream {
+    mutating func write(_ string: String) {
+    }
+}
+
+#if os(Windows)
+
+@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
+extension Rtow {
+    func render() {
         let things = Rtow.scene()
         
         imageData = .init(
@@ -133,14 +188,9 @@ public class Rtow {
             y += 1
         }
     }
-}
-
-#if os(Windows)
-
-@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
-extension Rtow {
+    
     // https://www.swift.org/blog/argument-parser/
-    static func main() {
+    static func main() async {
         let w = 320
         let h = 240
         
@@ -150,7 +200,7 @@ extension Rtow {
         rtow.samplesPerPixel = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
-        rtow.render()
+        await rtow.render(numRowsAtOnce: 4)
         
         print("P3")
         print("\(w) \(h)\n255")
