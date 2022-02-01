@@ -44,7 +44,7 @@ struct ContentView: View {
                 raycer.samplesPerPixel = 1
                 raycer.camera.set(aspratio: 320.0/240.0)
                 
-                await rtow.render(numRowsAtOnce: 4)
+                await raycer.render(numRowsAtOnce: 12)
                 update.toggle()
             }
     }

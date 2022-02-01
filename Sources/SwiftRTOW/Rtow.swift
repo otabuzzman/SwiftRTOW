@@ -123,8 +123,15 @@ public class Rtow: @unchecked Sendable {
                 threadGroupSize = rowsRemaining
             }
             
+            #if os(Windows)
+            struct DevNull: TextOutputStream {
+                mutating func write(_ string: String) {
+                }
+            }
+            
             var devNull = DevNull()
             dump("", to: &devNull)
+            #endif
             
             await withTaskGroup(of: Void.self) { threadGroup in
                 let baseRow = y
@@ -153,10 +160,6 @@ public class Rtow: @unchecked Sendable {
     }
 }
 
-struct DevNull: TextOutputStream {
-    mutating func write(_ string: String) {
-    }
-}
 
 #if os(Windows)
 
