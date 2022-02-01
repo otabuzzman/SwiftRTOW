@@ -33,7 +33,9 @@ public class Rtow {
     
     private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
         var rayload = Rayload()
+        
         #if RECURSIVE
+        
         if scene.hit(ray: ray, tmin: Util.kAcne0, tmax: Util.kInfinity, rayload: &rayload) {
             var sprayed = Ray()
             var attened = C(x: 0,y: 0, z: 0)
@@ -48,7 +50,9 @@ public class Rtow {
         let t = 0.5*(unit.y+1.0)
         
         return (1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0)
+        
         #else // ITERATIVE
+        
         var sprayed = ray
         var attened = C(x: 1.0, y: 1.0, z: 1.0)
         var d = 0
@@ -68,6 +72,7 @@ public class Rtow {
         }
         
         return attened
+        
         #endif // RECURSIVE
     }
     
@@ -102,17 +107,15 @@ public class Rtow {
         return s
     }
     
-    public func render(tiles: UInt = 1, range: Range<UInt> = 0..<1) {
+    public func render() {
         let things = Rtow.scene()
         
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
         
-        var i = 0
-        var y = imageHeight
-        while y>0 {
-            y -= 1
+        var y = 0
+        while y<imageHeight {
             var x = 0
             while x<imageWidth {
                 var color = C(x: 0, y: 0, z: 0)
@@ -124,10 +127,10 @@ public class Rtow {
                     color += trace(ray: ray, scene: things, traceDepth: traceDepth)
                     k += 1
                 }
-                imageData![i] = Rtow.sRGB(color: color/Float(samplesPerPixel))
-                i += 1
+                imageData![(-1+imageHeight-y)*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
                 x += 1
             }
+            y += 1
         }
     }
 }
