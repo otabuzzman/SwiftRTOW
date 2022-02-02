@@ -123,20 +123,10 @@ public class Rtow: @unchecked Sendable {
                 threadGroupSize = rowsRemaining
             }
             
-            #if os(Windows)
-            struct DevNull: TextOutputStream {
-                mutating func write(_ string: String) {
-                }
-            }
-            
-            var devNull = DevNull()
-            dump("", to: &devNull)
-            #endif
-            
-            await withTaskGroup(of: Void.self) { threadGroup in
+            await withTaskGroup(of: Void.self) { [unowned things] threadGroup in
                 let baseRow = y
                 for rowIndex in 0..<threadGroupSize {
-                    threadGroup.addTask { [self] in
+                    threadGroup.addTask { [unowned self, unowned things] in
                         let y = baseRow+rowIndex
                         var x = 0
                         while x<imageWidth {
