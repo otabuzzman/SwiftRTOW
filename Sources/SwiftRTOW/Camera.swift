@@ -58,7 +58,7 @@ public class Camera {
 		u = (self.vup×w).unitV()
 		v = w×u
 
-		let fovHeight = 2.0*tan(0.5*self.fov*Util.kPi/180.0)
+		let fovHeight = 2.0*tan(0.5*self.fov*kPi/180.0)
 		let fovWidth = fovHeight*self.aspratio
 		hvec = self.fostance*fovHeight/2.0*v
 		wvec = self.fostance*fovWidth/2.0*u
