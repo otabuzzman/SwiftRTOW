@@ -1,15 +1,15 @@
-public typealias Pixel = SIMD4<UInt8>
+typealias Pixel = SIMD4<UInt8>
 
-public class Rtow: @unchecked Sendable {
-    public var imageWidth = 1200
-    public var imageHeight = 800
-    public var samplesPerPixel = 10
-    public var traceDepth = 50
-    public var camera = Camera()
+class Rtow: @unchecked Sendable {
+    var imageWidth = 1200
+    var imageHeight = 800
+    var samplesPerPixel = 10
+    var traceDepth = 50
+    var camera = Camera()
     
     private(set) var imageData: [Pixel]?
     
-    public init() {}
+    init() {}
     
     private static func sRGB(color: C) -> Pixel {
         var r = color.x
@@ -107,7 +107,7 @@ public class Rtow: @unchecked Sendable {
         return s
     }
     
-    public func render(numRowsAtOnce threads: Int = 1) async {
+    func render(numRowsAtOnce threads: Int = 1) async {
         let things = Rtow.scene()
         
         imageData = .init(

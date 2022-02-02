@@ -3,13 +3,13 @@
 #if os(Windows)
 
 // SP4: import simd
-public struct SIMD3<T> {
+struct SIMD3<T> {
 	var x: T
 	var y: T
 	var z: T
 }
 
-public struct SIMD4<T> {
+struct SIMD4<T> {
 	var x: T
 	var y: T
 	var z: T

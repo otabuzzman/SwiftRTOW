@@ -2,7 +2,7 @@
 import Foundation
 #endif
 
-public class Camera {
+class Camera {
 	private(set) var eye: P
 	private(set) var pat: P
 	private(set) var vup: V
@@ -18,7 +18,7 @@ public class Camera {
 	private var wvec = V(x: 0, y: 0, z: 0)
 	private var dvec = V(x: 0, y: 0, z: 0)
 
-	public init() {
+	init() {
 		// RTOW default values
 		eye = P(x: 13.0, y: 2.0, z: 3.0)
 		pat = P(x: 0, y: 0, z: 0)
@@ -31,7 +31,7 @@ public class Camera {
 		set()
 	}
 
-	public func set(eye: P? = nil, pat: P? = nil, vup: V? = nil, fov: Float? = nil, aspratio: Float? = nil, aperture: Float? = nil, fostance: Float? = nil) {
+	func set(eye: P? = nil, pat: P? = nil, vup: V? = nil, fov: Float? = nil, aspratio: Float? = nil, aperture: Float? = nil, fostance: Float? = nil) {
 		if eye != nil {
 			self.eye = eye!
 		}
@@ -65,7 +65,7 @@ public class Camera {
 		dvec = self.fostance*w
 	}
 
-	public func ray(s: Float, t: Float) -> Ray {
+	func ray(s: Float, t: Float) -> Ray {
 		let r = aperture/2.0*rndVin1disk()
 		let o = r.x*u+r.y*v
 

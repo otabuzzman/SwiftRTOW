@@ -5,9 +5,9 @@ import simd
 infix operator •: MultiplicationPrecedence
 infix operator ×: MultiplicationPrecedence
 
-public typealias V = SIMD3<Float>
-public typealias P = V
-public typealias C = V
+typealias V = SIMD3<Float>
+typealias P = V
+typealias C = V
 
 extension V {
 	// V[0], V[1], V[2]
