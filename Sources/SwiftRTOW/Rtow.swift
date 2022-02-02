@@ -107,7 +107,7 @@ class Rtow: @unchecked Sendable {
         return s
     }
     
-    func render(numRowsAtOnce threads: Int = 1) async {
+    func render(numRowsAtOnce threads: Int) async {
         let things = Rtow.scene()
         
         imageData = .init(
