@@ -19,8 +19,8 @@ let package = Package(
             name: "SwiftRTOW",
             dependencies: [],
             exclude: [
-                "UIImage.swift",
-                "RtowView.swift"],
+                "RtowView.swift",
+                "UIImage.swift"],
             sources: [
                 "Rtow.swift",
                 "Thing.swift",

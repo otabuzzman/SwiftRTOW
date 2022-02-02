@@ -55,12 +55,6 @@ cmd /c rtow.png
 ```
 
 ### Usage in Swift Playgrounds 4
-- Setup new app in SP4
-- Delete `*.swift` files
-- Copy Swift files to app
-
-  The tedious approach to getting the files into the app is to manually build each file (except `Unknown.swift`) found in `Sources/SwiftaRROW` in SP4, leave them empty for now, and then copy&paste the contents file by file. For instance, one could open the repository in Safari, click on each file, copy its contents, switch to SP4, create the file and paste the clipboard into it.
-
-  The much easier approach is to just copy the files from one folder to another. Unfortunately *hides* SP4 the project folders and launches the app when trying to open them using *Files*. Accessing the repository folder on iPad is a little hurdle as well.
-
-  To solve these, the repository needs first to be cloned somewhere into the file system where it is accessible for the iPad (e.g. using *Working Copy*). After that, the files can be copied by using a tool that allows for *real* file access on iPad (e.g. *Textastic*).
+- Ceate new app in SP4
+- Delete predefined `*.swift` files in app
+- Copy&paste Swift files from repository to app
