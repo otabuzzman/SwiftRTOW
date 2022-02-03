@@ -34,24 +34,7 @@ class Rtow: @unchecked Sendable {
     private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
         var rayload = Rayload()
         
-        #if RECURSIVE
-        
-        if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
-            var sprayed = Ray()
-            var attened = C(x: 0,y: 0, z: 0)
-            if traceDepth>0 && rayload.optics!.spray(ray: ray, rayload: rayload, attened: &attened, sprayed: &sprayed) {
-                return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
-            }
-            
-            return C(x: 0, y: 0, z: 0)
-        }
-        
-        let unit = ray.dir.unitV()
-        let t = 0.5*(unit.y+1.0)
-        
-        return (1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0)
-        
-        #else // ITERATIVE
+        #if ITERATIVE
         
         var sprayed = ray
         var attened = C(x: 1.0, y: 1.0, z: 1.0)
@@ -73,7 +56,24 @@ class Rtow: @unchecked Sendable {
         
         return attened
         
-        #endif // RECURSIVE
+        #else // RECURSIVE (original RTOW)
+        
+        if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
+            var sprayed = Ray()
+            var attened = C(x: 0,y: 0, z: 0)
+            if traceDepth>0 && rayload.optics!.spray(ray: ray, rayload: rayload, attened: &attened, sprayed: &sprayed) {
+                return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
+            }
+            
+            return C(x: 0, y: 0, z: 0)
+        }
+        
+        let unit = ray.dir.unitV()
+        let t = 0.5*(unit.y+1.0)
+        
+        return (1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0)
+        
+        #endif // ITERATIVE
     }
     
     private static func scene() -> Things {
@@ -106,6 +106,8 @@ class Rtow: @unchecked Sendable {
         
         return s
     }
+    
+    #if CONCURRENT
     
     func render(numRowsAtOnce threads: Int) async {
         let things = Rtow.scene()
@@ -148,13 +150,9 @@ class Rtow: @unchecked Sendable {
             y += threadGroupSize
         }
     }
-}
-
-
-#if os(Windows)
-
-@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
-extension Rtow {
+    
+    #else // SINGLETASK (original RTOW)
+    
     func render() {
         let things = Rtow.scene()
         
@@ -182,6 +180,15 @@ extension Rtow {
         }
     }
     
+    #endif // CONCURRENT
+}
+
+
+
+#if os(Windows)
+
+@main // https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageDescription.md#target
+extension Rtow {
     // https://www.swift.org/blog/argument-parser/
     static func main() async {
         let w = 320
@@ -193,7 +200,11 @@ extension Rtow {
         rtow.samplesPerPixel = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
+        #if CONCURRENT
         await rtow.render(numRowsAtOnce: 4)
+        #else
+        rtow.render()
+        #endif
         
         print("P3")
         print("\(w) \(h)\n255")
