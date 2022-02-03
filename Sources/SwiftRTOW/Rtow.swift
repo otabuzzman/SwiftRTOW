@@ -31,16 +31,16 @@ class Rtow: @unchecked Sendable {
         return Pixel(x: r8, y: g8, z: b8, w: 255)
     }
     
-    private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
+    private func trace(ray: Ray, things: Things, traceDepth: Int) -> C {
         var rayload = Rayload()
         
         #if RECURSIVE // (original RTOW)
         
-        if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
+        if things.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
             var sprayed = Ray()
             var attened = C(x: 0,y: 0, z: 0)
             if traceDepth>0 && rayload.optics!.spray(ray: ray, rayload: rayload, attened: &attened, sprayed: &sprayed) {
-                return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
+                return attened*trace(ray: sprayed, things: things, traceDepth: traceDepth-1)
             }
             
             return C(x: 0, y: 0, z: 0)
@@ -57,7 +57,7 @@ class Rtow: @unchecked Sendable {
         var attened = C(x: 1.0, y: 1.0, z: 1.0)
         var d = 0
         while d<traceDepth {
-            if !scene.hit(ray: sprayed, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
+            if !things.hit(ray: sprayed, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
                 let unit = sprayed.dir.unitV()
                 let t = 0.5*(unit.y+1.0)
                 
@@ -93,7 +93,7 @@ class Rtow: @unchecked Sendable {
                     let s = 2.0*(Float(x)+Util.rnd())/(Float(imageWidth-1))-1.0
                     let t = 2.0*(Float(y)+Util.rnd())/(Float(imageHeight-1))-1.0
                     let ray = camera.ray(s: s, t: t)
-                    color += trace(ray: ray, scene: things, traceDepth: traceDepth)
+                    color += trace(ray: ray, things: things, traceDepth: traceDepth)
                     k += 1
                 }
                 imageData![(-1+imageHeight-y)*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
@@ -132,7 +132,7 @@ class Rtow: @unchecked Sendable {
                                 let s = 2.0*(Float(x)+Util.rnd())/(Float(imageWidth-1))-1.0
                                 let t = 2.0*(Float(y)+Util.rnd())/(Float(imageHeight-1))-1.0
                                 let ray = camera.ray(s: s, t: t)
-                                color += trace(ray: ray, scene: things, traceDepth: traceDepth)
+                                color += trace(ray: ray, things: things, traceDepth: traceDepth)
                                 k += 1
                             }
                             imageData![(-1+imageHeight-y)*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
