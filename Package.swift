@@ -23,6 +23,7 @@ let package = Package(
                 "UIImage.swift"],
             sources: [
                 "Rtow.swift",
+                "Stage.swift",
                 "Thing.swift",
                 "Sphere.swift",
                 "Things.swift",
