@@ -49,6 +49,7 @@ struct ContentView: View {
                 await raycer.render(numRowsAtOnce: 12, things: things)
                 update.toggle()
             }
+            .aspectRatio(contentMode: .fill)
     }
 }
 
