@@ -5,8 +5,8 @@ class Rtow: @unchecked Sendable {
     var imageHeight = 800
     var samplesPerPixel = 10
     var traceDepth = 50
-    var camera = Camera()
     
+    private(set) var camera = Camera()
     private(set) var imageData: [Pixel]?
     
     init() {}
@@ -76,42 +76,9 @@ class Rtow: @unchecked Sendable {
         #endif // RECURSIVE
     }
     
-    private static func scene() -> Things {
-        let s = Things()
-        
-        s.add(thing: Sphere(center: P(x: 0, y: -1000.0, z: 0), radius: 1000.0, optics: Diffuse(albedo: C(x: 0.5, y: 0.5, z: 0.5))))
-        
-        for a in -11..<11 {
-            for b in -11..<11 {
-                let select = Util.rnd()
-                let center = P(x: Float(a)+0.9*Util.rnd(), y: 0.2, z: Float(b)+0.9*Util.rnd())
-                if (center-P(x: 4.0, y: 0.2, z: 0)).len()>0.9 {
-                    if select<0.8 {
-                        let albedo = C.rnd()*C.rnd()
-                        s.add(thing: Sphere(center: center, radius: 0.2, optics: Diffuse(albedo: albedo)))
-                    } else if select<0.95 {
-                        let albedo = C.rnd(min: 0.5, max: 1.0)
-                        let fuzz = Util.rnd(min: 0, max: 0.5)
-                        s.add(thing: Sphere(center: center, radius: 0.2, optics: Reflect(albedo: albedo, fuzz: fuzz)))
-                    } else {
-                        s.add(thing: Sphere(center: center, radius: 0.2, optics: Refract(index: 1.5)))
-                    }
-                }
-            }
-        }
-        
-        s.add(thing: Sphere(center: P(x: 0, y: 1.0, z: 0), radius: 1.0, optics: Refract(index: 1.5)))
-        s.add(thing: Sphere(center: P(x: -4.0, y: 1.0, z: 0), radius: 1.0, optics: Diffuse(albedo: C(x: 0.4, y: 0.2, z: 0.1))))
-        s.add(thing: Sphere(center: P(x: 4.0, y: 1.0, z: 0), radius: 1.0, optics: Reflect(albedo: C(x: 0.7, y: 0.6, z: 0.5), fuzz: 0)))
-        
-        return s
-    }
-    
     #if SINGLETASK // (original RTOW)
     
-    func render() {
-        let things = Rtow.scene()
-        
+    func render(things: Stage) {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
@@ -138,9 +105,7 @@ class Rtow: @unchecked Sendable {
     
     #else // CONCURRENT
     
-    func render(numRowsAtOnce threads: Int) async {
-        let things = Rtow.scene()
-        
+    func render(numRowsAtOnce threads: Int, things: Stage) async {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
@@ -200,10 +165,13 @@ extension Rtow {
         rtow.samplesPerPixel = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
+        let things = Stage()
+        things.load()
+        
         #if SINGLETASK
-        rtow.render()
+        rtow.render(things: things)
         #else
-        await rtow.render(numRowsAtOnce: 4)
+        await rtow.render(numRowsAtOnce: 4, things: things)
         #endif
         
         print("P3")
