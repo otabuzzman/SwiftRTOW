@@ -33,8 +33,9 @@ let package = Package(
                 "Util.swift",
                 "Unknown.swift"],
             swiftSettings: [
-                .define("ITERATIVE"),
-                .define("CONCURRENT")]),
+                // .define("RECURSIVE"), // default ITERATIVE
+                // .define("SINGLETASK"), // default CONCURRENT
+                ]),
         .testTarget(
             name: "SwiftRTOWTests",
             dependencies: ["SwiftRTOW"]),

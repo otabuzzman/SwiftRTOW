@@ -34,7 +34,24 @@ class Rtow: @unchecked Sendable {
     private func trace(ray: Ray, scene: Things, traceDepth: Int) -> C {
         var rayload = Rayload()
         
-        #if ITERATIVE
+        #if RECURSIVE // (original RTOW)
+        
+        if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
+            var sprayed = Ray()
+            var attened = C(x: 0,y: 0, z: 0)
+            if traceDepth>0 && rayload.optics!.spray(ray: ray, rayload: rayload, attened: &attened, sprayed: &sprayed) {
+                return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
+            }
+            
+            return C(x: 0, y: 0, z: 0)
+        }
+        
+        let unit = ray.dir.unitV()
+        let t = 0.5*(unit.y+1.0)
+        
+        return (1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0)
+        
+        #else // ITERATIVE
         
         var sprayed = ray
         var attened = C(x: 1.0, y: 1.0, z: 1.0)
@@ -56,24 +73,7 @@ class Rtow: @unchecked Sendable {
         
         return attened
         
-        #else // RECURSIVE (original RTOW)
-        
-        if scene.hit(ray: ray, tmin: kAcne0, tmax: kInfinity, rayload: &rayload) {
-            var sprayed = Ray()
-            var attened = C(x: 0,y: 0, z: 0)
-            if traceDepth>0 && rayload.optics!.spray(ray: ray, rayload: rayload, attened: &attened, sprayed: &sprayed) {
-                return attened*trace(ray: sprayed, scene: scene, traceDepth: traceDepth-1)
-            }
-            
-            return C(x: 0, y: 0, z: 0)
-        }
-        
-        let unit = ray.dir.unitV()
-        let t = 0.5*(unit.y+1.0)
-        
-        return (1.0-t)*C(x: 1.0, y: 1.0, z: 1.0)+t*C(x: 0.5, y: 0.7, z: 1.0)
-        
-        #endif // ITERATIVE
+        #endif // RECURSIVE
     }
     
     private static func scene() -> Things {
@@ -107,7 +107,36 @@ class Rtow: @unchecked Sendable {
         return s
     }
     
-    #if CONCURRENT
+    #if SINGLETASK // (original RTOW)
+    
+    func render() {
+        let things = Rtow.scene()
+        
+        imageData = .init(
+            repeating: .init(x: 0, y: 0, z: 0, w: 255),
+            count: imageWidth*imageHeight)
+        
+        var y = 0
+        while y<imageHeight {
+            var x = 0
+            while x<imageWidth {
+                var color = C(x: 0, y: 0, z: 0)
+                var k = 0
+                while k<samplesPerPixel {
+                    let s = 2.0*(Float(x)+Util.rnd())/(Float(imageWidth-1))-1.0
+                    let t = 2.0*(Float(y)+Util.rnd())/(Float(imageHeight-1))-1.0
+                    let ray = camera.ray(s: s, t: t)
+                    color += trace(ray: ray, scene: things, traceDepth: traceDepth)
+                    k += 1
+                }
+                imageData![(-1+imageHeight-y)*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
+                x += 1
+            }
+            y += 1
+        }
+    }
+    
+    #else // CONCURRENT
     
     func render(numRowsAtOnce threads: Int) async {
         let things = Rtow.scene()
@@ -151,36 +180,7 @@ class Rtow: @unchecked Sendable {
         }
     }
     
-    #else // SINGLETASK (original RTOW)
-    
-    func render() {
-        let things = Rtow.scene()
-        
-        imageData = .init(
-            repeating: .init(x: 0, y: 0, z: 0, w: 255),
-            count: imageWidth*imageHeight)
-        
-        var y = 0
-        while y<imageHeight {
-            var x = 0
-            while x<imageWidth {
-                var color = C(x: 0, y: 0, z: 0)
-                var k = 0
-                while k<samplesPerPixel {
-                    let s = 2.0*(Float(x)+Util.rnd())/(Float(imageWidth-1))-1.0
-                    let t = 2.0*(Float(y)+Util.rnd())/(Float(imageHeight-1))-1.0
-                    let ray = camera.ray(s: s, t: t)
-                    color += trace(ray: ray, scene: things, traceDepth: traceDepth)
-                    k += 1
-                }
-                imageData![(-1+imageHeight-y)*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
-                x += 1
-            }
-            y += 1
-        }
-    }
-    
-    #endif // CONCURRENT
+    #endif // SINGLETASK
 }
 
 
@@ -200,10 +200,10 @@ extension Rtow {
         rtow.samplesPerPixel = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
-        #if CONCURRENT
-        await rtow.render(numRowsAtOnce: 4)
-        #else
+        #if SINGLETASK
         rtow.render()
+        #else
+        await rtow.render(numRowsAtOnce: 4)
         #endif
         
         print("P3")
