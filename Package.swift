@@ -23,7 +23,6 @@ let package = Package(
                 "UIImage.swift"],
             sources: [
                 "Rtow.swift",
-                "Stage.swift",
                 "Thing.swift",
                 "Sphere.swift",
                 "Things.swift",
@@ -32,6 +31,7 @@ let package = Package(
                 "Ray.swift",
                 "V.swift",
                 "Util.swift",
+                "Ch13.swift",
                 "Unknown.swift"],
             swiftSettings: [
                 // .define("RECURSIVE"), // default ITERATIVE

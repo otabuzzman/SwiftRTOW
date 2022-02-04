@@ -1,4 +1,4 @@
-class Stage: Things, @unchecked Sendable {
+class Ch13: @unchecked Sendable, Things {
     var things: [Thing]! = []
     
     func load() {

@@ -78,7 +78,7 @@ class Rtow: @unchecked Sendable {
     
     #if SINGLETASK // (original RTOW)
     
-    func render(things: Stage) {
+    func render(things: Things) {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
@@ -105,7 +105,7 @@ class Rtow: @unchecked Sendable {
     
     #else // CONCURRENT
     
-    func render(numRowsAtOnce threads: Int, things: Stage) async {
+    func render(numRowsAtOnce threads: Int, things: Things) async {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
@@ -119,10 +119,10 @@ class Rtow: @unchecked Sendable {
                 threadGroupSize = rowsRemaining
             }
             
-            await withTaskGroup(of: Void.self) { [unowned things] threadGroup in
+            await withTaskGroup(of: Void.self) { [things] threadGroup in
                 let baseRow = y
                 for rowIndex in 0..<threadGroupSize {
-                    threadGroup.addTask { [unowned self, unowned things] in
+                    threadGroup.addTask { [unowned self, things] in
                         let y = baseRow+rowIndex
                         var x = 0
                         while x<imageWidth {
@@ -165,7 +165,7 @@ extension Rtow {
         rtow.samplesPerPixel = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
-        let things = Stage()
+        let things = Ch13()
         things.load()
         
         #if SINGLETASK

@@ -1,4 +1,4 @@
-protocol Things {
+protocol Things: Sendable {
     var things: [Thing]! { get set }
     
     func load()
