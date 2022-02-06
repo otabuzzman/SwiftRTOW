@@ -1,6 +1,8 @@
+import SwiftUI
+
 typealias Pixel = SIMD4<UInt8>
 
-class Rtow: @unchecked Sendable {
+class Rtow: @unchecked Sendable, ObservableObject {
     var imageWidth = 1200
     var imageHeight = 800
     var samplesPerPixel = 10
@@ -8,6 +10,8 @@ class Rtow: @unchecked Sendable {
     
     private(set) var camera = Camera()
     private(set) var imageData: [Pixel]?
+    
+    @Published private(set) var rowRenderProgress = 0
     
     init() {}
     
@@ -82,6 +86,7 @@ class Rtow: @unchecked Sendable {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
+        rowRenderProgress = 0
         
         var y = 0
         while y<imageHeight {
@@ -100,6 +105,7 @@ class Rtow: @unchecked Sendable {
                 x += 1
             }
             y += 1
+            rowRenderProgress = y
         }
     }
     
@@ -109,6 +115,7 @@ class Rtow: @unchecked Sendable {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
+        rowRenderProgress = 0
         
         var threadGroupSize = max(threads, 1)
         
@@ -142,6 +149,7 @@ class Rtow: @unchecked Sendable {
                 }
             }
             y += threadGroupSize
+            rowRenderProgress = y
         }
     }
     
