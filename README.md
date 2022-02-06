@@ -40,19 +40,19 @@ Apps used on Winos 10
 - Clone repository from GitHub
 - Run commands in top-level directory
 
-```
-# run (background) implies build
-swift run >rtow.ppm
+  ```
+  rem run (background) implies build
+  swift run --configuration release >rtow.ppm
 
-# foreground run
-.build\debug\SwiftRTOW.exe >rtow.ppm
+  rem foreground run
+  .build\debug\SwiftRTOW.exe >rtow.ppm
 
-# convert result to PNG
-magick rtow.ppm rtow.png
+  rem convert result to PNG
+  magick rtow.ppm rtow.png
 
-# show result
-cmd /c rtow.png
-```
+  rem show result
+  cmd /c rtow.png
+  ```
 
 ### Usage in Swift Playgrounds 4
 - Ceate new app in SP4
