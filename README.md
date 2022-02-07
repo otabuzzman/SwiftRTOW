@@ -42,8 +42,8 @@ Apps used on Winos 10
 
   ```
   rem run (background) implies build
-  rem default build configuration is debug
-  swift run --configuration release >rtow.ppm
+  rem default configuration is debug
+  swift run >rtow.ppm
 
   rem foreground run
   .build\debug\SwiftRTOW.exe >rtow.ppm
@@ -62,6 +62,7 @@ Apps used on Winos 10
 - Ceate new app[^2] in SP4
 - Delete predefined `*.swift` files in app
 - Copy&paste Swift files from repository to app
+
   - Get repository on iPad (Working Copy)
   - Copy files from WC to SP4 folder (Textastic)
 
