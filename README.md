@@ -1,11 +1,11 @@
 # SwiftRTOW
-Peter Shirley's ray tracer from his mini-book [Ray Tracing in one weekend](https://github.com/RayTracing/raytracing.github.io/) (RTOW).
+Peter Shirley's ray tracer from his mini-book [Ray Tracing in One Weekend](https://github.com/RayTracing/raytracing.github.io/) (RTOW). Versions for *Swift on Windows* and *Swift Playgrounds 4*.
 
 ### Tools
 Apps used on iPad
 - [Swift Playgrounds 4](https://apps.apple.com/de/app/swift-playgrounds/id908519492)
 - [Working Copy](https://workingcopyapp.com/)
-- [Textastic](https://www.textasticapp.com/) (can handle files in *Swift Playgrounds* and *Working Copy* folders)
+- [Textastic](https://www.textasticapp.com/) (can handle files in *Swift Playgrounds 4* and *Working Copy* folders)
 - [GitHub](https://apps.apple.com/us/app/github/id1477376905)
 
 Apps used on Winos 10
