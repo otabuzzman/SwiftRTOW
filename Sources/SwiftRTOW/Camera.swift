@@ -1,6 +1,4 @@
-#if !os(Windows)
 import Foundation
-#endif
 
 class Camera {
 	private(set) var eye: P

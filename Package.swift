@@ -18,10 +18,9 @@ let package = Package(
         .executableTarget(
             name: "SwiftRTOW",
             dependencies: [],
-            exclude: [
-                "RtowView.swift",
-                "UIImage.swift"],
             sources: [
+                "RtowView.swift",
+                "UIImage.swift",
                 "Rtow.swift",
                 "Thing.swift",
                 "Sphere.swift",
@@ -31,8 +30,7 @@ let package = Package(
                 "Ray.swift",
                 "V.swift",
                 "Util.swift",
-                "Ch13.swift",
-                "Unknown.swift"],
+                "Ch13.swift"],
             swiftSettings: [
                 // .define("RECURSIVE"), // default ITERATIVE
                 // .define("SINGLETASK"), // default CONCURRENT

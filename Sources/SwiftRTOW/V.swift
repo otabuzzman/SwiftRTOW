@@ -1,6 +1,4 @@
-﻿#if !os(Windows)
-import simd
-#endif
+﻿import simd
 
 infix operator •: MultiplicationPrecedence
 infix operator ×: MultiplicationPrecedence
