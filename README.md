@@ -42,10 +42,14 @@ Apps used on Winos 10
 
   ```
   rem run (background) implies build
+  rem default build configuration is debug
   swift run --configuration release >rtow.ppm
 
   rem foreground run
   .build\debug\SwiftRTOW.exe >rtow.ppm
+
+  rem build for production
+  swift build --configuration release
 
   rem convert result to PNG
   magick rtow.ppm rtow.png
@@ -55,6 +59,10 @@ Apps used on Winos 10
   ```
 
 ### Usage in Swift Playgrounds 4
-- Ceate new app in SP4
+- Ceate new app[^2] in SP4
 - Delete predefined `*.swift` files in app
 - Copy&paste Swift files from repository to app
+  - Get repository on iPad (Working Copy)
+  - Copy files from WC to SP4 folder (Textastic)
+
+[^2]: Running the code in a Playground crashes.
