@@ -50,7 +50,8 @@ struct ContentView: View {
                 course.toggle()
                 let things = Ch13()
                 things.load()
-                await raycer.render(numRowsAtOnce: 12, things: things)
+                let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
+                await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
                 update.toggle()
                 course.toggle()
             }
@@ -59,7 +60,7 @@ struct ContentView: View {
                 ProgressView(value: Float(raycer.rowRenderProgress), total: Float(raycer.imageHeight))
                     .accentColor(.purple.opacity(0.8))
                     .background(.purple.opacity(0.2))
-                .scaleEffect(y: 2, anchor: .bottom)
+                    .scaleEffect(y: 2, anchor: .bottom)
             }
         }
     }
