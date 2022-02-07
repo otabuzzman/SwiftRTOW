@@ -1,5 +1,5 @@
 # SwiftRTOW
-Peter Shirley's ray tracer from his mini-book [Ray Tracing in one weekend](https://github.com/RayTracing/raytracing.github.io/) (RTOW).
+A SwiftUI version of Peter Shirley's ray tracer from his mini-book [Ray Tracing in One Weekend](https://github.com/RayTracing/raytracing.github.io/) (RTOW).
 
 ### Tools
 Apps used on iPad
