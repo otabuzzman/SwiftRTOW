@@ -37,8 +37,5 @@ let package = Package(
                 // .define("RECURSIVE"), // default ITERATIVE
                 // .define("SINGLETASK"), // default CONCURRENT
                 ]),
-        .testTarget(
-            name: "SwiftRTOWTests",
-            dependencies: ["SwiftRTOW"]),
     ]
 )
