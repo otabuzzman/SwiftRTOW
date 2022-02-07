@@ -18,7 +18,7 @@ Apps used on Winos 10
 - `main` (this)
 
   *Swift Playgrounds 4* only. Won't compile in *Swift on Windows*.
-- `swinows`
+- `swindows`
 
   *Swift Playgrounds 4* and *Swift on Windows*. Renders (SP4)/ outputs (SoW) image from chapter 13 in view/ on stdout.
 
