@@ -15,10 +15,10 @@ Apps used on Winos 10
 [^1]: Swift concurrency does not work in 5.5 ([post](https://forums.swift.org/t/swift-concurrency-dep-access-violation-on-task-deallocation/54224))
 
 ### Branches
-- `main` (this)
+- `swinows` (this)
 
   *Swift Playgrounds 4* only. Won't compile in *Swift on Windows*.
-- `swinows`
+- `main`
 
   *Swift Playgrounds 4* and *Swift on Windows*. Renders (SP4)/ outputs (SoW) image from chapter 13 in view/ on stdout.
 
