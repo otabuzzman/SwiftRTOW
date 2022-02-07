@@ -5,7 +5,7 @@ Peter Shirley's ray tracer from his mini-book [Ray Tracing in one weekend](https
 Apps used on iPad
 - [Swift Playgrounds 4](https://apps.apple.com/de/app/swift-playgrounds/id908519492)
 - [Working Copy](https://workingcopyapp.com/)
-- [Textastic](https://www.textasticapp.com/) (can edit SP4 `.swiftpm` files)
+- [Textastic](https://www.textasticapp.com/) (can handle files in *Swift Playgrounds* and *Working Copy* folders)
 - [GitHub](https://apps.apple.com/us/app/github/id1477376905)
 
 Apps used on Winos 10
@@ -13,6 +13,14 @@ Apps used on Winos 10
 - [ImageMagick](https://imagemagick.org/script/download.php) 7
 
 [^1]: Swift concurrency does not work in 5.5 ([post](https://forums.swift.org/t/swift-concurrency-dep-access-violation-on-task-deallocation/54224))
+
+### Branches
+- `main` (this)
+
+  *Swift Playgrounds 4* only. Won't compile in *Swift on Windows*.
+- `swinows`
+
+  *Swift Playgrounds 4* and *Swift on Windows*. Renders (SP4)/ outputs (SoW) image from chapter 13 in view/ on stdout.
 
 ### Setup
 - Create repository on GitHub (default settings)
