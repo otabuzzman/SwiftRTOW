@@ -20,7 +20,7 @@ Apps used on Winos 10
 
   **Cygwin command prompt (bash)**
   ```
-  git clone https://github.com/otabuzzman/SwiftRTOW
+  git clone https://github.com/otabuzzman/SwiftRTOW.git
 
   cd SwiftRTOW
   ```
