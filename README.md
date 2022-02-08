@@ -58,20 +58,21 @@ Apps used on Winos 10
   ```
   rem run (background) implies build
   rem default configuration is debug
-  swift run >rtow.ppm
+  swift run >rtow-c13.ppm
 
   rem foreground run
-  .build\debug\SwiftRTOW.exe >rtow.ppm
+  .build\debug\SwiftRTOW.exe >rtow-c13.ppm
 
   rem build for production
   swift build --configuration release
 
   rem convert result to PNG
-  magick rtow.ppm rtow.png
+  magick rtow-c13.ppm rtow-c13.png
 
   rem show result
-  cmd /c rtow.png
+  cmd /c rtow-c13.png
   ```
+  To render images for chapter 8 and 10 replace class `C13` in file `Rtow.swift` by `Ch8` and `Ch10` respectively. Re-run commands from above accordingly.
 
 ### Usage in Swift Playgrounds 4
 - Ceate new app[^2] in SP4
