@@ -7,6 +7,6 @@ DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 *.lock
 *.png
+!rtow-*.png
 *.ppm
 tmp/
-
