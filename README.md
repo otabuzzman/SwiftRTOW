@@ -4,9 +4,9 @@ Peter Shirley's ray tracer from his mini-book [Ray Tracing in One Weekend](https
 ### Galery
 
 |RTOW samples|   |   |
-|:---|:---|
+|:---|:---|:---|
 |Image from chaper 8|Image from chapter 10|Final image from book|
-|![Image from chaper 8](./rtwo-ch8.png)|![Image from chapter 10](./rtwo-ch10.png)|![Final image from book](./rtwo-ch13.png)|
+|![Image from chaper 8](./rtow-ch8.png)|![Image from chapter 10](./rtow-ch10.png)|![Final image from book](./rtow-ch13.png)|
 
 ### Tools
 Apps used on iPad
