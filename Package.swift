@@ -21,6 +21,7 @@ let package = Package(
             sources: [
                 "RtowView.swift",
                 "UIImage.swift",
+                "Fsm.swift",
                 "Rtow.swift",
                 "Thing.swift",
                 "Sphere.swift",
