@@ -3,7 +3,7 @@ Peter Shirley's ray tracer from his mini-book [Ray Tracing in One Weekend](https
 
 ### Galery
 
-|RTOW samples|   |   |
+|RTOW samples|To reproduce see [below](#usage-on-windows)|   |
 |:---|:---|:---|
 |Image from chaper 8|Image from chapter 10|Final image from book|
 |![Image from chaper 8](./rtow-ch8.png)|![Image from chapter 10](./rtow-ch10.png)|![Final image from book](./rtow-ch13.png)|
