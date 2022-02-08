@@ -156,13 +156,12 @@ class Rtow: @unchecked Sendable {
 extension Rtow {
     // https://www.swift.org/blog/argument-parser/
     static func main() async {
-        let w = 320
-        let h = 240
+        let w = 1280
+        let h = 720
         
         let rtow = Rtow()
         rtow.imageWidth = w
         rtow.imageHeight = h
-        rtow.samplesPerPixel = 1
         rtow.camera.set(aspratio: Float(w)/Float(h))
         
         let things = Ch13()

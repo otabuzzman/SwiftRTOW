@@ -31,6 +31,8 @@ let package = Package(
                 "Ray.swift",
                 "V.swift",
                 "Util.swift",
+                "Ch8.swift",
+                "Ch10.swift",
                 "Ch13.swift",
                 "Unknown.swift"],
             swiftSettings: [
