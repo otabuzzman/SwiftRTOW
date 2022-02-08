@@ -29,7 +29,8 @@ let package = Package(
                 "Camera.swift",
                 "Ray.swift",
                 "V.swift",
-                "Util.swift",
+                "Ch8.swift",
+                "Ch10.swift",
                 "Ch13.swift"],
             swiftSettings: [
                 // .define("RECURSIVE"), // default ITERATIVE
