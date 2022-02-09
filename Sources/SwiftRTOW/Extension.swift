@@ -24,7 +24,7 @@ extension Image {
     init(forPngResource name: String) {
         guard
             let path = Bundle.module.path(forResource: name, ofType: "png"),
-            let image = UIImage(contentsOfFile: path!)
+            let image = UIImage(contentsOfFile: path)
         else {
             self.init(name)
         

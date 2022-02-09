@@ -39,37 +39,46 @@ struct ContentView: View {
     @State private var course = false
     
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            RtowView(raycer: raycer, update: $update)
-            .task {
-                raycer.imageWidth = 320
-                raycer.imageHeight = 240
-                raycer.samplesPerPixel = 1
-                raycer.camera.set(aspratio: 320.0/240.0)
+        ZStack {
+            Color.purple
+                .opacity(0.2)
+                .ignoresSafeArea()
                 
-                course.toggle()
-                let things = Ch13()
-                things.load()
-                let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
-                await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
-                update.toggle()
-                course.toggle()
+            VStack {
+                ZStack(alignment: .bottomLeading) {
+                    RtowView(raycer: raycer, update: $update)
+                    .task {
+                        raycer.imageWidth = 320
+                        raycer.imageHeight = 240
+                        raycer.samplesPerPixel = 1
+                        raycer.camera.set(aspratio: 320.0/240.0)
+                        
+                        course.toggle()
+                        let things = Ch13()
+                        things.load()
+                        let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
+                        await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
+                        update.toggle()
+                        course.toggle()
+                    }
+                    .aspectRatio(contentMode: .fill)
+                    if course {
+                        ProgressView(value: Float(raycer.rowRenderProgress), total: Float(raycer.imageHeight))
+                            .accentColor(.purple.opacity(0.8))
+                            .background(.purple.opacity(0.2))
+                            .scaleEffect(y: 2, anchor: .bottom)
+                    }
+                }
+                
+                HStack {
+                    Button("Chapter 8") {
+                    }.buttonStyle(LoadButton(image: "rtow-ch8-btn"))
+                    Button("Chapter 10") {
+                    }.buttonStyle(LoadButton(image: "rtow-ch10-btn"))
+                    Button("Chapter 13") {
+                    }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
+                }
             }
-            .aspectRatio(contentMode: .fill)
-            if course {
-                ProgressView(value: Float(raycer.rowRenderProgress), total: Float(raycer.imageHeight))
-                    .accentColor(.purple.opacity(0.8))
-                    .background(.purple.opacity(0.2))
-                    .scaleEffect(y: 2, anchor: .bottom)
-            }
-        }
-        HStack {
-            Button {
-            }.buttonStyle(LoadButton(image: "rtow-ch8-btn"))
-            Button {
-            }.buttonStyle(LoadButton(image: "rtow-ch10-btn"))
-            Button {
-            }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
         }
     }
 }
