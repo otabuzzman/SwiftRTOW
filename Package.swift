@@ -20,8 +20,9 @@ let package = Package(
             dependencies: [],
             sources: [
                 "RtowView.swift",
-                "UIImage.swift",
-                "Fsm.swift",
+                "UIFsm.swift",
+                "Style.swift",
+                "Extension.swift",
                 "Rtow.swift",
                 "Thing.swift",
                 "Sphere.swift",

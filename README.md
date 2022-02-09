@@ -16,4 +16,15 @@ Apps used on iPad
   - Get repository on iPad (Working Copy)
   - Copy files from WC to SP4 folder (Textastic)
 
+- Add PNG files with SP4 as resources to app
+
 [^1]: Running the code in a Playground crashes.
+
+### Which file for what
+|File|Comment|
+|:---|:------|
+|`CpuRTOW`<br>(folder)|A Swift implementation of RTOW. Supports Swift concurrency (multi-threading) on CPU cores and iterative ray tracing.|
+|`RtowView.swift`|The application main view.|
+|`UIFsm.swift`|The UI finite state machine.|
+|`Extension.swift`|Extensions to SwiftUI classes and protocols.|
+|`Style.swift`|SwiftUI view style configuration data and code.|

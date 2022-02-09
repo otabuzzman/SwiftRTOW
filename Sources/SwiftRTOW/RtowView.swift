@@ -63,6 +63,14 @@ struct ContentView: View {
                     .scaleEffect(y: 2, anchor: .bottom)
             }
         }
+        HStack {
+            Button {
+            }.buttonStyle(LoadButton(image: "rtow-ch8-btn"))
+            Button {
+            }.buttonStyle(LoadButton(image: "rtow-ch10-btn"))
+            Button {
+            }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
+        }
     }
 }
 
