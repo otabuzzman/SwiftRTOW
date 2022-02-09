@@ -54,7 +54,7 @@ struct ContentView: View {
                         raycer.camera.set(aspratio: 320.0/240.0)
                         
                         course.toggle()
-                        let things = Ch13()
+                        let things = Ch10()
                         things.load()
                         let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
                         await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
@@ -78,6 +78,7 @@ struct ContentView: View {
                     Button("Chapter 13") {
                     }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
                 }
+                Spacer()
             }
         }
     }
