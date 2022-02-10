@@ -20,8 +20,9 @@ struct Stack<T> {
 enum FsmState: Int {
     case CAM = 0
     case DIR
+    case LOD
     case POS
-    case RND
+    case VSC
 }
 
 enum FsmEvent: Int {
@@ -29,6 +30,7 @@ enum FsmEvent: Int {
     case CAM
     case CTL
     case DIR
+    case LOD
     case POS
     case RET
     case ROL
@@ -48,11 +50,12 @@ class Fsm {
     init(state: FsmState) {
         self.hState.push(state)
         self.EATable = [
-            /* S/E     BAL       CAM       CTL       DIR       POS       RET       ROL       VOL       ZOM     */
-            /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
-            /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
-            /* POS */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
-            /* RND */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
+            /* S/E     BAL       CAM       CTL       DIR       LOD       POS       RET       ROL       VOL       ZOM     */
+            /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* POS */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* RND */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
         ]
     }
     
