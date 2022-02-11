@@ -35,6 +35,7 @@ struct RtowView: UIViewRepresentable {
 
 struct ContentView: View {
     @StateObject private var raycer = Rtow()
+    @State private var things: Things = Ch10()
     @State private var update = false
     @State private var course = false
     
@@ -53,9 +54,9 @@ struct ContentView: View {
                         raycer.samplesPerPixel = 1
                         raycer.camera.set(aspratio: 320.0/240.0)
                         
-                        course.toggle()
-                        let things = Ch10()
                         things.load()
+                        
+                        course.toggle()
                         let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
                         await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
                         update.toggle()
@@ -72,10 +73,16 @@ struct ContentView: View {
                 
                 HStack {
                     Button("Chapter 8") {
+                        things = Ch8()
+                        things.load()
                     }.buttonStyle(LoadButton(image: "rtow-ch8-btn"))
                     Button("Chapter 10") {
+                        things = Ch10()
+                        things.load()
                     }.buttonStyle(LoadButton(image: "rtow-ch10-btn"))
                     Button("Chapter 13") {
+                        things = Ch13()
+                        things.load()
                     }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
                 }
                 Spacer()

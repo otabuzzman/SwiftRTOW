@@ -42,13 +42,13 @@ typealias FsmHState = Stack<FsmState>
 typealias FsmHEvent = Stack<FsmEvent>
 typealias FsmAction = () -> Void
 
-class Fsm {
+class UIFsm {
     var hState = FsmHState()
     var hEvent = FsmHEvent()
     var EATable: [[FsmAction]] = [[]]
     
-    init(state: FsmState) {
-        self.hState.push(state)
+    init() {
+        self.hState.push(FsmState.VSC)
         self.EATable = [
             /* S/E     BAL       CAM       CTL       DIR       LOD       POS       RET       ROL       VOL       ZOM     */
             /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
