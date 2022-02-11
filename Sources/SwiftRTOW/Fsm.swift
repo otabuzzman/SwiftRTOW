@@ -42,20 +42,20 @@ typealias FsmHState = Stack<FsmState>
 typealias FsmHEvent = Stack<FsmEvent>
 typealias FsmAction = () -> Void
 
-class UIFsm {
+class Fsm {
     var hState = FsmHState()
     var hEvent = FsmHEvent()
-    var EATable: [[FsmAction]] = [[]]
+    var eaTable: [[FsmAction]] = [[]]
     
     init() {
         self.hState.push(FsmState.VSC)
-        self.EATable = [
+        self.eaTable = [
             /* S/E     BAL       CAM       CTL       DIR       LOD       POS       RET       ROL       VOL       ZOM     */
             /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
             /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
             /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
             /* POS */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
-            /* RND */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
+            /* VSC */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
         ]
     }
     
@@ -64,7 +64,7 @@ class UIFsm {
         let e = event.rawValue
         
         self.hEvent.push(event)
-        EATable[s][e]()
+        eaTable[s][e]()
     }
     
     private func eaReject() {
