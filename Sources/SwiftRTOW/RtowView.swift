@@ -28,7 +28,6 @@ struct RtowView: UIViewRepresentable {
             imageData: raycer.imageData!,
             imageWidth: raycer.imageWidth,
             imageHeight: raycer.imageHeight)!
-        raycer.rowRenderFinished.toggle()
     }
 }
 
@@ -51,7 +50,7 @@ struct ContentView: View {
                         raycer.samplesPerPixel = 1
                         raycer.camera.set(aspratio: 320.0/240.0)
                         
-                        let things = Ch8()
+                        let things = Ch10()
                         things.load()
                         
                         course.toggle()

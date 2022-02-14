@@ -2,6 +2,7 @@ import SwiftUI
 
 typealias Pixel = SIMD4<UInt8>
 
+@MainActor
 class Rtow: @unchecked Sendable, ObservableObject {
     var imageWidth = 1200
     var imageHeight = 800
@@ -11,8 +12,8 @@ class Rtow: @unchecked Sendable, ObservableObject {
     private(set) var camera = Camera()
     private(set) var imageData: [Pixel]?
     
-    @Published var rowRenderProgress = 0
-    @Published var rowRenderFinished = false
+    @Published private(set) var rowRenderProgress = 0
+    @Published private(set) var rowRenderFinished = false
     
     init() {}
     
@@ -87,6 +88,8 @@ class Rtow: @unchecked Sendable, ObservableObject {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
+        rowRenderProgress = 0
+        rowRenderFinished = false
         
         var y = 0
         while y<imageHeight {
@@ -116,6 +119,8 @@ class Rtow: @unchecked Sendable, ObservableObject {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
+        rowRenderProgress = 0
+        rowRenderFinished = false
         
         var threadGroupSize = max(threads, 1)
         
@@ -129,7 +134,7 @@ class Rtow: @unchecked Sendable, ObservableObject {
             await withTaskGroup(of: Void.self) { [things] threadGroup in
                 let baseRow = y
                 for rowIndex in 0..<threadGroupSize {
-                    threadGroup.addTask { [unowned self, things] in
+                    threadGroup.addTask { @MainActor [unowned self, things] in
                         let y = baseRow+rowIndex
                         var x = 0
                         while x<imageWidth {
