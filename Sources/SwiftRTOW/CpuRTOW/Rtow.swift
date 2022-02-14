@@ -11,7 +11,8 @@ class Rtow: @unchecked Sendable, ObservableObject {
     private(set) var camera = Camera()
     private(set) var imageData: [Pixel]?
     
-    @Published private(set) var rowRenderProgress = 0
+    @Published var rowRenderProgress = 0
+    @Published var rowRenderFinished = false
     
     init() {}
     
@@ -86,7 +87,6 @@ class Rtow: @unchecked Sendable, ObservableObject {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
-        rowRenderProgress = 0
         
         var y = 0
         while y<imageHeight {
@@ -107,6 +107,7 @@ class Rtow: @unchecked Sendable, ObservableObject {
             y += 1
             rowRenderProgress = y
         }
+        rowRenderFinished = true
     }
     
     #else // CONCURRENT
@@ -115,7 +116,6 @@ class Rtow: @unchecked Sendable, ObservableObject {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
-        rowRenderProgress = 0
         
         var threadGroupSize = max(threads, 1)
         
@@ -151,6 +151,7 @@ class Rtow: @unchecked Sendable, ObservableObject {
             y += threadGroupSize
             rowRenderProgress = y
         }
+        rowRenderFinished = true
     }
     
     #endif // SINGLETASK

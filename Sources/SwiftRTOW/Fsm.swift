@@ -18,25 +18,14 @@ struct Stack<T> {
 }
 
 enum FsmState: Int {
-    case CAM = 0
-    case DIR
-    case LOD
-    case POS
-    case VSC
+    case CAM, DIR, LOD, POS, VSC
 }
+let FsmStateName = ["CAM", "DIR", "LOD", "POS", "VSC"]
 
 enum FsmEvent: Int {
-    case BAL = 0
-    case CAM
-    case CTL
-    case DIR
-    case LOD
-    case POS
-    case RET
-    case ROL
-    case VOL
-    case ZOM
+    case BAL, CAM, CTL, DIR, LOD, POS, RET, ROL, VOL, ZOM
 }
+let FsmEventName = ["BAL", "CAM", "CTL", "DIR", "LOD", "POS", "RET", "ROL", "VOL", "ZOM"]
 
 typealias FsmHState = Stack<FsmState>
 typealias FsmHEvent = Stack<FsmEvent>
@@ -63,12 +52,20 @@ class Fsm {
         let s = hState.peek()!.rawValue
         let e = event.rawValue
         
+        print("event \(FsmEventName[e]) received in state \(FsmStateName[s]) : ", terminator: "")
+        
         self.hEvent.push(event)
         eaTable[s][e]()
     }
     
+    var isCam: Bool { get { hState.peek() == FsmState.CAM } }
+    var isDir: Bool { get { hState.peek() == FsmState.DIR } }
+    var isLod: Bool { get { hState.peek() == FsmState.LOD } }
+    var isPos: Bool { get { hState.peek() == FsmState.POS } }
+    var isVsc: Bool { get { hState.peek() == FsmState.VSC } }
+    
     private func eaReject() {
-        print("event \(hEvent.peek()!.rawValue) rejected in state \(hState.peek()!.rawValue)")
+        print("rejected")
         
         // let currState = hState.peek()!
         // hState.pop()

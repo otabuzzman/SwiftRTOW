@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct RtowView: UIViewRepresentable {
-    var raycer: Rtow
-    @Binding var update: Bool
+    @EnvironmentObject var raycer: Rtow
     
     func makeUIView(context: Context) -> UIImageView {
         let w = raycer.imageWidth
@@ -21,7 +20,7 @@ struct RtowView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIImageView, context: Context) {
-        if !update {
+        if !raycer.rowRenderFinished {
             return
         }
         
@@ -29,14 +28,12 @@ struct RtowView: UIViewRepresentable {
             imageData: raycer.imageData!,
             imageWidth: raycer.imageWidth,
             imageHeight: raycer.imageHeight)!
-        update.toggle()
+        raycer.rowRenderFinished.toggle()
     }
 }
 
 struct ContentView: View {
-    @StateObject private var raycer = Rtow()
-    @State private var things: Things = Ch10()
-    @State private var update = false
+    @EnvironmentObject var raycer: Rtow
     @State private var course = false
     
     var body: some View {
@@ -47,19 +44,19 @@ struct ContentView: View {
                 
             VStack {
                 ZStack(alignment: .bottomLeading) {
-                    RtowView(raycer: raycer, update: $update)
+                    RtowView()
                     .task {
                         raycer.imageWidth = 320
                         raycer.imageHeight = 240
                         raycer.samplesPerPixel = 1
                         raycer.camera.set(aspratio: 320.0/240.0)
                         
+                        let things = Ch8()
                         things.load()
                         
                         course.toggle()
                         let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
                         await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
-                        update.toggle()
                         course.toggle()
                     }
                     .aspectRatio(contentMode: .fill)
@@ -73,15 +70,15 @@ struct ContentView: View {
                 
                 HStack {
                     Button("Chapter 8") {
-                        things = Ch8()
+                        let things = Ch8()
                         things.load()
                     }.buttonStyle(LoadButton(image: "rtow-ch8-btn"))
                     Button("Chapter 10") {
-                        things = Ch10()
+                        let things = Ch10()
                         things.load()
                     }.buttonStyle(LoadButton(image: "rtow-ch10-btn"))
                     Button("Chapter 13") {
-                        things = Ch13()
+                        let things = Ch13()
                         things.load()
                     }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
                 }
@@ -93,9 +90,12 @@ struct ContentView: View {
 
 @main
 struct MyApp: App {
+    @StateObject var raycer = Rtow()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(raycer)
         }
     }
 }
