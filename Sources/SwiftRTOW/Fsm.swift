@@ -68,8 +68,8 @@ class Fsm: ObservableObject {
     var isVsc: Bool { get { hState.peek() == FsmState.VSC } }
     
     private func eaVscLod() {
-        let raycer = eaParam.pop() as! Rtow
         let things = eaParam.pop() as! Things
+        let raycer = eaParam.peek() as! Rtow
         
         Task {
             let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3

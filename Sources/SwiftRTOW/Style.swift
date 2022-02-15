@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LoadButton: ButtonStyle {
+    @Environment(\.isEnabled) private var enabled
     var image: String
     
     func makeBody(configuration: Configuration) -> some View {
@@ -8,7 +9,7 @@ struct LoadButton: ButtonStyle {
         
         ZStack {
             Rectangle()
-                .fill(Color.purple.opacity(0.8))
+                .fill(enabled ? .purple.opacity(0.8) : .purple.opacity(0.6))
                 .cornerRadius(buttonSize*0.15)
             Image(forPngResource: image)
                 .resizable()
@@ -18,8 +19,8 @@ struct LoadButton: ButtonStyle {
                 .overlay(
                     RoundedRectangle(cornerRadius: buttonSize*0.15*0.91)
                         .fill(configuration.isPressed ?
-                              Color.purple.opacity(0.2) :
-                                Color.white.opacity(0)))
+                              .purple.opacity(0.2) :
+                                .white.opacity(0)))
         }.frame(width: buttonSize, height: buttonSize)
     }
 }

@@ -50,11 +50,11 @@ struct ContentView: View {
                         raycer.samplesPerPixel = 1
                         raycer.camera.set(aspratio: 320.0/240.0)
                         
+                        appFsm.eaParam.push(raycer)
+                        
                         let things = Ch10()
                         things.load()
-                        
                         appFsm.eaParam.push(things)
-                        appFsm.eaParam.push(raycer)
                         appFsm.transition(event: FsmEvent.LOD)
                     }
                     .aspectRatio(contentMode: .fill)
@@ -70,16 +70,22 @@ struct ContentView: View {
                     Button("Chapter 8") {
                         let things = Ch8()
                         things.load()
+                        appFsm.eaParam.push(things)
+                        appFsm.transition(event: FsmEvent.LOD)
                     }.buttonStyle(LoadButton(image: "rtow-ch8-btn"))
                     Button("Chapter 10") {
                         let things = Ch10()
                         things.load()
+                        appFsm.eaParam.push(things)
+                        appFsm.transition(event: FsmEvent.LOD)
                     }.buttonStyle(LoadButton(image: "rtow-ch10-btn"))
                     Button("Chapter 13") {
                         let things = Ch13()
                         things.load()
+                        appFsm.eaParam.push(things)
+                        appFsm.transition(event: FsmEvent.LOD)
                     }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
-                }
+                }.disabled(appFsm.isLod)
                 Spacer()
             }
         }
