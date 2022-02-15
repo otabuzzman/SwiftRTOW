@@ -1,6 +1,6 @@
 import Foundation
 
-class Camera {
+class Camera: @unchecked Sendable {
 	private(set) var eye: P
 	private(set) var pat: P
 	private(set) var vup: V
