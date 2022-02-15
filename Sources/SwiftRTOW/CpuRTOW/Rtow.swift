@@ -131,10 +131,10 @@ class Rtow: @unchecked Sendable, ObservableObject {
                 threadGroupSize = rowsRemaining
             }
             
-            await withTaskGroup(of: Void.self) { [things] threadGroup in
+            await withTaskGroup(of: Void.self) { threadGroup in
                 let baseRow = y
                 for rowIndex in 0..<threadGroupSize {
-                    threadGroup.addTask { @MainActor [unowned self, things] in
+                    threadGroup.addTask { @MainActor [unowned self] in
                         let y = baseRow+rowIndex
                         var x = 0
                         while x<imageWidth {

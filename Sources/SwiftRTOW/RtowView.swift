@@ -33,7 +33,7 @@ struct RtowView: UIViewRepresentable {
 
 struct ContentView: View {
     @EnvironmentObject var raycer: Rtow
-    @State private var course = false
+    @EnvironmentObject var appFsm: Fsm
     
     var body: some View {
         ZStack {
@@ -53,13 +53,12 @@ struct ContentView: View {
                         let things = Ch10()
                         things.load()
                         
-                        course.toggle()
-                        let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
-                        await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
-                        course.toggle()
+                        appFsm.eaParam.push(things)
+                        appFsm.eaParam.push(raycer)
+                        appFsm.transition(event: FsmEvent.LOD)
                     }
                     .aspectRatio(contentMode: .fill)
-                    if course {
+                    if appFsm.isLod {
                         ProgressView(value: Float(raycer.rowRenderProgress), total: Float(raycer.imageHeight))
                             .accentColor(.purple.opacity(0.8))
                             .background(.purple.opacity(0.2))
@@ -89,11 +88,13 @@ struct ContentView: View {
 
 @main
 struct MyApp: App {
+    @StateObject var appFsm = Fsm()
     @StateObject var raycer = Rtow()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appFsm)
                 .environmentObject(raycer)
         }
     }
