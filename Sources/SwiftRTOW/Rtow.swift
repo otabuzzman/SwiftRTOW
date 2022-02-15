@@ -1,5 +1,6 @@
 typealias Pixel = SIMD4<UInt8>
 
+@MainActor
 class Rtow: @unchecked Sendable {
     var imageWidth = 1200
     var imageHeight = 800
@@ -11,7 +12,7 @@ class Rtow: @unchecked Sendable {
     
     init() {}
     
-    private static func sRGB(color: C) -> Pixel {
+    private static nonisolated func sRGB(color: C) -> Pixel {
         var r = color.x
         var g = color.y
         var b = color.z
@@ -31,7 +32,7 @@ class Rtow: @unchecked Sendable {
         return Pixel(x: r8, y: g8, z: b8, w: 255)
     }
     
-    private func trace(ray: Ray, things: Things, traceDepth: Int) -> C {
+    private static nonisolated func trace(ray: Ray, things: Things, traceDepth: Int) -> C {
         var rayload = Rayload()
         
         #if RECURSIVE // (original RTOW)
@@ -114,15 +115,33 @@ class Rtow: @unchecked Sendable {
         
         var y = 0
         while y<imageHeight {
-            let rowsRemaining = -1+imageHeight-1
+            let rowsRemaining = imageHeight-y
             if threadGroupSize>rowsRemaining {
                 threadGroupSize = rowsRemaining
             }
             
-            await withTaskGroup(of: Void.self) { [things] threadGroup in
-                let baseRow = y
-                for rowIndex in 0..<threadGroupSize {
-                    threadGroup.addTask { [unowned self, things] in
+            let imageRows = await Rtow.render(numRowsAtOnce: threadGroupSize, baseRow: y, imageWidth: imageWidth, imageHeight: imageHeight, traceDepth: traceDepth, samplesPerPixel: samplesPerPixel, camera: camera, things: things)
+            
+            y += threadGroupSize
+            
+            for p in 0..<imageRows.count {
+                imageData![(imageHeight-y)*imageWidth+p] = imageRows[p]
+            }
+        }
+    }
+    
+    private static nonisolated func render(numRowsAtOnce: Int, baseRow: Int, imageWidth: Int, imageHeight: Int, traceDepth: Int, samplesPerPixel: Int, camera: Camera, things: Things) async -> [Pixel] {
+            var imageData: [Pixel] = .init(
+                repeating: .init(x: 0, y: 0, z: 0, w: 255),
+                count: numRowsAtOnce*imageWidth)
+
+            await withTaskGroup(of: (Int, [Pixel]).self) { threadGroup in
+                for rowIndex in 0..<numRowsAtOnce {
+                    threadGroup.addTask {
+                        var imageRow: [Pixel] = .init(
+                            repeating: .init(x: 0, y: 0, z: 0, w: 255),
+                            count: imageWidth)
+                            
                         let y = baseRow+rowIndex
                         var x = 0
                         while x<imageWidth {
@@ -132,17 +151,25 @@ class Rtow: @unchecked Sendable {
                                 let s = 2.0*(Float(x)+Util.rnd())/(Float(imageWidth-1))-1.0
                                 let t = 2.0*(Float(y)+Util.rnd())/(Float(imageHeight-1))-1.0
                                 let ray = camera.ray(s: s, t: t)
-                                color += trace(ray: ray, things: things, traceDepth: traceDepth)
+                                color += Rtow.trace(ray: ray, things: things, traceDepth: traceDepth)
                                 k += 1
                             }
-                            imageData![(-1+imageHeight-y)*imageWidth+x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
+                            imageRow[x] = Rtow.sRGB(color: color/Float(samplesPerPixel))
                             x += 1
                         }
+                        
+                        return (rowIndex, imageRow)
+                    }
+                }
+                
+                for await (rowIndex, imageRow) in threadGroup {
+                    for p in 0..<imageRow.count {
+                        imageData[(-1+numRowsAtOnce-rowIndex)*imageWidth+p] = imageRow[p]
                     }
                 }
             }
-            y += threadGroupSize
-        }
+
+        return imageData
     }
     
     #endif // SINGLETASK

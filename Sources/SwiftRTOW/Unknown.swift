@@ -9,7 +9,7 @@ struct SIMD3<T> {
 	var z: T
 }
 
-struct SIMD4<T> {
+struct SIMD4<T: Sendable>: @unchecked Sendable {
 	var x: T
 	var y: T
 	var z: T
