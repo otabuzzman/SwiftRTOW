@@ -17,7 +17,7 @@ class Rtow: @unchecked Sendable, ObservableObject {
     
     init() {}
     
-    private static nonisolated func sRGB(color: C) -> Pixel {
+    private nonisolated static func sRGB(color: C) -> Pixel {
         var r = color.x
         var g = color.y
         var b = color.z
@@ -37,7 +37,7 @@ class Rtow: @unchecked Sendable, ObservableObject {
         return Pixel(x: r8, y: g8, z: b8, w: 255)
     }
     
-    private func nonisolated trace(ray: Ray, things: Things, traceDepth: Int) -> C {
+    private nonisolated static func trace(ray: Ray, things: Things, traceDepth: Int) -> C {
         var rayload = Rayload()
         
         #if RECURSIVE // (original RTOW)
@@ -119,6 +119,8 @@ class Rtow: @unchecked Sendable, ObservableObject {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
+        rowRenderProgress = 0
+        rowRenderFinished = false
         
         var threadGroupSize = max(threads, 1)
         
@@ -136,7 +138,9 @@ class Rtow: @unchecked Sendable, ObservableObject {
             for p in 0..<imageRows.count {
                 imageData![(imageHeight-y)*imageWidth+p] = imageRows[p]
             }
+            rowRenderProgress = y
         }
+        rowRenderFinished = true
     }
     
     private static nonisolated func render(numRowsAtOnce: Int, baseRow: Int, imageWidth: Int, imageHeight: Int, traceDepth: Int, samplesPerPixel: Int, camera: Camera, things: Things) async -> [Pixel] {
