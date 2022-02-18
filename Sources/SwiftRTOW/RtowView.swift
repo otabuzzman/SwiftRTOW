@@ -35,6 +35,8 @@ struct ContentView: View {
     @EnvironmentObject var raycer: Rtow
     @EnvironmentObject var appFsm: Fsm
     
+    @State private var pressedButton = ButtonType.None
+    
     var body: some View {
         ZStack {
             Color.purple
@@ -72,19 +74,22 @@ struct ContentView: View {
                         things.load()
                         appFsm.eaParam.push(things)
                         appFsm.transition(event: FsmEvent.LOD)
-                    }.buttonStyle(LoadButton(image: "rtow-ch8-btn"))
+                        pressedButton = ButtonType.Ch8
+                    }.buttonStyle(LoadButton(pretendButton: ButtonType.Ch8, pressedButton: pressedButton, image: "rtow-ch8-btn"))
                     Button("Chapter 10") {
                         let things = Ch10()
                         things.load()
                         appFsm.eaParam.push(things)
                         appFsm.transition(event: FsmEvent.LOD)
-                    }.buttonStyle(LoadButton(image: "rtow-ch10-btn"))
+                        pressedButton = ButtonType.Ch10
+                    }.buttonStyle(LoadButton(pretendButton: ButtonType.Ch10, pressedButton: pressedButton, image: "rtow-ch10-btn"))
                     Button("Chapter 13") {
                         let things = Ch13()
                         things.load()
                         appFsm.eaParam.push(things)
                         appFsm.transition(event: FsmEvent.LOD)
-                    }.buttonStyle(LoadButton(image: "rtow-ch13-btn"))
+                        pressedButton = ButtonType.Ch13
+                    }.buttonStyle(LoadButton(pretendButton: ButtonType.Ch13, pressedButton: pressedButton, image: "rtow-ch13-btn"))
                 }.disabled(appFsm.isLod)
                 Spacer()
             }

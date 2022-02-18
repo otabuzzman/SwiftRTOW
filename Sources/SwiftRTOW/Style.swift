@@ -1,8 +1,16 @@
 import SwiftUI
 
+enum ButtonType {
+    case None, Ch8, Ch10, Ch13
+}
+
 struct LoadButton: ButtonStyle {
-    @Environment(\.isEnabled) private var enabled
+    var pretendButton: ButtonType
+    var pressedButton: ButtonType
     var image: String
+    
+    @Environment(\.isEnabled) var enabled
+    @EnvironmentObject var appFsm: Fsm
     
     func makeBody(configuration: Configuration) -> some View {
         let buttonSize: CGFloat = UIScreen.main.bounds.width*0.1
@@ -18,9 +26,11 @@ struct LoadButton: ButtonStyle {
                 .scaleEffect(0.91)
                 .overlay(
                     RoundedRectangle(cornerRadius: buttonSize*0.15*0.91)
-                        .fill(configuration.isPressed ?
+                        .fill((appFsm.isLod && (pretendButton == pressedButton)) ?
                               .purple.opacity(0.2) :
                                 .white.opacity(0)))
-        }.frame(width: buttonSize, height: buttonSize)
+        }
+        .frame(width: buttonSize, height: buttonSize)
+        .scaleEffect(configuration.isPressed ? 0.98 : 1)
     }
 }
