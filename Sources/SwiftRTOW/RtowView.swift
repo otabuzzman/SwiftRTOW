@@ -40,8 +40,7 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            Color.purple
-                .opacity(0.2)
+            Color.primaryPale
                 .ignoresSafeArea()
                 
             VStack {
@@ -70,8 +69,8 @@ struct ContentView: View {
                         ProgressView(
                             value: Float(raycer.rowRenderProgress),
                             total: Float(raycer.imageHeight))
-                            .accentColor(.purple.opacity(0.8))
-                            .background(.purple.opacity(0.2))
+                            .accentColor(.primaryRich)
+                            .background(.primaryPale)
                             .scaleEffect(y: 2, anchor: .bottom)
                             .opacity(appFsm.isLod ? 1.0 : 0)
                     }

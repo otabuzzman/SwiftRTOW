@@ -34,3 +34,39 @@ extension Image {
         self.init(uiImage: image)
     }
 }
+
+extension Color {
+    static let crystal: Color = .white.opacity(0)
+    
+    static let primary: Color = .purple
+    static let primaryRich = primary.opacity(0.8)
+    static let primarySoft = primary.opacity(0.6)
+    static let primaryPale = primary.opacity(0.25)
+    static let primaryHint = primary.opacity(0.1)
+    
+    static let progressBar = primaryRich
+    static let progressFly = primaryPale
+    
+    static let buttonEnabled = primaryRich
+    static let buttonDisabled = primarySoft
+    static let buttonPressed = primaryPale
+    static let buttonHinted = primaryHint
+}
+
+extension ShapeStyle where Self == Color {
+    static var crystal: Color { .crystal }
+    
+    static var primary: Color { .purple }
+    static var primaryRich: Color { .primaryRich }
+    static var primarySoft: Color { .primarySoft }
+    static var primaryPale: Color { .primaryPale }
+    static var primaryHint: Color { .primaryHint }
+    
+    static var progressBar: Color { .primaryRich }
+    static var progressFly: Color { .primaryPale }
+    
+    static var buttonEnabled: Color { .primaryRich }
+    static var buttonDisabled: Color { .primarySoft }
+    static var buttonPressed: Color { .primaryPale }
+    static var buttonHinted: Color { .primaryHint }
+}

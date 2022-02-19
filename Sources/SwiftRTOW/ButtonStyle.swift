@@ -19,7 +19,7 @@ struct BaseButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
             Rectangle()
-                .fill(enabled ? .purple.opacity(0.8) : .purple.opacity(0.6))
+                .fill(enabled ? .buttonEnabled : .buttonDisabled)
                 .cornerRadius(buttonSize*0.15)
             Image(forPngResource: image)
                 .resizable()
@@ -29,8 +29,7 @@ struct BaseButton: ButtonStyle {
                 .overlay(
                     RoundedRectangle(cornerRadius: buttonSize*0.15*0.91)
                         .fill((appFsm.isLod && (pretendButton == pressedButton)) ?
-                                .purple.opacity(0.2) :
-                                    .white.opacity(0)))
+                                .buttonPressed : .crystal))
         }
         .frame(width: buttonSize, height: buttonSize)
         .scaleEffect(configuration.isPressed ? 0.98 : 1)
@@ -51,14 +50,13 @@ struct SideButton: ButtonStyle {
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(buttonSize*0.15*0.91)
                 .scaleEffect(0.91)
-                .foregroundColor(.purple.opacity(0.8))
-                .background(.purple.opacity(0.1))
+                .foregroundColor(.buttonEnabled)
+                .background(.buttonHinted)
                 .cornerRadius(buttonSize*0.15)
                 .overlay(
                     RoundedRectangle(cornerRadius: buttonSize*0.15*0.91)
                         .fill(pretendButton == pressedButton ?
-                              .purple.opacity(0.2) :
-                                .white.opacity(0)))
+                              .buttonPressed : .crystal))
         }
         .frame(width: buttonSize, height: buttonSize)
         .scaleEffect(configuration.isPressed ? 0.98 : 1)
