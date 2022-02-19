@@ -35,7 +35,8 @@ struct ContentView: View {
     @EnvironmentObject var raycer: Rtow
     @EnvironmentObject var appFsm: Fsm
     
-    @State private var pressedButton = ButtonType.None
+    @State private var pressedBaseButton = ButtonType.None
+    @State private var pressedSideButton = ButtonType.Camera
     
     var body: some View {
         ZStack {
@@ -44,28 +45,58 @@ struct ContentView: View {
                 .ignoresSafeArea()
                 
             VStack {
-                ZStack(alignment: .bottomLeading) {
-                    RtowView()
-                    .task {
-                        raycer.imageWidth = 320
-                        raycer.imageHeight = 240
-                        raycer.samplesPerPixel = 1
-                        raycer.camera.set(aspratio: 320.0/240.0)
+                ZStack(alignment: .leading) {
+                    ZStack(alignment: .bottomLeading) {
+                        RtowView()
+                            .task {
+                                raycer.imageWidth = 320
+                                raycer.imageHeight = 240
+                                raycer.samplesPerPixel = 1
+                                raycer.camera.set(aspratio: 320.0/240.0)
                         
-                        appFsm.eaParam.push(raycer)
+                                appFsm.eaParam.push(raycer)
                         
-                        let things = Ch10()
-                        things.load()
-                        appFsm.eaParam.push(things)
-                        appFsm.transition(event: FsmEvent.LOD)
-                    }
-                    .aspectRatio(contentMode: .fill)
-                    if appFsm.isLod {
-                        ProgressView(value: Float(raycer.rowRenderProgress), total: Float(raycer.imageHeight))
+                                let things = Ch10()
+                                things.load()
+                                appFsm.eaParam.push(things)
+                                appFsm.transition(event: FsmEvent.LOD)
+                            }
+                            .aspectRatio(contentMode: .fill)
+                            .frame(
+                                maxWidth: UIScreen.main.bounds.width,
+                                maxHeight: UIScreen.main.bounds.height)
+                            .clipped()
+                    
+                        ProgressView(
+                            value: Float(raycer.rowRenderProgress),
+                            total: Float(raycer.imageHeight))
                             .accentColor(.purple.opacity(0.8))
                             .background(.purple.opacity(0.2))
                             .scaleEffect(y: 2, anchor: .bottom)
+                            .opacity(appFsm.isLod ? 1.0 : 0)
                     }
+                    VStack {
+                        Button("Set viewer position") {
+                            pressedSideButton = ButtonType.Viewer
+                        }.buttonStyle(SideButton(
+                            pretendButton: ButtonType.Viewer,
+                            pressedButton: pressedSideButton,
+                            image: "location.fill.viewfinder"))
+                            
+                        Button("Set camera direction") {
+                            pressedSideButton = ButtonType.Camera
+                        }.buttonStyle(SideButton(
+                            pretendButton: ButtonType.Camera,
+                            pressedButton: pressedSideButton,
+                            image: "camera.viewfinder"))
+                        
+                        Button("Adjust camera optics") {
+                            pressedSideButton = ButtonType.Optics
+                        }.buttonStyle(SideButton(
+                            pretendButton: ButtonType.Optics,
+                            pressedButton: pressedSideButton,
+                            image: "camera.aperture"))
+                    }.padding(.leading)
                 }
                 
                 HStack {
@@ -74,22 +105,33 @@ struct ContentView: View {
                         things.load()
                         appFsm.eaParam.push(things)
                         appFsm.transition(event: FsmEvent.LOD)
-                        pressedButton = ButtonType.Ch8
-                    }.buttonStyle(LoadButton(pretendButton: ButtonType.Ch8, pressedButton: pressedButton, image: "rtow-ch8-btn"))
+                        pressedBaseButton = ButtonType.Ch8
+                    }.buttonStyle(BaseButton(
+                        pretendButton: ButtonType.Ch8,
+                        pressedButton: pressedBaseButton,
+                        image: "rtow-ch8-btn"))
+                    
                     Button("Chapter 10") {
                         let things = Ch10()
                         things.load()
                         appFsm.eaParam.push(things)
                         appFsm.transition(event: FsmEvent.LOD)
-                        pressedButton = ButtonType.Ch10
-                    }.buttonStyle(LoadButton(pretendButton: ButtonType.Ch10, pressedButton: pressedButton, image: "rtow-ch10-btn"))
+                        pressedBaseButton = ButtonType.Ch10
+                    }.buttonStyle(BaseButton(
+                        pretendButton: ButtonType.Ch10, 
+                        pressedButton: pressedBaseButton,
+                        image: "rtow-ch10-btn"))
+                    
                     Button("Chapter 13") {
                         let things = Ch13()
                         things.load()
                         appFsm.eaParam.push(things)
                         appFsm.transition(event: FsmEvent.LOD)
-                        pressedButton = ButtonType.Ch13
-                    }.buttonStyle(LoadButton(pretendButton: ButtonType.Ch13, pressedButton: pressedButton, image: "rtow-ch13-btn"))
+                        pressedBaseButton = ButtonType.Ch13
+                    }.buttonStyle(BaseButton(
+                        pretendButton: ButtonType.Ch13,
+                        pressedButton: pressedBaseButton,
+                        image: "rtow-ch13-btn"))
                 }.disabled(appFsm.isLod)
                 Spacer()
             }
