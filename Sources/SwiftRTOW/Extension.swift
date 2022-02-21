@@ -54,17 +54,8 @@ extension Color {
 }
 
 extension ShapeStyle where Self == Color {
-    static var crystal: Color { .crystal }
-    
-    static var primary: Color { .purple }
-    static var primaryRich: Color { .primaryRich }
-    static var primarySoft: Color { .primarySoft }
     static var primaryPale: Color { .primaryPale }
-    static var primaryHint: Color { .primaryHint }
-    
-    static var progressBar: Color { .primaryRich }
-    static var progressFly: Color { .primaryPale }
-    
+
     static var buttonEnabled: Color { .primaryRich }
     static var buttonDisabled: Color { .primarySoft }
     static var buttonPressed: Color { .primaryPale }
