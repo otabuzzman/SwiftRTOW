@@ -80,7 +80,8 @@ struct ContentView: View {
                             appFsm.pop()
                         }
                     }
-                    VStack {
+                    
+                    if appFsm.isPos || appFsm.isDir || appFsm.isCam { VStack {
                         Button("Set viewer position") {
                             pressedSideButton = ButtonType.Viewer
                         }.buttonStyle(SideButton(
@@ -101,7 +102,11 @@ struct ContentView: View {
                             pretendButton: ButtonType.Optics,
                             pressedButton: pressedSideButton,
                             image: "camera.aperture"))
-                    }.padding(.leading)
+                    }
+                    .padding(.leading)
+                    .zIndex(1) // SO #57730074
+                    .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.63)))
+                    }
                 }
                 
                 HStack {

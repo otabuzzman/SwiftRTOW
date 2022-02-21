@@ -1,24 +1,5 @@
 import SwiftUI
 
-class Stack<T> {
-    var stack: [T] = []
-    
-    func peek() -> T? {
-        guard let last = stack.last else {
-            return nil
-        }
-        return last
-    }
-    
-    func push(_ element: T) {
-        stack.append(element)
-    }
-    
-    func pop() -> T {
-        return stack.removeLast()
-    }
-}
-
 enum FsmState: Int {
     case CAM, DIR, LOD, POS, VSC
 }
@@ -29,21 +10,19 @@ enum FsmEvent: Int {
 }
 let FsmEventName = ["BAL", "CAM", "CTL", "DIR", "LOD", "POS", "RET", "ROL", "VOL", "ZOM"]
 
-typealias FsmHState = Stack<FsmState>
-typealias FsmHEvent = Stack<FsmEvent>
 typealias FsmAction = () throws -> Void
 
 class Fsm: ObservableObject {
-    private var hState = FsmHState()
-    private var hEvent = FsmHEvent()
+    @Published private(set) var hState = FsmHState()
+    @Published private(set) var hEvent = FsmHEvent()
     private var eaTable: [[FsmAction]] = [[]]
-    private var eaParam = Stack<Any>()
+    private var eaParam = EaParam()
     
-    var isCam: Bool { get { hState.peek() == FsmState.CAM } }
-    var isDir: Bool { get { hState.peek() == FsmState.DIR } }
-    var isLod: Bool { get { hState.peek() == FsmState.LOD } }
-    var isPos: Bool { get { hState.peek() == FsmState.POS } }
-    var isVsc: Bool { get { hState.peek() == FsmState.VSC } }
+    var isCam: Bool { get { hState.peek() as? FsmState == FsmState.CAM } }
+    var isDir: Bool { get { hState.peek() as? FsmState == FsmState.DIR } }
+    var isLod: Bool { get { hState.peek() as? FsmState == FsmState.LOD } }
+    var isPos: Bool { get { hState.peek() as? FsmState == FsmState.POS } }
+    var isVsc: Bool { get { hState.peek() as? FsmState == FsmState.VSC } }
     
     init(startWithState state: FsmState = FsmState.VSC) {
         self.hState.push(state)
@@ -61,7 +40,7 @@ class Fsm: ObservableObject {
     func pop() { _ = eaParam.pop() }
     
     func transition(event: FsmEvent) throws {
-        let s = hState.peek()!.rawValue
+        let s = (hState.peek() as! FsmState).rawValue
         let e = event.rawValue
         
         print("state \(FsmStateName[s]) received event \(FsmEventName[e]) : ", terminator: "")
@@ -101,7 +80,7 @@ class Fsm: ObservableObject {
         let pressedSideButton = eaParam.pop() as! ButtonType
         
         let autoReturnTask = Task {
-            try? await Task.sleep(nanoseconds: 1*1_000_000_000)
+            try? await Task.sleep(nanoseconds: 3*1_000_000_000)
             
             _ = eaParam.pop() // autoReturnTask
             try transition(event: FsmEvent.RET)
@@ -152,7 +131,7 @@ class Fsm: ObservableObject {
         _ = hEvent.pop()
         let nextState = hState.peek()!
         
-        print("new state \(FsmStateName[nextState.rawValue])")
+        print("new state \(FsmStateName[(nextState as! FsmState).rawValue])")
     }
     
     private func eaReject() throws {
@@ -162,7 +141,7 @@ class Fsm: ObservableObject {
         let nextState = currState
         hState.push(nextState)
         
-        print("rejected (keep state \(FsmStateName[nextState.rawValue]))")
+        print("rejected (keep state \(FsmStateName[(nextState as! FsmState).rawValue]))")
         throw FsmError.unexpectedEvent
     }
 }
