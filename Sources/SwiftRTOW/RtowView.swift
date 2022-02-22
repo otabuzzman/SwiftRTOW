@@ -145,7 +145,7 @@ struct ContentView: View {
                         pretendButton: ButtonType.Ch13,
                         pressedButton: pressedBaseButton,
                         image: "rtow-ch13-btn"))
-                }.disabled(appFsm.isLod)
+                }.disabled(!appFsm.isVsc)
                 Spacer()
             }
         }
