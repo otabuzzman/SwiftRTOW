@@ -6,9 +6,9 @@ enum FsmState: Int {
 let FsmStateName = ["CAM", "DIR", "LOD", "POS", "VSC"]
 
 enum FsmEvent: Int {
-    case BAL, CAM, CTL, DIR, LOD, POS, RET, ROL, VOL, ZOM
+    case CAM, CTL, DIR, LOD, MAG, MOV, POS, RET, ROT
 }
-let FsmEventName = ["BAL", "CAM", "CTL", "DIR", "LOD", "POS", "RET", "ROL", "VOL", "ZOM"]
+let FsmEventName = ["CAM", "CTL", "DIR", "LOD", "MAG", "MOV", "POS", "RET", "ROT"]
 
 typealias FsmAction = () throws -> Void
 
@@ -27,12 +27,12 @@ class Fsm: ObservableObject {
     init(startWithState state: FsmState = FsmState.VSC) {
         self.hState.push(state)
         self.eaTable = [
-            /* S/E     BAL       CAM       CTL       DIR       LOD       POS       RET       ROL       VOL       ZOM     */
-            /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaCamRet, eaReject, eaReject, eaReject],
-            /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaDirRet, eaReject, eaReject, eaReject],
-            /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject, eaReject, eaReject],
-            /* POS */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaPosRet, eaReject, eaReject, eaReject],
-            /* VSC */ [eaReject, eaReject, eaVscCtl, eaReject, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject]
+            /* S/E     CAM       CTL       DIR       LOD       MAG       MOV       POS       RET       ROT     */
+            /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaCamRet, eaReject],
+            /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaDirRet, eaReject],
+            /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject],
+            /* POS */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaPosRet, eaReject],
+            /* VSC */ [eaReject, eaVscCtl, eaReject, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject]
         ]
     }
     
