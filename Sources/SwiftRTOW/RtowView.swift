@@ -44,7 +44,7 @@ struct ContentView: View {
                 .ignoresSafeArea()
                 
             VStack {
-                ZStack(alignment: .leading) {
+                ZStack {
                     ZStack(alignment: .bottomLeading) {
                         RtowView()
                             .task {
@@ -61,8 +61,8 @@ struct ContentView: View {
                             }
                             .aspectRatio(contentMode: .fill)
                             .frame(
-                                maxWidth: UIScreen.main.bounds.width,
-                                maxHeight: UIScreen.main.bounds.height)
+                                maxWidth: UIScreen.width,
+                                maxHeight: UIScreen.height)
                             .clipped()
                     
                         ProgressView(
@@ -72,40 +72,51 @@ struct ContentView: View {
                             .background(.primaryPale)
                             .scaleEffect(y: 2, anchor: .bottom)
                             .opacity(appFsm.isLod ? 1.0 : 0)
-                    }.onTapGesture {
+                    }
+                    .simultaneousGesture(TapGesture().onEnded({
                         do {
                             appFsm.push(parameter: pressedSideButton)
                             try appFsm.transition(event: FsmEvent.CTL)
                         } catch {
                             appFsm.pop()
                         }
-                    }
+                    }))
+                    .simultaneousGesture(DragGesture(minimumDistance: 128)
+                                            .onChanged({ _ in
+                    })
+                                            .onEnded({ _ in
+                    }))
                     
-                    if appFsm.isPos || appFsm.isDir || appFsm.isCam { VStack {
-                        Button("Set viewer position") {
-                            pressedSideButton = ButtonType.Viewer
-                        }.buttonStyle(SideButton(
-                            pretendButton: ButtonType.Viewer,
-                            pressedButton: pressedSideButton,
-                            image: "location.fill.viewfinder"))
-                            
-                        Button("Set camera direction") {
-                            pressedSideButton = ButtonType.Camera
-                        }.buttonStyle(SideButton(
-                            pretendButton: ButtonType.Camera,
-                            pressedButton: pressedSideButton,
-                            image: "camera.viewfinder"))
+                    if appFsm.isPos || appFsm.isDir || appFsm.isCam  {
+                        ZStack(alignment: .leading) {
+                            VStack {
+                                Button("Set viewer position") {
+                                    pressedSideButton = ButtonType.Viewer
+                                }.buttonStyle(SideButton(
+                                    pretendButton: ButtonType.Viewer,
+                                    pressedButton: pressedSideButton,
+                                    image: "location.fill.viewfinder"))
+                                
+                                Button("Set camera direction") {
+                                    pressedSideButton = ButtonType.Camera
+                                }.buttonStyle(SideButton(
+                                    pretendButton: ButtonType.Camera,
+                                    pressedButton: pressedSideButton,
+                                    image: "camera.viewfinder"))
                         
-                        Button("Adjust camera optics") {
-                            pressedSideButton = ButtonType.Optics
-                        }.buttonStyle(SideButton(
-                            pretendButton: ButtonType.Optics,
-                            pressedButton: pressedSideButton,
-                            image: "camera.aperture"))
-                    }
-                    .padding(.leading)
-                    .zIndex(1) // SO #57730074
-                    .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.63)))
+                                Button("Adjust camera optics") {
+                                    pressedSideButton = ButtonType.Optics
+                                }.buttonStyle(SideButton(
+                                    pretendButton: ButtonType.Optics,
+                                    pressedButton: pressedSideButton,
+                                    image: "camera.aperture"))
+                            }.padding(.leading)
+                            
+                            FinderView(type: .current).frame(minWidth: 0, maxWidth: .infinity)
+                            FinderView(type: .preview).frame(minWidth: 0, maxWidth: .infinity)
+                        }
+                        .zIndex(1) // SO #57730074
+                        .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.63)))
                     }
                 }
                 

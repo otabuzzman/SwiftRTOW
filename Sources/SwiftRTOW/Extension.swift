@@ -1,5 +1,11 @@
 import SwiftUI
 
+extension UIScreen {
+    static let width = UIScreen.main.bounds.size.width
+    static let height = UIScreen.main.bounds.size.height
+    static let aspectRatio = width/height
+}
+
 extension UIImage {
     convenience init?(imageData: [Pixel], imageWidth: Int, imageHeight: Int) {
         guard imageWidth>0 && imageHeight>0, imageData.count == imageWidth*imageHeight else {
@@ -54,6 +60,7 @@ extension Color {
 }
 
 extension ShapeStyle where Self == Color {
+    static var primaryRich: Color { .primaryRich }
     static var primaryPale: Color { .primaryPale }
 
     static var buttonEnabled: Color { .primaryRich }

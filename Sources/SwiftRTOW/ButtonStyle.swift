@@ -6,7 +6,7 @@ enum ButtonType {
     case Viewer, Camera, Optics
 }
 
-private let buttonSize: CGFloat = UIScreen.main.bounds.width*0.1
+private let buttonSize: CGFloat = UIScreen.width*0.1
 
 struct BaseButton: ButtonStyle {
     var pretendButton: ButtonType
