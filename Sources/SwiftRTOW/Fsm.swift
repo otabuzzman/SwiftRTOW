@@ -15,6 +15,9 @@ typealias FsmAction = () throws -> Void
 class Fsm: ObservableObject {
     @Published private(set) var hState = FsmHState()
     @Published private(set) var hEvent = FsmHEvent()
+    
+    @Published private(set) var movAmount = CGSize.zero
+    
     private var eaTable: [[FsmAction]] = [[]]
     private var eaParam = EaParam()
     
@@ -29,7 +32,7 @@ class Fsm: ObservableObject {
         self.eaTable = [
             /* S/E     CAM       CTL       DIR       LOD       MAG       MOV       POS       RET       ROT     */
             /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaCamRet, eaReject],
-            /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaDirRet, eaReject],
+            /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaDirMov, eaReject, eaDirRet, eaReject],
             /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject],
             /* POS */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaPosRet, eaReject],
             /* VSC */ [eaReject, eaVscCtl, eaReject, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject]
@@ -37,7 +40,7 @@ class Fsm: ObservableObject {
     }
     
     func push(parameter: Any) { eaParam.push(parameter) }
-    func pop() { _ = eaParam.pop() }
+    @discardableResult func pop() -> Any { eaParam.pop() }
     
     func transition(event: FsmEvent) throws {
         let s = (hState.peek() as! FsmState).rawValue
@@ -47,6 +50,21 @@ class Fsm: ObservableObject {
         
         self.hEvent.push(event)
         try eaTable[s][e]()
+    }
+    
+    private var dirMovAmount = CGSize.zero
+    private var dirMovRecall = CGSize.zero
+    private func eaDirMov() {
+        let movAmount = eaParam.pop() as! CGSize
+        dirMovAmount = dirMovRecall+movAmount
+        self.movAmount = dirMovAmount
+        
+        _ = hState.pop()
+        _ = hEvent.pop()
+        let nextState = FsmState.DIR
+        hState.push(nextState)
+        
+        print("new state \(FsmStateName[nextState.rawValue])")
     }
     
     private func eaPosRet() {
@@ -79,13 +97,11 @@ class Fsm: ObservableObject {
     private func eaVscCtl() {
         let pressedSideButton = eaParam.pop() as! ButtonType
         
-        let autoReturnTask = Task {
-            try? await Task.sleep(nanoseconds: 3*1_000_000_000)
+        Task { () -> Void in
+            try await Task.sleep(nanoseconds: 3*1_000_000_000)
             
-            _ = eaParam.pop() // autoReturnTask
             try transition(event: FsmEvent.RET)
         }
-        eaParam.push(autoReturnTask)
         
         _ = hState.pop()
         _ = hEvent.pop()
@@ -110,7 +126,7 @@ class Fsm: ObservableObject {
         let raycer = eaParam.pop() as! Rtow
         let things = eaParam.pop() as! Things
         
-        Task {
+        Task { () -> Void in
             let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
             await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
             

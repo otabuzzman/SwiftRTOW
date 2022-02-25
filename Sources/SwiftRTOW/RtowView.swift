@@ -73,19 +73,6 @@ struct ContentView: View {
                             .scaleEffect(y: 2, anchor: .bottom)
                             .opacity(appFsm.isLod ? 1.0 : 0)
                     }
-                    .simultaneousGesture(TapGesture().onEnded({
-                        do {
-                            appFsm.push(parameter: pressedSideButton)
-                            try appFsm.transition(event: FsmEvent.CTL)
-                        } catch {
-                            appFsm.pop()
-                        }
-                    }))
-                    .simultaneousGesture(DragGesture(minimumDistance: 128)
-                                            .onChanged({ _ in
-                    })
-                                            .onEnded({ _ in
-                    }))
                     
                     if appFsm.isPos || appFsm.isDir || appFsm.isCam  {
                         ZStack(alignment: .leading) {
@@ -112,13 +99,31 @@ struct ContentView: View {
                                     image: "camera.aperture"))
                             }.padding(.leading)
                             
-                            FinderView(type: .current).frame(minWidth: 0, maxWidth: .infinity)
-                            FinderView(type: .preview).frame(minWidth: 0, maxWidth: .infinity)
+                            Group {
+                                FinderView(type: .current)
+                                FinderView(type: .preview).offset(appFsm.movAmount)
+                            }.frame(minWidth: 0, maxWidth: .infinity)
                         }
                         .zIndex(1) // SO #57730074
                         .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.63)))
                     }
                 }
+                .simultaneousGesture(TapGesture().onEnded({
+                    do {
+                        appFsm.push(parameter: pressedSideButton)
+                        try appFsm.transition(event: FsmEvent.CTL)
+                    } catch {
+                        appFsm.pop()
+                    }
+                }))
+                .simultaneousGesture(
+                    DragGesture()
+                        .onChanged { value in
+                            appFsm.push(parameter: value.translation)
+                            try? appFsm.transition(event: FsmEvent.MOV)
+                        }
+                        .onEnded { _ in
+                        })
                 
                 HStack {
                     Button("Chapter 8") {
