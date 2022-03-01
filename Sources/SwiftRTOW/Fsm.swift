@@ -1,14 +1,14 @@
 import SwiftUI
 
 enum FsmState: Int {
-    case CAM, DIR, LOD, POS, VSC
+    case CAM, LOD, MOV, OPT, ROL, VSC, VWR, ZOM
 }
-let FsmStateName = ["CAM", "DIR", "LOD", "POS", "VSC"]
+let FsmStateName = ["CAM", "LOD", "MOV", "OPT", "ROL", "VSC", "VWR", "ZOM"]
 
 enum FsmEvent: Int {
-    case CAM, CTL, DIR, LOD, MAG, MOV, POS, RET, ROT
+    case CAM, CTL, LOD, MOV, OPT, RET, ROL, VWR, ZOM
 }
-let FsmEventName = ["CAM", "CTL", "DIR", "LOD", "MAG", "MOV", "POS", "RET", "ROT"]
+let FsmEventName = ["CAM", "CTL", "LOD", "MOV", "OPT", "RET", "ROL", "VWR", "ZOM"]
 
 typealias FsmAction = () throws -> Void
 
@@ -22,21 +22,24 @@ class Fsm: ObservableObject {
     private var eaParam = EaParam()
     
     var isCam: Bool { get { hState.peek() as? FsmState == FsmState.CAM } }
-    var isDir: Bool { get { hState.peek() as? FsmState == FsmState.DIR } }
     var isLod: Bool { get { hState.peek() as? FsmState == FsmState.LOD } }
-    var isPos: Bool { get { hState.peek() as? FsmState == FsmState.POS } }
+    var isOpt: Bool { get { hState.peek() as? FsmState == FsmState.OPT } }
+    var isVwr: Bool { get { hState.peek() as? FsmState == FsmState.VWR } }
     var isVsc: Bool { get { hState.peek() as? FsmState == FsmState.VSC } }
     
     init(startWithState state: FsmState = FsmState.VSC) {
         self.hState.push(state)
         self.eaTable = [
-            /* S/E     CAM       CTL       DIR       LOD       MAG       MOV       POS       RET       ROT     */
-            /* CAM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaCamRet, eaReject],
-            /* DIR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaDirMov, eaReject, eaDirRet, eaReject],
-            /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject],
-            /* POS */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaPosRet, eaReject],
-            /* VSC */ [eaReject, eaVscCtl, eaReject, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject]
-        ]
+            /* S/E     CAM       CTL       LOD       MOV       OPT       RET       ROL       VWR       ZOM     */
+            /* CAM */ [eaReject, eaReject, eaReject, eaCamMov, eaReject, eaCamRet, eaReject, eaReject, eaReject],
+            /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject, eaReject, eaReject],
+            /* MOV */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* OPT */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaOptRet, eaReject, eaReject, eaReject],
+            /* ROL */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* VSC */ [eaReject, eaVscCtl, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* VWR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaVwrRet, eaReject, eaReject, eaReject],
+            /* ZOM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
+            ]
     }
     
     func push(parameter: Any) { eaParam.push(parameter) }
@@ -54,110 +57,101 @@ class Fsm: ObservableObject {
     
     private var dirMovAmount = CGSize.zero
     private var dirMovRecall = CGSize.zero
-    private func eaDirMov() {
+    private func eaCamMov() {
         let movAmount = eaParam.pop() as! CGSize
         dirMovAmount = dirMovRecall+movAmount
         self.movAmount = dirMovAmount
         
-        _ = hState.pop()
-        _ = hEvent.pop()
-        let nextState = FsmState.DIR
-        hState.push(nextState)
-        
-        print("new state \(FsmStateName[nextState.rawValue])")
+        update(withState: FsmState.CAM)
     }
     
-    private func eaPosRet() {
-        _ = hState.pop()
-        _ = hEvent.pop()
-        let nextState = FsmState.VSC
-        hState.push(nextState)
-        
-        print("new state \(FsmStateName[nextState.rawValue])")
-    }
-    
-    private func eaDirRet() {
-        _ = hState.pop()
-        _ = hEvent.pop()
-        let nextState = FsmState.VSC
-        hState.push(nextState)
-        
-        print("new state \(FsmStateName[nextState.rawValue])")
+    private func eaVwrRet() {
+        update(withState: FsmState.VSC)
     }
     
     private func eaCamRet() {
-        _ = hState.pop()
-        _ = hEvent.pop()
-        let nextState = FsmState.VSC
-        hState.push(nextState)
-        
-        print("new state \(FsmStateName[nextState.rawValue])")
+        update(withState: FsmState.VSC)
+    }
+    
+    private func eaOptRet() {
+        update(withState: FsmState.VSC)
     }
     
     private func eaVscCtl() {
         let pressedSideButton = eaParam.pop() as! ButtonType
         
-        Task { () -> Void in
-            try await Task.sleep(nanoseconds: 3*1_000_000_000)
-            
-            try transition(event: FsmEvent.RET)
+        runOnTimeout(seconds: 3) {
+            do {
+                try self.transition(event: FsmEvent.RET)
+            } catch {}
         }
-        
-        _ = hState.pop()
-        _ = hEvent.pop()
         
         let nextState: FsmState
         switch pressedSideButton {
         case .Viewer:
-            nextState = FsmState.POS
+            nextState = FsmState.VWR
         case .Camera:
-            nextState = FsmState.DIR
+            nextState = FsmState.CAM
         case .Optics:
-            nextState = FsmState.CAM
+            nextState = FsmState.OPT
         default:
-            nextState = FsmState.CAM
+            nextState = FsmState.OPT
         }
-        hState.push(nextState)
         
-        print("new state \(FsmStateName[nextState.rawValue])")
+        update(withState: nextState)
     }
     
     private func eaVscLod() {
         let raycer = eaParam.pop() as! Rtow
         let things = eaParam.pop() as! Things
         
-        Task { () -> Void in
+        runInBackground {
             let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
             await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
-            
-            try transition(event: FsmEvent.RET)
+            do {
+                try self.transition(event: FsmEvent.RET)
+            } catch {}
         }
         
-        // keep H state
-        // _ = hState.pop()
-        _ = hEvent.pop()
-        let nextState = FsmState.LOD
-        hState.push(nextState)
-        
-        print("new state \(FsmStateName[nextState.rawValue])")
+        update(withState: FsmState.LOD, noHistory: false)
     }
     
     private func eaLodRet() {
-        _ = hState.pop()
-        _ = hEvent.pop()
-        let nextState = hState.peek()!
+        hState.pop()
+        hEvent.pop()
         
-        print("new state \(FsmStateName[(nextState as! FsmState).rawValue])")
+        update(withState: hState.peek(.elementOnTop) as! FsmState)
     }
     
     private func eaReject() throws {
-        let currState = hState.peek()!
-        _ = hState.pop()
-        _ = hEvent.pop()
-        let nextState = currState
-        hState.push(nextState)
+        print("rejected : ", terminator: "")
         
-        print("rejected (keep state \(FsmStateName[(nextState as! FsmState).rawValue]))")
+        update(withState: hState.peek() as! FsmState)
         throw FsmError.unexpectedEvent
+    }
+    
+    private func update(withState state: FsmState, noHistory: Bool = true) {
+        if noHistory {
+            hState.pop()
+            hEvent.pop()
+        }
+        hState.push(state)
+        
+        print("new state \(FsmStateName[state.rawValue]) (S/E history \(hState.count)/\(hEvent.count))")
+    }
+    
+    private func runOnTimeout(seconds: Int, closure: @escaping () -> Void) {
+        if seconds>0 {
+            Task {
+                try await Task.sleep(nanoseconds: UInt64(seconds*1_000_000_000))
+                closure()
+            }
+        }
+    }
+    
+    private func runInBackground(closure: @escaping () async -> Void) {
+        Task {
+            await closure()
+        }
     }
 }

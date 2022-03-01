@@ -74,7 +74,7 @@ struct ContentView: View {
                             .opacity(appFsm.isLod ? 1.0 : 0)
                     }
                     
-                    if appFsm.isPos || appFsm.isDir || appFsm.isCam  {
+                    if appFsm.isCsl || appFsm.isCad {
                         ZStack(alignment: .leading) {
                             VStack {
                                 Button("Set viewer position") {
@@ -123,6 +123,7 @@ struct ContentView: View {
                             try? appFsm.transition(event: FsmEvent.MOV)
                         }
                         .onEnded { _ in
+                            try? appFsm.transition(event: FsmEvent.RET)
                         })
                 
                 HStack {

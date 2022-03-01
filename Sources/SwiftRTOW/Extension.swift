@@ -70,6 +70,10 @@ extension ShapeStyle where Self == Color {
 }
 
 extension CGSize {
+    static prefix func -(v: CGSize) -> CGSize {
+        return CGSize(width: -v.width, height: -v.height)
+    }
+    
     static func +(lhs: CGSize, rhs: CGSize) -> CGSize {
         return CGSize(width: lhs.width+rhs.width, height: lhs.height+rhs.height)
     }
