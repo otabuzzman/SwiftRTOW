@@ -7,6 +7,7 @@ enum FinderType {
 
 struct FinderView: View {
     @EnvironmentObject var raycer: Rtow
+    @EnvironmentObject var appFsm: Fsm
     var scaleFactor = 0.31415
     var type: FinderType!
     
@@ -41,7 +42,7 @@ struct FinderView: View {
                 .frame(width: width(), height: height())
         } else {
             RoundedRectangle(cornerRadius: cornerRadius)
-                .strokeBorder(.primaryRich, lineWidth: 4)
+                .strokeBorder(.primaryRich, lineWidth: 4/appFsm.zomAmount)
                 .frame(width: width(), height: height())
         }
     }

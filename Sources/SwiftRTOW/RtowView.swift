@@ -57,7 +57,7 @@ struct ContentView: View {
                                 things.load()
                                 appFsm.push(parameter: things)
                                 appFsm.push(parameter: raycer)
-                                try? appFsm.transition(event: FsmEvent.LOD)
+                                try? appFsm.transition(event: .LOD)
                             }
                             .aspectRatio(contentMode: .fill)
                             .frame(
@@ -71,7 +71,7 @@ struct ContentView: View {
                             .accentColor(.primaryRich)
                             .background(.primaryPale)
                             .scaleEffect(y: 2, anchor: .bottom)
-                            .opacity(appFsm.isLod ? 1.0 : 0)
+                            .opacity(appFsm.isState(.LOD) ? 1.0 : 0)
                     }
                     
                     if appFsm.isCsl || appFsm.isCad {
@@ -79,6 +79,7 @@ struct ContentView: View {
                             VStack {
                                 Button("Set viewer position") {
                                     pressedSideButton = ButtonType.Viewer
+                                    try? appFsm.transition(event: .VWR)
                                 }.buttonStyle(SideButton(
                                     pretendButton: ButtonType.Viewer,
                                     pressedButton: pressedSideButton,
@@ -86,6 +87,7 @@ struct ContentView: View {
                                 
                                 Button("Set camera direction") {
                                     pressedSideButton = ButtonType.Camera
+                                    try? appFsm.transition(event: .CAM)
                                 }.buttonStyle(SideButton(
                                     pretendButton: ButtonType.Camera,
                                     pressedButton: pressedSideButton,
@@ -93,6 +95,7 @@ struct ContentView: View {
                         
                                 Button("Adjust camera optics") {
                                     pressedSideButton = ButtonType.Optics
+                                    try? appFsm.transition(event: .OPT)
                                 }.buttonStyle(SideButton(
                                     pretendButton: ButtonType.Optics,
                                     pressedButton: pressedSideButton,
@@ -101,7 +104,9 @@ struct ContentView: View {
                             
                             Group {
                                 FinderView(type: .current)
-                                FinderView(type: .preview).offset(appFsm.movAmount)
+                                FinderView(type: .preview)
+                                    .offset(appFsm.movAmount)
+                                    .scaleEffect(appFsm.zomAmount)
                             }.frame(minWidth: 0, maxWidth: .infinity)
                         }
                         .zIndex(1) // SO #57730074
@@ -111,7 +116,7 @@ struct ContentView: View {
                 .simultaneousGesture(TapGesture().onEnded({
                     do {
                         appFsm.push(parameter: pressedSideButton)
-                        try appFsm.transition(event: FsmEvent.CTL)
+                        try appFsm.transition(event: .CTL)
                     } catch {
                         appFsm.pop()
                     }
@@ -120,10 +125,19 @@ struct ContentView: View {
                     DragGesture()
                         .onChanged { value in
                             appFsm.push(parameter: value.translation)
-                            try? appFsm.transition(event: FsmEvent.MOV)
+                            try? appFsm.transition(event: .MOV)
                         }
                         .onEnded { _ in
-                            try? appFsm.transition(event: FsmEvent.RET)
+                            try? appFsm.transition(event: .RET)
+                        })
+                .simultaneousGesture(
+                    MagnificationGesture()
+                        .onChanged { value in
+                            appFsm.push(parameter: value)
+                            try? appFsm.transition(event: .ZOM)
+                        }
+                        .onEnded { _ in
+                            try? appFsm.transition(event: .RET)
                         })
                 
                 HStack {
@@ -132,7 +146,7 @@ struct ContentView: View {
                         things.load()
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
-                        try? appFsm.transition(event: FsmEvent.LOD)
+                        try? appFsm.transition(event: .LOD)
                         pressedBaseButton = ButtonType.Ch8
                     }.buttonStyle(BaseButton(
                         pretendButton: ButtonType.Ch8,
@@ -144,7 +158,7 @@ struct ContentView: View {
                         things.load()
                         appFsm.push(parameter:things)
                         appFsm.push(parameter: raycer)
-                        try? appFsm.transition(event: FsmEvent.LOD)
+                        try? appFsm.transition(event: .LOD)
                         pressedBaseButton = ButtonType.Ch10
                     }.buttonStyle(BaseButton(
                         pretendButton: ButtonType.Ch10, 
@@ -156,13 +170,13 @@ struct ContentView: View {
                         things.load()
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
-                        try? appFsm.transition(event: FsmEvent.LOD)
+                        try? appFsm.transition(event: .LOD)
                         pressedBaseButton = ButtonType.Ch13
                     }.buttonStyle(BaseButton(
                         pretendButton: ButtonType.Ch13,
                         pressedButton: pressedBaseButton,
                         image: "rtow-ch13-btn"))
-                }.disabled(!appFsm.isVsc)
+                }.disabled(!appFsm.isState(.VSC))
                 Spacer()
             }
         }

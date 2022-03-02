@@ -17,37 +17,42 @@ class Fsm: ObservableObject {
     @Published private(set) var hEvent = FsmHEvent()
     
     @Published private(set) var movAmount = CGSize.zero
-    private var camMovAmount = CGSize.zero
-    private var camMovRecall = CGSize.zero
+    private var vwrMovAmount = CGSize.zero
+    private var vwrMovRecall = CGSize.zero
     private var startJumpMov: CGSize? = nil
+    @Published private(set) var zomAmount = 1.0
+    private var vwrZomAmount = 1.0
+    private var vwrZomRecall = 1.0
+    private var startJumpZom: CGFloat? = nil
+    
+    private var timeoutTask: Task<Void, Never>!
+    private var outbackTask: Task<Void, Never>!
     
     private var eaTable: [[FsmAction]] = [[]]
     private var eaParam = EaParam()
     
-    var isCam: Bool { get { hState.peek() as? FsmState == FsmState.CAM } }
-    var isLod: Bool { get { hState.peek() as? FsmState == FsmState.LOD } }
-    var isMov: Bool { get { hState.peek() as? FsmState == FsmState.MOV } }
-    var isOpt: Bool { get { hState.peek() as? FsmState == FsmState.OPT } }
-    var isTrn: Bool { get { hState.peek() as? FsmState == FsmState.TRN } }
-    var isVwr: Bool { get { hState.peek() as? FsmState == FsmState.VWR } }
-    var isVsc: Bool { get { hState.peek() as? FsmState == FsmState.VSC } }
-    var isZom: Bool { get { hState.peek() as? FsmState == FsmState.ZOM } }
+    func isState(_ state: FsmState, atHistoryLevel level: StackIndex = .last) -> Bool {
+        guard
+            let peek = hState.peek(level) as? FsmState
+        else { return false }
+        return peek == state
+    }
     
-    var isCsl: Bool { get { isVwr || isCam || isOpt } }
-    var isCad: Bool { get { isMov || isTrn || isZom } }
+    var isCsl: Bool { get { isState(.VWR) || isState(.CAM) || isState(.OPT) } }
+    var isCad: Bool { get { isState(.MOV) || isState(.TRN) || isState(.ZOM) } }
     
-    init(startWithState state: FsmState = FsmState.VSC) {
+    init(startWithState state: FsmState = .VSC) {
         self.hState.push(state)
         self.eaTable = [
             /* S/E     CAM       CTL       LOD       MOV       OPT       RET       TRN       VWR       ZOM     */
-            /* CAM */ [eaReject, eaReject, eaReject, eaCamMov, eaReject, eaCamRet, eaReject, eaReject, eaReject],
+            /* CAM */ [eaCamCam, eaReject, eaReject, eaReject, eaCamOpt, eaCamRet, eaReject, eaCamVwr, eaReject],
             /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject, eaReject, eaReject],
             /* MOV */ [eaReject, eaReject, eaReject, eaMovMov, eaReject, eaMovRet, eaReject, eaReject, eaReject],
-            /* OPT */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaOptRet, eaReject, eaReject, eaReject],
+            /* OPT */ [eaOptCam, eaReject, eaReject, eaReject, eaOptOpt, eaOptRet, eaReject, eaOptVwr, eaReject],
             /* TRN */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
             /* VSC */ [eaReject, eaVscCtl, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
-            /* VWR */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaVwrRet, eaReject, eaReject, eaReject],
-            /* ZOM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject]
+            /* VWR */ [eaVwrCam, eaReject, eaReject, eaVwrMov, eaVwrOpt, eaVwrRet, eaReject, eaVwrVwr, eaVwrZom],
+            /* ZOM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaZomRet, eaReject, eaReject, eaZomZom]
             ]
     }
     
@@ -64,14 +69,44 @@ class Fsm: ObservableObject {
         try eaTable[s][e]()
     }
     
+    private func eaVwrVwr() { update(withState: .VWR) }
+    private func eaVwrCam() { 
+        timeoutTask.cancel()
+        timeoutTask = runOnTimeout(seconds: 3) {
+            do { try self.transition(event: .RET) } catch {}
+        }
+        
+        update(withState: .CAM)
+    }
+    private func eaVwrOpt() {
+        timeoutTask.cancel()
+        timeoutTask = runOnTimeout(seconds: 3) {
+            do { try self.transition(event: .RET) } catch {}
+        }
+        
+        update(withState: .OPT)
+    }
+    
+    private func eaCamVwr() { update(withState: .VWR) }
+    private func eaCamCam() { update(withState: .CAM) }
+    private func eaCamOpt() { update(withState: .OPT) }
+    
+    private func eaOptVwr() { update(withState: .VWR) }
+    private func eaOptCam() { update(withState: .CAM) }
+    private func eaOptOpt() { update(withState: .OPT) }
+    
+    private func eaVwrRet() { update(withState: .VSC) }
+    private func eaCamRet() { update(withState: .VSC) }
+    private func eaOptRet() { update(withState: .VSC) }
+    
     private func eaMovRet() {
         timeoutTask = runOnTimeout(seconds: 3) {
             do {
-                try self.transition(event: FsmEvent.RET)
+                try self.transition(event: .RET)
             } catch {}
         }
         
-        camMovRecall = camMovAmount
+        vwrMovRecall = vwrMovAmount
         startJumpMov = nil
         
         hState.pop()
@@ -82,13 +117,14 @@ class Fsm: ObservableObject {
     
     private func eaMovMov() {
         let movAmount = eaParam.pop() as! CGSize
-        camMovAmount = startJumpMov!+camMovRecall+movAmount
-        self.movAmount = camMovAmount
         
-        update(withState: FsmState.MOV)
+        vwrMovAmount = startJumpMov!+vwrMovRecall+movAmount
+        self.movAmount = vwrMovAmount/zomAmount
+        
+        update(withState: .MOV)
     }
     
-    private func eaCamMov() {
+    private func eaVwrMov() {
         timeoutTask.cancel()
         
         let movAmount = eaParam.pop() as! CGSize
@@ -96,56 +132,93 @@ class Fsm: ObservableObject {
         if startJumpMov == nil {
             startJumpMov = -movAmount
         } else {
-            camMovAmount = startJumpMov!+camMovRecall+movAmount
-            self.movAmount = camMovAmount
+            vwrMovAmount = startJumpMov!+vwrMovRecall+movAmount
+            self.movAmount = vwrMovAmount/zomAmount
         }
         
-        update(withState: FsmState.MOV, noHistory: false)
+        update(withState: .MOV, noHistory: false)
     }
     
-    private func eaVwrRet() {
-        update(withState: FsmState.VSC)
+    private func eaZomRet() {
+        timeoutTask = runOnTimeout(seconds: 3) {
+            do {
+                try self.transition(event: .RET)
+            } catch {}
+        }
+        
+        vwrZomRecall = vwrZomAmount
+        startJumpZom = nil
+        
+        hState.pop()
+        hEvent.pop()
+        
+        update(withState: hState.peek() as! FsmState)
     }
     
-    private func eaCamRet() {
-        update(withState: FsmState.VSC)
+    private func eaZomZom() {
+        let zomAmount = eaParam.pop() as! CGFloat
+        
+        vwrZomAmount = startJumpZom!+vwrZomRecall+zomAmount
+        self.zomAmount = vwrZomAmount
+        
+        update(withState: .ZOM)
     }
     
-    private func eaOptRet() {
-        update(withState: FsmState.VSC)
+    private func eaVwrZom() {
+        timeoutTask.cancel()
+        
+        let zomAmount = eaParam.pop() as! CGFloat
+        
+        if startJumpZom == nil {
+            startJumpZom = -zomAmount
+        } else {
+            vwrZomAmount = startJumpZom!+vwrZomRecall+zomAmount
+            self.zomAmount = vwrZomAmount
+        }
+        
+        update(withState: .ZOM, noHistory: false)
     }
     
-    let timeoutTask: Task<Void, Never>!
     private func eaVscCtl() {
         timeoutTask = runOnTimeout(seconds: 3) {
             do {
-                try self.transition(event: FsmEvent.RET)
+                try self.transition(event: .RET)
             } catch {}
         }
         
         movAmount = CGSize.zero
-        camMovAmount = CGSize.zero
-        camMovRecall = CGSize.zero
+        vwrMovAmount = CGSize.zero
+        vwrMovRecall = CGSize.zero
         startJumpMov = nil
+        zomAmount = 1.0
+        vwrZomAmount = 1.0
+        vwrZomRecall = 1.0
+        startJumpZom = nil
         
         let pressedSideButton = eaParam.pop() as! ButtonType
         
         let nextState: FsmState
         switch pressedSideButton {
         case .Viewer:
-            nextState = FsmState.VWR
+            nextState = .VWR
         case .Camera:
-            nextState = FsmState.CAM
+            nextState = .CAM
         case .Optics:
-            nextState = FsmState.OPT
+            nextState = .OPT
         default:
-            nextState = FsmState.OPT
+            nextState = .OPT
         }
         
         update(withState: nextState)
     }
     
-    let outbackTask: Task<Void, Never>!
+    private func eaLodRet() {
+        hState.pop()
+        hEvent.pop()
+        
+        update(withState: hState.peek(.last) as! FsmState)
+    }
+    
     private func eaVscLod() {
         let raycer = eaParam.pop() as! Rtow
         let things = eaParam.pop() as! Things
@@ -154,18 +227,11 @@ class Fsm: ObservableObject {
             let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
             await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
             do {
-                try self.transition(event: FsmEvent.RET)
+                try self.transition(event: .RET)
             } catch {}
         }
         
-        update(withState: FsmState.LOD, noHistory: false)
-    }
-    
-    private func eaLodRet() {
-        hState.pop()
-        hEvent.pop()
-        
-        update(withState: hState.peek(.elementOnTop) as! FsmState)
+        update(withState: .LOD, noHistory: false)
     }
     
     private func eaReject() throws {

@@ -28,7 +28,7 @@ struct BaseButton: ButtonStyle {
                 .scaleEffect(0.91)
                 .overlay(
                     RoundedRectangle(cornerRadius: buttonSize*0.15*0.91)
-                        .fill((appFsm.isLod && (pretendButton == pressedButton)) ?
+                        .fill((appFsm.isState(.LOD) && (pretendButton == pressedButton)) ?
                                 .buttonPressed : .crystal))
         }
         .frame(width: buttonSize, height: buttonSize)

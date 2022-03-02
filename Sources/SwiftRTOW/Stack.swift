@@ -9,7 +9,7 @@ protocol Stack {
 extension Stack {
     var count: Int { stack.count }
     
-    func peek(_ element: StackIndex = .elementOnTop) -> Any? {
+    func peek(_ element: StackIndex = .last) -> Any? {
         let index = -1+count+element.rawValue
         if (0..<count).contains(index) {
             return stack[index]
@@ -27,9 +27,9 @@ extension Stack {
 }
 
 enum StackIndex: Int {
-    case element3rd = -2
-    case element2nd
-    case elementOnTop
+    case lastButTwo = -2
+    case lastButOne
+    case last
 }
 
 struct FsmHState: Stack {
