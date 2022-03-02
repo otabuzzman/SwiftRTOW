@@ -105,7 +105,7 @@ class Fsm: ObservableObject {
         let movAmount = eaParam.pop() as! CGSize
         
         vwrMovAmount = startJumpMov!+vwrMovRecall+movAmount
-        self.movAmount = vwrMovAmount/zomAmount
+        self.movAmount = vwrMovAmount
         
         update(withState: .MOV)
     }
@@ -119,7 +119,7 @@ class Fsm: ObservableObject {
             startJumpMov = -movAmount
         } else {
             vwrMovAmount = startJumpMov!+vwrMovRecall+movAmount
-            self.movAmount = vwrMovAmount/zomAmount
+            self.movAmount = vwrMovAmount
         }
         
         update(withState: .MOV, noHistory: false)

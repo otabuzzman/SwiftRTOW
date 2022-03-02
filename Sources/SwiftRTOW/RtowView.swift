@@ -105,8 +105,8 @@ struct ContentView: View {
                             Group {
                                 FinderView(type: .current)
                                 FinderView(type: .preview)
-                                    .offset(appFsm.movAmount)
                                     .scaleEffect(appFsm.zomAmount)
+                                    .offset(appFsm.movAmount)
                             }.frame(minWidth: 0, maxWidth: .infinity)
                         }
                         .zIndex(1) // SO #57730074
