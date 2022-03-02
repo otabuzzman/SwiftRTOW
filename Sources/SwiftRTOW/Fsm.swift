@@ -70,22 +70,8 @@ class Fsm: ObservableObject {
     }
     
     private func eaVwrVwr() { update(withState: .VWR) }
-    private func eaVwrCam() { 
-        timeoutTask.cancel()
-        timeoutTask = runOnTimeout(seconds: 3) {
-            do { try self.transition(event: .RET) } catch {}
-        }
-        
-        update(withState: .CAM)
-    }
-    private func eaVwrOpt() {
-        timeoutTask.cancel()
-        timeoutTask = runOnTimeout(seconds: 3) {
-            do { try self.transition(event: .RET) } catch {}
-        }
-        
-        update(withState: .OPT)
-    }
+    private func eaVwrCam() { update(withState: .CAM) }
+    private func eaVwrOpt() { update(withState: .OPT) }
     
     private func eaCamVwr() { update(withState: .VWR) }
     private func eaCamCam() { update(withState: .CAM) }
@@ -255,6 +241,7 @@ class Fsm: ObservableObject {
         Task {
             do {
                 try await Task.sleep(nanoseconds: UInt64(seconds*1_000_000_000))
+                try Task.checkCancellation()
                 closure()
             } catch {}
         }

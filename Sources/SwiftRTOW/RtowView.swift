@@ -128,7 +128,7 @@ struct ContentView: View {
                             try? appFsm.transition(event: .MOV)
                         }
                         .onEnded { _ in
-                            try? appFsm.transition(event: .RET)
+                            if appFsm.isCad { try? appFsm.transition(event: .RET) }
                         })
                 .simultaneousGesture(
                     MagnificationGesture()
@@ -137,7 +137,7 @@ struct ContentView: View {
                             try? appFsm.transition(event: .ZOM)
                         }
                         .onEnded { _ in
-                            try? appFsm.transition(event: .RET)
+                            if appFsm.isCad { try? appFsm.transition(event: .RET) }
                         })
                 
                 HStack {
