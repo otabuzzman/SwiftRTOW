@@ -25,6 +25,9 @@ Apps used on iPad
 |:---|:------|
 |`CpuRTOW`<br>(folder)|A Swift implementation of RTOW. Supports Swift concurrency (multi-threading) on CPU cores and iterative ray tracing.|
 |`RtowView.swift`|The application main view.|
-|`UIFsm.swift`|The UI finite state machine.|
+|`Fsm.swift`|The UI finite state machine.|
+|`ButtonStyle.swift`|Base (load) button style configuration data and code.|
+|`FinderViews.swift`|Finder views for viewer, camera and optics controls.|
 |`Extension.swift`|Extensions to SwiftUI classes and protocols.|
-|`Style.swift`|SwiftUI view style configuration data and code.|
+|`Error.swift`|Error exceptions enum.|
+|`Stack.swift`|Stack implementation.|
