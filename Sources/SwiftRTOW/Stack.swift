@@ -31,15 +31,3 @@ enum StackIndex: Int {
     case lastButOne
     case last
 }
-
-struct FsmHState: Stack {
-    var stack: Array<Any>! = []
-}
-
-struct FsmHEvent: Stack {
-    var stack: Array<Any>! = []
-}
-
-class EaParam: Stack {
-    var stack: Array<Any>! = []
-}

@@ -12,6 +12,18 @@ let FsmEventName = ["CAM", "CTL", "LOD", "MOV", "OPT", "RET", "TRN", "VWR", "ZOM
 
 typealias FsmAction = () throws -> Void
 
+struct FsmHState: Stack {
+    var stack: Array<Any>! = []
+}
+
+struct FsmHEvent: Stack {
+    var stack: Array<Any>! = []
+}
+
+class EaParam: Stack {
+    var stack: Array<Any>! = []
+}
+
 class Fsm: ObservableObject {
     @Published private(set) var hState = FsmHState()
     @Published private(set) var hEvent = FsmHEvent()
