@@ -1,13 +1,12 @@
 import SwiftUI
 
 enum FinderType {
-    case current
-    case preview
+    case viewer
+    case camera
 }
 
 struct FinderView: View {
     @EnvironmentObject var raycer: Rtow
-    @EnvironmentObject var appFsm: Fsm
     var scaleFactor = 0.31415
     var type: FinderType!
     
@@ -36,13 +35,14 @@ struct FinderView: View {
             CGFloat(raycer.imageWidth),
             CGFloat(raycer.imageHeight))*0.042
         
-        if type == .current {
+        switch type! {
+        case .viewer:
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .strokeBorder(.primaryRich, lineWidth: 4)
+                .frame(width: width(), height: height())
+        case .camera:
             RoundedRectangle(cornerRadius: cornerRadius)
                 .foregroundColor(.primaryPale)
-                .frame(width: width(), height: height())
-        } else {
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .strokeBorder(.primaryRich, lineWidth: 4/appFsm.zomAmount)
                 .frame(width: width(), height: height())
         }
     }

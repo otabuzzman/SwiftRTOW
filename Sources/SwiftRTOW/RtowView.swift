@@ -103,10 +103,12 @@ struct ContentView: View {
                             }.padding(.leading)
                             
                             Group {
-                                FinderView(type: .current)
-                                FinderView(type: .preview)
-                                    .scaleEffect(appFsm.zomAmount)
-                                    .offset(appFsm.movAmount)
+                                FinderView(type: .camera)
+                                    .scaleEffect(appFsm.vwrZomAmount)
+                                    .rotation3DEffect(.degrees(appFsm.camMovAmount), axis: appFsm.camMovAxis)
+                                FinderView(type: .viewer)
+                                    .rotationEffect(appFsm.camTrnAngle)
+                                    .offset(appFsm.vwrMovAmount)
                             }.frame(minWidth: 0, maxWidth: .infinity)
                         }
                         .zIndex(1) // SO #57730074
@@ -126,6 +128,15 @@ struct ContentView: View {
                         .onChanged { value in
                             appFsm.push(parameter: value.translation)
                             try? appFsm.transition(event: .MOV)
+                        }
+                        .onEnded { _ in
+                            if appFsm.isCad { try? appFsm.transition(event: .RET) }
+                        })
+                .simultaneousGesture(
+                    RotationGesture()
+                        .onChanged { value in
+                            appFsm.push(parameter: value)
+                            try? appFsm.transition(event: .TRN)
                         }
                         .onEnded { _ in
                             if appFsm.isCad { try? appFsm.transition(event: .RET) }
