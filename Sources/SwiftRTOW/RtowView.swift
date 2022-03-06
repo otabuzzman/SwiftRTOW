@@ -103,10 +103,18 @@ struct ContentView: View {
                             }.padding(.leading)
                             
                             Group {
-                                FinderView(type: .camera)
+                                FinderViewer(aspectRatio: CGFloat(raycer.camera.aspratio),
+                                             fieldOfView: appFsm.optZomAmount)
+                                    .scaleEffect(appFsm.optZomAmount)
+                                    .rotationEffect(appFsm.camTrnAngle)
+                                    .offset(appFsm.vwrMovAmount)
+                                FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
                                     .scaleEffect(appFsm.vwrZomAmount)
                                     .rotation3DEffect(.degrees(appFsm.camMovAmount), axis: appFsm.camMovAxis)
-                                FinderView(type: .viewer)
+                                FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio),
+                                             depthOfField: appFsm.optMovAmount,
+                                             focusDistance: appFsm.optTrnAngle.degrees,
+                                             fieldOfView: appFsm.optZomAmount)
                                     .rotationEffect(appFsm.camTrnAngle)
                                     .offset(appFsm.vwrMovAmount)
                             }.frame(minWidth: 0, maxWidth: .infinity)

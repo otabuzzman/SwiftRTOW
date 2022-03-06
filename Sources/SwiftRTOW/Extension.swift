@@ -61,6 +61,7 @@ extension Color {
 
 extension ShapeStyle where Self == Color {
     static var primaryRich: Color { .primaryRich }
+    static var primarySoft: Color { .primarySoft }
     static var primaryPale: Color { .primaryPale }
 
     static var buttonEnabled: Color { .primaryRich }

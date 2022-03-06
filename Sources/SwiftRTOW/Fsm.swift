@@ -33,9 +33,9 @@ class Fsm: ObservableObject {
     private var startJumpVwrMov = CGSize.zero
     @Published private(set) var vwrZomAmount = 1.0
     private var vwrZomRecall = 1.0
-    private var startJumpVwrZom: CGFloat = 0
-    @Published private(set) var camMovAmount: CGFloat = 0
-    private var camMovRecall: CGFloat = 0
+    private var startJumpVwrZom = CGFloat.zero
+    @Published private(set) var camMovAmount = CGFloat.zero
+    private var camMovRecall = CGFloat.zero
     private let camMovCoeff = 0.31415
     @Published private(set) var camMovAxis = (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero)
     private var camMovAxisRecall = (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero)
@@ -43,6 +43,16 @@ class Fsm: ObservableObject {
     @Published private(set) var camTrnAngle = Angle.zero
     private var camTrnAngleRecall = Angle.zero
     private var startJumpCamTrn = Angle.zero
+    @Published private(set) var optMovAmount = CGFloat.zero
+    private var optMovRecall = CGFloat.zero
+    private var startJumpOptMov = CGSize.zero
+    private let optMovCoeff = 0.31415
+    @Published private(set) var optTrnAngle = Angle.zero
+    private var optTrnAngleRecall = Angle.zero
+    private var startJumpOptTrn = Angle.zero
+    @Published private(set) var optZomAmount = 1.0
+    private var optZomRecall = 1.0
+    private var startJumpOptZom = CGFloat.zero
     
     private var timeoutTask: Task<Void, Never>!
     private var outbackTask: Task<Void, Never>!
@@ -67,7 +77,7 @@ class Fsm: ObservableObject {
             /* CAM */ [eaCamCam, eaReject, eaReject, eaCamMov, eaCamOpt, eaCamRet, eaCamTrn, eaCamVwr, eaReject],
             /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject, eaReject, eaReject],
             /* MOV */ [eaReject, eaReject, eaReject, eaMovMov, eaReject, eaMovRet, eaReject, eaReject, eaReject],
-            /* OPT */ [eaOptCam, eaReject, eaReject, eaReject, eaOptOpt, eaOptRet, eaReject, eaOptVwr, eaReject],
+            /* OPT */ [eaOptCam, eaReject, eaReject, eaOptMov, eaOptOpt, eaOptRet, eaOptTrn, eaOptVwr, eaOptZom],
             /* TRN */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaTrnRet, eaTrnTrn, eaReject, eaReject],
             /* VSC */ [eaReject, eaVscCtl, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
             /* VWR */ [eaVwrCam, eaReject, eaReject, eaVwrMov, eaVwrOpt, eaVwrRet, eaReject, eaVwrVwr, eaVwrZom],
@@ -118,9 +128,12 @@ class Fsm: ObservableObject {
             vwrMovRecall = vwrMovAmount
             startJumpVwrMov = .zero
         case .CAM:
-            startJumpCamMov = .zero
             camMovRecall = camMovAmount
+            startJumpCamMov = .zero
             camMovAxisRecall = camMovAxis
+        case .OPT:
+            optMovRecall = optMovAmount
+            startJumpOptMov = .zero
         default:
             break
         }
@@ -143,7 +156,12 @@ class Fsm: ObservableObject {
             self.camMovAmount = camMovRecall+(
                 camMovAmount.width*camMovAmount.width+camMovAmount.height*camMovAmount.height
             ).squareRoot()*camMovCoeff
-            camMovAxis = camMovAxisRecall+(x: movAmount.height, y: movAmount.width, z: 0)
+            camMovAxis = camMovAxisRecall+(x: -movAmount.height, y: movAmount.width, z: 0)
+        case .OPT:
+            let optMovAmount = startJumpOptMov+movAmount
+            self.optMovAmount = optMovRecall+(
+                optMovAmount.width*optMovAmount.width+optMovAmount.height*optMovAmount.height
+            ).squareRoot()*optMovCoeff
         default:
             break
         }
@@ -164,6 +182,9 @@ class Fsm: ObservableObject {
         case .CAM:
             camTrnAngleRecall = camTrnAngle
             startJumpCamTrn = .zero
+        case .OPT:
+            optTrnAngleRecall = optTrnAngle
+            startJumpOptTrn = .zero
         default:
             break
         }
@@ -181,6 +202,8 @@ class Fsm: ObservableObject {
         switch hState {
         case .CAM:
             camTrnAngle = startJumpCamTrn+camTrnAngleRecall+trnAmount
+        case .OPT:
+            optTrnAngle = startJumpOptTrn+optTrnAngleRecall+trnAmount
         default:
             break
         }
@@ -201,6 +224,9 @@ class Fsm: ObservableObject {
         case .VWR:
             vwrZomRecall = vwrZomAmount
             startJumpVwrZom = 0
+        case .OPT:
+            optZomRecall = optZomAmount
+            startJumpOptZom = 0
         default:
             break
         }
@@ -218,6 +244,8 @@ class Fsm: ObservableObject {
         switch hState {
         case .VWR:
             vwrZomAmount = startJumpVwrZom+vwrZomRecall+zomAmount
+        case .OPT:
+            optZomAmount = startJumpOptZom+optZomRecall+zomAmount
         default:
             break
         }
@@ -261,6 +289,33 @@ class Fsm: ObservableObject {
         update(withState: .TRN, noHistory: false)
     }
     
+    private func eaOptMov() {
+        timeoutTask.cancel()
+        
+        let movAmount = eaParam.pop() as! CGSize
+        startJumpOptMov = -movAmount
+        
+        update(withState: .MOV, noHistory: false)
+    }
+    
+    private func eaOptTrn() {
+        timeoutTask.cancel()
+        
+        let trnAmount = eaParam.pop() as! Angle
+        startJumpOptTrn = -trnAmount
+        
+        update(withState: .TRN, noHistory: false)
+    }
+    
+    private func eaOptZom() {
+        timeoutTask.cancel()
+        
+        let zomAmount = eaParam.pop() as! CGFloat
+        startJumpOptZom = -zomAmount
+        
+        update(withState: .ZOM, noHistory: false)
+    }
+    
     private func eaVscCtl() {
         timeoutTask = runOnTimeout(seconds: 3) {
             do {
@@ -273,15 +328,24 @@ class Fsm: ObservableObject {
         startJumpVwrMov = .zero
         vwrZomAmount = 1.0
         vwrZomRecall = 1.0
-        startJumpVwrZom = 0
-        camMovAmount = 0
-        camMovRecall = 0
-        camMovAxis = (x: 0, y: 0, z: 0)
-        camMovAxisRecall = (x: 0, y: 0, z: 0)
+        startJumpVwrZom = .zero
+        camMovAmount = .zero
+        camMovRecall = .zero
+        camMovAxis = (x: .zero, y: .zero, z: .zero)
+        camMovAxisRecall = (x: .zero, y: .zero, z: .zero)
         startJumpCamMov = .zero
         camTrnAngle = .zero
         camTrnAngleRecall = .zero
         startJumpCamTrn = .zero
+        optMovAmount = .zero
+        optMovRecall = .zero
+        startJumpOptMov = .zero
+        optTrnAngle = .zero
+        optTrnAngleRecall = .zero
+        startJumpOptTrn = .zero
+        optZomAmount = 1.0
+        optZomRecall = 1.0
+        startJumpOptZom = .zero
         
         let pressedSideButton = eaParam.pop() as! ButtonType
         
