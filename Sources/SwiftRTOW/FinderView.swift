@@ -50,8 +50,8 @@ struct ViewerControls: FinderElement, ViewModifier {
 }
 
 extension FinderViewer {
-    func applyViewerControls(aspectRatio: CGFloat, fieldOfView: CGFloat, viewerLRUD: CGSize, cameraZoom: CGFloat, cameraLevel: Angle) -> some View {
-        modifier(ViewerControls(aspectRatio: aspectRatio, fieldOfView: fieldOfView, viewerLRUD: viewerLRUD, cameraZoom: cameraZoom, cameraLevel: cameraLevel))
+    func applyViewerControls(aspectRatio: CGFloat, fieldOfView: CGFloat, viewerLRUD: CGSize, cameraLevel: Angle) -> some View {
+        modifier(ViewerControls(aspectRatio: aspectRatio, fieldOfView: fieldOfView, viewerLRUD: viewerLRUD, cameraLevel: cameraLevel))
     }
 }
 
