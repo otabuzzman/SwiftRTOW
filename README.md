@@ -27,7 +27,7 @@ Apps used on iPad
 |`RtowView.swift`|The application main view.|
 |`Fsm.swift`|The UI finite state machine.|
 |`ButtonStyle.swift`|Base button style configurations and code.|
-|`FinderViews.swift`|Finder views for viewer, camera and optics controls.|
+|`FinderView.swift`|Finder views for viewer, camera and optics controls.|
 |`Extension.swift`|SwiftUI classes and protocols extensions.|
 |`Error.swift`|Error exceptions.|
 |`Stack.swift`|A stack implementation.|

@@ -48,12 +48,17 @@ struct ContentView: View {
                     ZStack(alignment: .bottomLeading) {
                         RtowView()
                             .task {
-                                raycer.imageWidth = 320
-                                raycer.imageHeight = 240
-                                raycer.samplesPerPixel = 1
-                                raycer.camera.set(aspratio: 320.0/240.0)
-                        
-                                let things = Ch10()
+                                var things: Things
+                                if _isDebugAssertConfiguration() { // SO #24003291
+                                    raycer.imageWidth = 320
+                                    raycer.imageHeight = 240
+                                    raycer.samplesPerPixel = 1
+                                    raycer.camera.set(aspratio: 320.0/240.0)
+                                    
+                                    things = Ch10()
+                                } else {
+                                    things = Ch13()
+                                }
                                 things.load()
                                 appFsm.push(parameter: things)
                                 appFsm.push(parameter: raycer)
@@ -103,20 +108,27 @@ struct ContentView: View {
                             }.padding(.leading)
                             
                             Group {
-                                FinderViewer(aspectRatio: CGFloat(raycer.camera.aspratio),
-                                             fieldOfView: appFsm.optZomAmount)
-                                    .scaleEffect(appFsm.optZomAmount)
-                                    .rotationEffect(appFsm.camTrnAngle)
-                                    .offset(appFsm.vwrMovAmount)
-                                FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
-                                    .scaleEffect(appFsm.vwrZomAmount)
-                                    .rotation3DEffect(.degrees(appFsm.camMovAmount), axis: appFsm.camMovAxis)
-                                FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio),
-                                             depthOfField: appFsm.optMovAmount,
-                                             focusDistance: appFsm.optTrnAngle.degrees,
-                                             fieldOfView: appFsm.optZomAmount)
-                                    .rotationEffect(appFsm.camTrnAngle)
-                                    .offset(appFsm.vwrMovAmount)
+                                FinderViewer()
+                                    .applyViewerControls(
+                                        aspectRatio: CGFloat(raycer.camera.aspratio),
+                                        fieldOfView: appFsm.optZomAmount,
+                                        viewerLRUD: appFsm.vwrMovAmount,
+                                        cameraLevel: appFsm.camTrnAngle)
+                                FinderCamera()
+                                    .applyCameraControls(
+                                        aspectRatio: CGFloat(raycer.camera.aspratio),
+                                        viewerDistance: appFsm.vwrZomAmount,
+                                        cameraDirection: (
+                                            angle: appFsm.camMovAmount,
+                                            axis: appFsm.camMovAxis))
+                                FinderOptics()
+                                    .applyOpticsControls(
+                                        aspectRatio: CGFloat(raycer.camera.aspratio),
+                                        fieldOfView: appFsm.optZomAmount,
+                                        depthOfField: appFsm.optMovAmount,
+                                        focusDistance: appFsm.optTrnAngle,
+                                        viewerLRUD: appFsm.vwrMovAmount,
+                                        cameraLevel: appFsm.camTrnAngle)
                             }.frame(minWidth: 0, maxWidth: .infinity)
                         }
                         .zIndex(1) // SO #57730074
