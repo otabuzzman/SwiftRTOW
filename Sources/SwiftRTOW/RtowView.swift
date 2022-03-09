@@ -108,22 +108,19 @@ struct ContentView: View {
                             }.padding(.leading)
                             
                             Group {
-                                FinderViewer()
+                                FinderViewer(aspectRatio: CGFloat(raycer.camera.aspratio))
                                     .applyViewerControls(
-                                        aspectRatio: CGFloat(raycer.camera.aspratio),
                                         fieldOfView: appFsm.optZomAmount,
                                         viewerLRUD: appFsm.vwrMovAmount,
                                         cameraLevel: appFsm.camTrnAngle)
-                                FinderCamera()
+                                FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
                                     .applyCameraControls(
-                                        aspectRatio: CGFloat(raycer.camera.aspratio),
                                         viewerDistance: appFsm.vwrZomAmount,
                                         cameraDirection: (
                                             angle: appFsm.camMovAmount,
                                             axis: appFsm.camMovAxis))
-                                FinderOptics()
+                                FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio))
                                     .applyOpticsControls(
-                                        aspectRatio: CGFloat(raycer.camera.aspratio),
                                         fieldOfView: appFsm.optZomAmount,
                                         depthOfField: appFsm.optMovAmount,
                                         focusDistance: appFsm.optTrnAngle,

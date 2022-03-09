@@ -24,6 +24,8 @@ extension FinderElement {
 }
 
 struct FinderViewer: View {
+    var aspectRatio: CGFloat
+    
     var body: some View {
         EmptyView()
     }
@@ -46,16 +48,18 @@ struct ViewerControls: FinderElement, ViewModifier {
             .scaleEffect(fieldOfView)
             .rotationEffect(cameraLevel)
             .offset(viewerLRUD)
-    } 
+    }
 }
 
 extension FinderViewer {
-    func applyViewerControls(aspectRatio: CGFloat, fieldOfView: CGFloat, viewerLRUD: CGSize, cameraLevel: Angle) -> some View {
+    func applyViewerControls(fieldOfView: CGFloat, viewerLRUD: CGSize, cameraLevel: Angle) -> some View {
         modifier(ViewerControls(aspectRatio: aspectRatio, fieldOfView: fieldOfView, viewerLRUD: viewerLRUD, cameraLevel: cameraLevel))
     }
 }
 
 struct FinderCamera: View {
+    var aspectRatio: CGFloat
+    
     var body: some View {
         EmptyView()
     }
@@ -80,12 +84,14 @@ struct CameraControls: FinderElement, ViewModifier {
 }
 
 extension FinderCamera {
-    func applyCameraControls(aspectRatio: CGFloat, viewerDistance: CGFloat, cameraDirection: (angle: CGFloat, axis: (x: CGFloat, y: CGFloat, z: CGFloat))) -> some View {
+    func applyCameraControls(viewerDistance: CGFloat, cameraDirection: (angle: CGFloat, axis: (x: CGFloat, y: CGFloat, z: CGFloat))) -> some View {
         modifier(CameraControls(aspectRatio: aspectRatio, viewerDistance: viewerDistance, cameraDirection: cameraDirection))
     }
 }
 
 struct FinderOptics: View {
+    var aspectRatio: CGFloat
+    
     var body: some View {
         EmptyView()
     }
@@ -125,7 +131,7 @@ struct OpticsControls: FinderElement, ViewModifier {
 }
 
 extension FinderOptics {
-    func applyOpticsControls(aspectRatio: CGFloat, fieldOfView: CGFloat, depthOfField: CGFloat, focusDistance: Angle, viewerLRUD: CGSize, cameraLevel: Angle) -> some View {
+    func applyOpticsControls(fieldOfView: CGFloat, depthOfField: CGFloat, focusDistance: Angle, viewerLRUD: CGSize, cameraLevel: Angle) -> some View {
         modifier(OpticsControls(aspectRatio: aspectRatio, fieldOfView: fieldOfView, depthOfField: depthOfField, focusDistance: focusDistance, viewerLRUD: viewerLRUD, cameraLevel: cameraLevel))
     }
 }
