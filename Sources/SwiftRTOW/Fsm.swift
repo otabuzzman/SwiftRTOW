@@ -34,12 +34,14 @@ class Fsm: ObservableObject {
     @Published private(set) var vwrZomAmount = 1.0
     private var vwrZomRecall = 1.0
     private var startJumpVwrZom = CGFloat.zero
-    @Published private(set) var camMovAmount = CGFloat.zero
-    private var camMovRecall = CGFloat.zero
-    private let camMovCoeff = 0.31415
-    @Published private(set) var camMovAxis = (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero)
-    private var camMovAxisRecall = (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero)
+    @Published private(set) var camMovAmount = (
+        rotationAngle: CGFloat.zero,
+        rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
+    private var camMovRecall = (
+        rotationAngle: CGFloat.zero,
+        rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
     private var startJumpCamMov = CGSize.zero
+    private let camMovCoeff = 0.31415
     @Published private(set) var camTrnAmount = CGFloat.zero
     private var camTrnRecall = CGFloat.zero
     private var startJumpCamTrn = CGFloat.zero
@@ -130,7 +132,6 @@ class Fsm: ObservableObject {
         case .CAM:
             camMovRecall = camMovAmount
             startJumpCamMov = .zero
-            camMovAxisRecall = camMovAxis
         case .OPT:
             optMovRecall = optMovAmount
             startJumpOptMov = .zero
@@ -153,10 +154,10 @@ class Fsm: ObservableObject {
             vwrMovAmount = startJumpVwrMov+vwrMovRecall+movAmount
         case .CAM:
             let camMovAmount = startJumpCamMov+movAmount
-            self.camMovAmount = camMovRecall+(
+            self.camMovAmount.0 = camMovRecall.0+(
                 camMovAmount.width*camMovAmount.width+camMovAmount.height*camMovAmount.height
             ).squareRoot()*camMovCoeff
-            camMovAxis = camMovAxisRecall+(x: -movAmount.height, y: movAmount.width, z: 0)
+            self.camMovAmount.1 = camMovRecall.1+(x: -movAmount.height, y: movAmount.width, z: 0)
         case .OPT:
             let optMovAmount = startJumpOptMov+movAmount
             self.optMovAmount = optMovRecall+(
@@ -329,10 +330,12 @@ class Fsm: ObservableObject {
         vwrZomAmount = 1.0
         vwrZomRecall = 1.0
         startJumpVwrZom = .zero
-        camMovAmount = .zero
-        camMovRecall = .zero
-        camMovAxis = (x: .zero, y: .zero, z: .zero)
-        camMovAxisRecall = (x: .zero, y: .zero, z: .zero)
+        camMovAmount = (
+            rotationAngle: CGFloat.zero,
+            rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
+        camMovRecall = (
+            rotationAngle: CGFloat.zero,
+            rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
         startJumpCamMov = .zero
         camTrnAmount = .zero
         camTrnRecall = .zero

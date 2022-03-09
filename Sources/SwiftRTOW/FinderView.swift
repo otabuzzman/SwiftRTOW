@@ -65,10 +65,13 @@ struct FinderCamera: View {
     }
 }
 
+typealias RotationAxis = (x: CGFloat, y: CGFloat, z: CGFloat)
+typealias CameraDirection = (rotationAngle: CGFloat, rotationAxis: RotationAxis)
+
 struct CameraControls: FinderElement, ViewModifier {
     var aspectRatio: CGFloat
     var viewerDistance: CGFloat
-    var cameraDirection: (angle: CGFloat, axis: (x: CGFloat, y: CGFloat, z: CGFloat))
+    var cameraDirection: CameraDirection
     
     func body(content: Content) -> some View {
         let cornerRadius = min(width, height)*0.075
@@ -84,7 +87,7 @@ struct CameraControls: FinderElement, ViewModifier {
 }
 
 extension FinderCamera {
-    func applyCameraControls(viewerDistance: CGFloat, cameraDirection: (angle: CGFloat, axis: (x: CGFloat, y: CGFloat, z: CGFloat))) -> some View {
+    func applyCameraControls(viewerDistance: CGFloat, cameraDirection: CameraDirection) -> some View {
         modifier(CameraControls(aspectRatio: aspectRatio, viewerDistance: viewerDistance, cameraDirection: cameraDirection))
     }
 }

@@ -116,9 +116,7 @@ struct ContentView: View {
                                 FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
                                     .applyCameraControls(
                                         viewerDistance: appFsm.vwrZomAmount,
-                                        cameraDirection: (
-                                            angle: appFsm.camMovAmount,
-                                            axis: appFsm.camMovAxis))
+                                        cameraDirection: appFsm.camMovAmount)
                                 FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio))
                                     .applyOpticsControls(
                                         fieldOfView: appFsm.optZomAmount,
