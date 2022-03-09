@@ -6,8 +6,6 @@ enum ButtonType {
     case Viewer, Camera, Optics
 }
 
-private let buttonSize: CGFloat = UIScreen.width*0.1
-
 struct BaseButton: ButtonStyle {
     var pretendButton: ButtonType
     var pressedButton: ButtonType
@@ -17,6 +15,8 @@ struct BaseButton: ButtonStyle {
     @EnvironmentObject var appFsm: Fsm
     
     func makeBody(configuration: Configuration) -> some View {
+        let buttonSize = UIScreen.width*0.1
+        
         ZStack {
             Rectangle()
                 .fill(enabled ? .buttonEnabled : .buttonDisabled)
@@ -44,6 +44,8 @@ struct SideButton: ButtonStyle {
     @EnvironmentObject var appFsm: Fsm
     
     func makeBody(configuration: Configuration) -> some View {
+        let buttonSize = UIScreen.width*0.1
+        
         ZStack {
             Image(systemName: image)
                 .resizable()

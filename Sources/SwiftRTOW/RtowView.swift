@@ -83,26 +83,26 @@ struct ContentView: View {
                         ZStack(alignment: .leading) {
                             VStack {
                                 Button("Set viewer position") {
-                                    pressedSideButton = ButtonType.Viewer
+                                    pressedSideButton = .Viewer
                                     try? appFsm.transition(event: .VWR)
                                 }.buttonStyle(SideButton(
-                                    pretendButton: ButtonType.Viewer,
+                                    pretendButton: .Viewer,
                                     pressedButton: pressedSideButton,
                                     image: "location.fill.viewfinder"))
                                 
                                 Button("Set camera direction") {
-                                    pressedSideButton = ButtonType.Camera
+                                    pressedSideButton = .Camera
                                     try? appFsm.transition(event: .CAM)
                                 }.buttonStyle(SideButton(
-                                    pretendButton: ButtonType.Camera,
+                                    pretendButton: .Camera,
                                     pressedButton: pressedSideButton,
                                     image: "camera.viewfinder"))
                         
                                 Button("Adjust camera optics") {
-                                    pressedSideButton = ButtonType.Optics
+                                    pressedSideButton = .Optics
                                     try? appFsm.transition(event: .OPT)
                                 }.buttonStyle(SideButton(
-                                    pretendButton: ButtonType.Optics,
+                                    pretendButton: .Optics,
                                     pressedButton: pressedSideButton,
                                     image: "camera.aperture"))
                             }.padding(.leading)
@@ -173,21 +173,21 @@ struct ContentView: View {
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
                         try? appFsm.transition(event: .LOD)
-                        pressedBaseButton = ButtonType.Ch8
+                        pressedBaseButton = .Ch8
                     }.buttonStyle(BaseButton(
-                        pretendButton: ButtonType.Ch8,
+                        pretendButton: .Ch8,
                         pressedButton: pressedBaseButton,
                         image: "rtow-ch8-btn"))
                     
                     Button("Chapter 10") {
                         let things = Ch10()
                         things.load()
-                        appFsm.push(parameter:things)
+                        appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
                         try? appFsm.transition(event: .LOD)
-                        pressedBaseButton = ButtonType.Ch10
+                        pressedBaseButton = .Ch10
                     }.buttonStyle(BaseButton(
-                        pretendButton: ButtonType.Ch10, 
+                        pretendButton: .Ch10,
                         pressedButton: pressedBaseButton,
                         image: "rtow-ch10-btn"))
                     
@@ -197,9 +197,9 @@ struct ContentView: View {
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
                         try? appFsm.transition(event: .LOD)
-                        pressedBaseButton = ButtonType.Ch13
+                        pressedBaseButton = .Ch13
                     }.buttonStyle(BaseButton(
-                        pretendButton: ButtonType.Ch13,
+                        pretendButton: .Ch13,
                         pressedButton: pressedBaseButton,
                         image: "rtow-ch13-btn"))
                 }.disabled(!appFsm.isState(.VSC))
