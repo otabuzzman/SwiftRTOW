@@ -40,16 +40,16 @@ class Fsm: ObservableObject {
     @Published private(set) var camMovAxis = (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero)
     private var camMovAxisRecall = (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero)
     private var startJumpCamMov = CGSize.zero
-    @Published private(set) var camTrnAngle = Angle.zero
-    private var camTrnAngleRecall = Angle.zero
-    private var startJumpCamTrn = Angle.zero
+    @Published private(set) var camTrnAmount = CGFloat.zero
+    private var camTrnRecall = CGFloat.zero
+    private var startJumpCamTrn = CGFloat.zero
     @Published private(set) var optMovAmount = CGFloat.zero
     private var optMovRecall = CGFloat.zero
     private var startJumpOptMov = CGSize.zero
     private let optMovCoeff = 0.31415
-    @Published private(set) var optTrnAngle = Angle.zero
-    private var optTrnAngleRecall = Angle.zero
-    private var startJumpOptTrn = Angle.zero
+    @Published private(set) var optTrnAmount = CGFloat.zero
+    private var optTrnRecall = CGFloat.zero
+    private var startJumpOptTrn = CGFloat.zero
     @Published private(set) var optZomAmount = 1.0
     private var optZomRecall = 1.0
     private var startJumpOptZom = CGFloat.zero
@@ -180,10 +180,10 @@ class Fsm: ObservableObject {
         
         switch hState {
         case .CAM:
-            camTrnAngleRecall = camTrnAngle
+            camTrnRecall = camTrnAmount
             startJumpCamTrn = .zero
         case .OPT:
-            optTrnAngleRecall = optTrnAngle
+            optTrnRecall = optTrnAmount
             startJumpOptTrn = .zero
         default:
             break
@@ -196,14 +196,14 @@ class Fsm: ObservableObject {
     }
     
     private func eaTrnTrn() {
-        let trnAmount = eaParam.pop() as! Angle
+        let trnAmount = eaParam.pop() as! CGFloat
         let hState = self.hState.peek(.lastButOne) as! FsmState
         
         switch hState {
         case .CAM:
-            camTrnAngle = startJumpCamTrn+camTrnAngleRecall+trnAmount
+            camTrnAmount = startJumpCamTrn+camTrnRecall+trnAmount
         case .OPT:
-            optTrnAngle = startJumpOptTrn+optTrnAngleRecall+trnAmount
+            optTrnAmount = startJumpOptTrn+optTrnRecall+trnAmount
         default:
             break
         }
@@ -283,7 +283,7 @@ class Fsm: ObservableObject {
     private func eaCamTrn() {
         timeoutTask.cancel()
         
-        let trnAmount = eaParam.pop() as! Angle
+        let trnAmount = eaParam.pop() as! CGFloat
         startJumpCamTrn = -trnAmount
         
         update(withState: .TRN, noHistory: false)
@@ -301,7 +301,7 @@ class Fsm: ObservableObject {
     private func eaOptTrn() {
         timeoutTask.cancel()
         
-        let trnAmount = eaParam.pop() as! Angle
+        let trnAmount = eaParam.pop() as! CGFloat
         startJumpOptTrn = -trnAmount
         
         update(withState: .TRN, noHistory: false)
@@ -334,14 +334,14 @@ class Fsm: ObservableObject {
         camMovAxis = (x: .zero, y: .zero, z: .zero)
         camMovAxisRecall = (x: .zero, y: .zero, z: .zero)
         startJumpCamMov = .zero
-        camTrnAngle = .zero
-        camTrnAngleRecall = .zero
+        camTrnAmount = .zero
+        camTrnRecall = .zero
         startJumpCamTrn = .zero
         optMovAmount = .zero
         optMovRecall = .zero
         startJumpOptMov = .zero
-        optTrnAngle = .zero
-        optTrnAngleRecall = .zero
+        optTrnAmount = .zero
+        optTrnRecall = .zero
         startJumpOptTrn = .zero
         optZomAmount = 1.0
         optZomRecall = 1.0

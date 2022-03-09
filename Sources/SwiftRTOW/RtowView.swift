@@ -112,7 +112,7 @@ struct ContentView: View {
                                     .applyViewerControls(
                                         fieldOfView: appFsm.optZomAmount,
                                         viewerLRUD: appFsm.vwrMovAmount,
-                                        cameraLevel: appFsm.camTrnAngle)
+                                        cameraLevel: appFsm.camTrnAmount)
                                 FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
                                     .applyCameraControls(
                                         viewerDistance: appFsm.vwrZomAmount,
@@ -123,9 +123,9 @@ struct ContentView: View {
                                     .applyOpticsControls(
                                         fieldOfView: appFsm.optZomAmount,
                                         depthOfField: appFsm.optMovAmount,
-                                        focusDistance: appFsm.optTrnAngle,
+                                        focusDistance: appFsm.optTrnAmount,
                                         viewerLRUD: appFsm.vwrMovAmount,
-                                        cameraLevel: appFsm.camTrnAngle)
+                                        cameraLevel: appFsm.camTrnAmount)
                             }.frame(minWidth: 0, maxWidth: .infinity)
                         }
                         .zIndex(1) // SO #57730074
@@ -152,7 +152,7 @@ struct ContentView: View {
                 .simultaneousGesture(
                     RotationGesture()
                         .onChanged { value in
-                            appFsm.push(parameter: value)
+                            appFsm.push(parameter: CGFloat(value.degrees))
                             try? appFsm.transition(event: .TRN)
                         }
                         .onEnded { _ in

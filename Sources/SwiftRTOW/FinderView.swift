@@ -35,7 +35,7 @@ struct ViewerControls: FinderElement, ViewModifier {
     var aspectRatio: CGFloat
     var fieldOfView: CGFloat
     var viewerLRUD: CGSize
-    var cameraLevel: Angle
+    var cameraLevel: CGFloat
     
     func body(content: Content) -> some View {
         let cornerRadius = min(width, height)*0.075
@@ -46,13 +46,13 @@ struct ViewerControls: FinderElement, ViewModifier {
             .frame(width: width, height: height)
         // view
             .scaleEffect(fieldOfView)
-            .rotationEffect(cameraLevel)
+            .rotationEffect(.degrees(cameraLevel))
             .offset(viewerLRUD)
     }
 }
 
 extension FinderViewer {
-    func applyViewerControls(fieldOfView: CGFloat, viewerLRUD: CGSize, cameraLevel: Angle) -> some View {
+    func applyViewerControls(fieldOfView: CGFloat, viewerLRUD: CGSize, cameraLevel: CGFloat) -> some View {
         modifier(ViewerControls(aspectRatio: aspectRatio, fieldOfView: fieldOfView, viewerLRUD: viewerLRUD, cameraLevel: cameraLevel))
     }
 }
@@ -101,13 +101,13 @@ struct OpticsControls: FinderElement, ViewModifier {
     var aspectRatio: CGFloat
     var fieldOfView: CGFloat
     var depthOfField: CGFloat
-    var focusDistance: Angle
+    var focusDistance: CGFloat
     var viewerLRUD: CGSize
-    var cameraLevel: Angle
+    var cameraLevel: CGFloat
     
     func body(content: Content) -> some View {
         let cornerRadius = min(width, height)*0.075
-        let scaleFactor = 1.0/1.618034*(1.0-focusDistance.degrees/180.0)
+        let scaleFactor = 1.0/1.618034*(1.0-focusDistance/180.0)
         
         ZStack {
             RoundedRectangle(cornerRadius: cornerRadius)
@@ -125,13 +125,13 @@ struct OpticsControls: FinderElement, ViewModifier {
         }
         .frame(width: width, height: height)
         .scaleEffect(fieldOfView)
-        .rotationEffect(cameraLevel)
+        .rotationEffect(.degrees(cameraLevel))
         .offset(viewerLRUD)
     }
 }
 
 extension FinderOptics {
-    func applyOpticsControls(fieldOfView: CGFloat, depthOfField: CGFloat, focusDistance: Angle, viewerLRUD: CGSize, cameraLevel: Angle) -> some View {
+    func applyOpticsControls(fieldOfView: CGFloat, depthOfField: CGFloat, focusDistance: CGFloat, viewerLRUD: CGSize, cameraLevel: CGFloat) -> some View {
         modifier(OpticsControls(aspectRatio: aspectRatio, fieldOfView: fieldOfView, depthOfField: depthOfField, focusDistance: focusDistance, viewerLRUD: viewerLRUD, cameraLevel: cameraLevel))
     }
 }
