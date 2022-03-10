@@ -80,6 +80,12 @@ extension CGSize {
     }
 }
 
+extension Comparable {
+    func clamped(to limits: ClosedRange<Self>) -> Self {
+        return min(max(self, limits.lowerBound), limits.upperBound)
+    }
+}
+
 // .rotation3DEffect modifier axis touple operators
 func +<T: Numeric>(lhs: (x: T, y: T, z: T), rhs: (x: T, y: T, z: T)) -> (x: T, y: T, z: T) {
     return (x: lhs.0+rhs.0, y: lhs.1+rhs.1, z: lhs.2+rhs.2)

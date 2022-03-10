@@ -46,7 +46,7 @@ struct ViewerControls: ViewModifier {
                 // view
                     .frame(width: width, height: height)
                     .scaleEffect(fieldOfView)
-                    .rotationEffect(.degrees(cameraLevel))
+                    .rotationEffect(.degrees(cameraLevel.clamped(to: -63.0...63.0)))
                     .offset(viewerLRUD)
             }.frame(width: borderWidth, height: borderHeight, alignment: .center)
         }
@@ -150,7 +150,7 @@ struct OpticsControls: ViewModifier {
                 }
                 .frame(width: width, height: height)
                 .scaleEffect(fieldOfView)
-                .rotationEffect(.degrees(cameraLevel))
+                .rotationEffect(.degrees(cameraLevel.clamped(to: -63.0...63.0)))
                 .offset(viewerLRUD)
             }.frame(width: borderWidth, height: borderHeight, alignment: .center)
         }
