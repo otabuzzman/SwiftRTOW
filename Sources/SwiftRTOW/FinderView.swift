@@ -1,25 +1,17 @@
 import SwiftUI
 
-protocol FinderElement {
-    var aspectRatio: CGFloat { get set }
-    
-    var width: CGFloat { get }
-    var height: CGFloat { get }
-}
-
-extension FinderElement {
-    var width: CGFloat {
-        let scaleFactor = 0.31415
-        
-        return (UIScreen.aspectRatio>aspectRatio ?
-                UIScreen.height*aspectRatio : UIScreen.width)*scaleFactor
-    }
-    
-    var height: CGFloat {
-        let scaleFactor = 0.31415
-        
-        return (UIScreen.aspectRatio>aspectRatio ?
-                UIScreen.height : UIScreen.width)*scaleFactor/aspectRatio
+struct FinderBorder: View {
+    var body: some View {
+        GeometryReader { geometry in
+            let borderWidth = geometry.size.width
+            let borderHeight = geometry.size.height
+            
+            let cornerRadius = min(borderWidth, borderHeight)*0.031415
+            
+            RoundedRectangle(cornerRadius: cornerRadius)
+            // shape
+                .strokeBorder(.primaryRich, lineWidth: 2)
+        }
     }
 }
 
@@ -31,23 +23,33 @@ struct FinderViewer: View {
     }
 }
 
-struct ViewerControls: FinderElement, ViewModifier {
+struct ViewerControls: ViewModifier {
     var aspectRatio: CGFloat
     var fieldOfView: CGFloat
     var viewerLRUD: CGSize
     var cameraLevel: CGFloat
     
     func body(content: Content) -> some View {
-        let cornerRadius = min(width, height)*0.075
-        
-        RoundedRectangle(cornerRadius: cornerRadius)
-        // shape
-            .strokeBorder(.primaryRich, lineWidth: 4/fieldOfView)
-            .frame(width: width, height: height)
-        // view
-            .scaleEffect(fieldOfView)
-            .rotationEffect(.degrees(cameraLevel))
-            .offset(viewerLRUD)
+        GeometryReader { geometry in
+            let borderWidth = geometry.size.width
+            let borderHeight = geometry.size.height
+            let borderRatio = borderWidth/borderHeight
+            
+            let cornerRadius = min(borderWidth, borderHeight)*0.031415
+            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.5
+            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.5/aspectRatio
+            
+            VStack { // https://swiftui-lab.com/geometryreader-bug/ (FB7971927)
+                RoundedRectangle(cornerRadius: cornerRadius)
+                // shape
+                    .strokeBorder(.primaryRich, lineWidth: 4/fieldOfView)
+                // view
+                    .frame(width: width, height: height)
+                    .scaleEffect(fieldOfView)
+                    .rotationEffect(.degrees(cameraLevel))
+                    .offset(viewerLRUD)
+            }.frame(width: borderWidth, height: borderHeight, alignment: .center)
+        }
     }
 }
 
@@ -68,21 +70,31 @@ struct FinderCamera: View {
 typealias RotationAxis = (x: CGFloat, y: CGFloat, z: CGFloat)
 typealias CameraDirection = (rotationAngle: CGFloat, rotationAxis: RotationAxis)
 
-struct CameraControls: FinderElement, ViewModifier {
+struct CameraControls: ViewModifier {
     var aspectRatio: CGFloat
     var viewerDistance: CGFloat
     var cameraDirection: CameraDirection
     
     func body(content: Content) -> some View {
-        let cornerRadius = min(width, height)*0.075
-        
-        RoundedRectangle(cornerRadius: cornerRadius)
-        // shape
-            .foregroundColor(.primaryPale)
-            .frame(width: width, height: height)
-        // view
-            .scaleEffect(viewerDistance)
-            .rotation3DEffect(.degrees(cameraDirection.0), axis: cameraDirection.1)
+        GeometryReader { geometry in
+            let borderWidth = geometry.size.width
+            let borderHeight = geometry.size.height
+            let borderRatio = borderWidth/borderHeight
+            
+            let cornerRadius = min(borderWidth, borderHeight)*0.031415
+            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.5
+            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.5/aspectRatio
+            
+            VStack { // https://swiftui-lab.com/geometryreader-bug/ (FB7971927)
+                RoundedRectangle(cornerRadius: cornerRadius)
+                // shape
+                    .foregroundColor(.primaryPale)
+                // view
+                    .frame(width: width, height: height)
+                    .scaleEffect(viewerDistance)
+                    .rotation3DEffect(.degrees(cameraDirection.0), axis: cameraDirection.1)
+            }.frame(width: borderWidth, height: borderHeight, alignment: .center)
+        }
     }
 }
 
@@ -100,7 +112,7 @@ struct FinderOptics: View {
     }
 }
 
-struct OpticsControls: FinderElement, ViewModifier {
+struct OpticsControls: ViewModifier {
     var aspectRatio: CGFloat
     var fieldOfView: CGFloat
     var depthOfField: CGFloat
@@ -109,27 +121,39 @@ struct OpticsControls: FinderElement, ViewModifier {
     var cameraLevel: CGFloat
     
     func body(content: Content) -> some View {
-        let cornerRadius = min(width, height)*0.075
         let scaleFactor = 1.0/1.618034*(1.0-focusDistance/180.0)
         
-        ZStack {
-            RoundedRectangle(cornerRadius: cornerRadius)
-            // shape
-                .fill(RadialGradient(
-                    gradient: Gradient(
-                        colors: [.crystal, .primaryHint, .primaryPale]),
-                    center: .center,
-                    startRadius: min(width, height)/2.0-depthOfField,
-                    endRadius: min(width, height)-depthOfField))
-            Circle()
-            // shape
-                .strokeBorder(.primarySoft, lineWidth: 4/(scaleFactor*fieldOfView))
-                .scaleEffect(scaleFactor)
+        GeometryReader { geometry in
+            let borderWidth = geometry.size.width
+            let borderHeight = geometry.size.height
+            let borderRatio = borderWidth/borderHeight
+            
+            let cornerRadius = min(borderWidth, borderHeight)*0.031415
+            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.5
+            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.5/aspectRatio
+            
+            VStack { // https://swiftui-lab.com/geometryreader-bug/ (FB7971927)
+                ZStack {
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                    // shape
+                        .fill(RadialGradient(
+                            gradient: Gradient(
+                                colors: [.crystal, .primaryHint, .primaryPale]),
+                            center: .center,
+                            startRadius: min(width, height)/2.0-depthOfField,
+                            endRadius: min(width, height)-depthOfField))
+                    Circle()
+                    // shape
+                        .strokeBorder(.primarySoft, lineWidth: 2/(scaleFactor*fieldOfView))
+                        .scaleEffect(scaleFactor)
+                    
+                }
+                .frame(width: width, height: height)
+                .scaleEffect(fieldOfView)
+                .rotationEffect(.degrees(cameraLevel))
+                .offset(viewerLRUD)
+            }.frame(width: borderWidth, height: borderHeight, alignment: .center)
         }
-        .frame(width: width, height: height)
-        .scaleEffect(fieldOfView)
-        .rotationEffect(.degrees(cameraLevel))
-        .offset(viewerLRUD)
     }
 }
 

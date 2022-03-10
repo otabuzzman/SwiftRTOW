@@ -108,23 +108,33 @@ struct ContentView: View {
                             }.padding(.leading)
                             
                             Group {
-                                FinderViewer(aspectRatio: CGFloat(raycer.camera.aspratio))
-                                    .applyViewerControls(
-                                        fieldOfView: appFsm.optZomAmount,
-                                        viewerLRUD: appFsm.vwrMovAmount,
-                                        cameraLevel: appFsm.camTrnAmount)
-                                FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
-                                    .applyCameraControls(
-                                        viewerDistance: appFsm.vwrZomAmount,
-                                        cameraDirection: appFsm.camMovAmount)
-                                FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio))
-                                    .applyOpticsControls(
-                                        fieldOfView: appFsm.optZomAmount,
-                                        depthOfField: appFsm.optMovAmount,
-                                        focusDistance: appFsm.optTrnAmount,
-                                        viewerLRUD: appFsm.vwrMovAmount,
-                                        cameraLevel: appFsm.camTrnAmount)
-                            }.frame(minWidth: 0, maxWidth: .infinity)
+                                Group {
+                                    FinderBorder()
+                                    
+                                    FinderViewer(aspectRatio: CGFloat(raycer.camera.aspratio))
+                                        .applyViewerControls(
+                                            fieldOfView: appFsm.optZomAmount,
+                                            viewerLRUD: appFsm.vwrMovAmount,
+                                            cameraLevel: appFsm.camTrnAmount)
+                                
+                                    FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
+                                        .applyCameraControls(
+                                            viewerDistance: appFsm.vwrZomAmount,
+                                            cameraDirection: appFsm.camMovAmount)
+                                
+                                    FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio))
+                                        .applyOpticsControls(
+                                            fieldOfView: appFsm.optZomAmount,
+                                            depthOfField: appFsm.optMovAmount,
+                                            focusDistance: appFsm.optTrnAmount,
+                                            viewerLRUD: appFsm.vwrMovAmount,
+                                            cameraLevel: appFsm.camTrnAmount)
+                                }.frame(
+                                    width: min(UIScreen.width, UIScreen.width)*0.63,
+                                    height: min(UIScreen.width, UIScreen.width)*0.63)
+                            }
+                            // force controls ZStack to span screen width
+                            .frame(minWidth: 0, maxWidth: .infinity)
                         }
                         .zIndex(1) // SO #57730074
                         .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.63)))
@@ -203,6 +213,7 @@ struct ContentView: View {
                         pressedButton: pressedBaseButton,
                         image: "rtow-ch13-btn"))
                 }.disabled(!appFsm.isState(.VSC))
+                
                 Spacer()
             }
         }
