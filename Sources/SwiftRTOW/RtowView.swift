@@ -38,6 +38,10 @@ struct ContentView: View {
     @State private var pressedBaseButton = ButtonType.None
     @State private var pressedSideButton = ButtonType.Camera
     
+    private let finderSize = CGSize(
+        width: min(UIScreen.width, UIScreen.width)*0.63,
+        height: min(UIScreen.width, UIScreen.width)*0.63)
+    
     var body: some View {
         ZStack {
             Color.primaryPale
@@ -120,18 +124,16 @@ struct ContentView: View {
                                     FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
                                         .applyCameraControls(
                                             viewerDistance: appFsm.vwrZomAmount,
-                                            cameraDirection: appFsm.camMovAmount)
+                                            cameraDirection: appFsm.camMovAngle)
                                 
                                     FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio))
                                         .applyOpticsControls(
                                             fieldOfView: appFsm.optZomAmount,
-                                            depthOfField: appFsm.optMovAmount,
+                                            depthOfField: appFsm.optMovAngle,
                                             focusDistance: appFsm.optTrnAmount,
                                             viewerLRUD: appFsm.vwrMovAmount,
                                             cameraLevel: appFsm.camTrnAmount)
-                                }.frame(
-                                    width: min(UIScreen.width, UIScreen.width)*0.63,
-                                    height: min(UIScreen.width, UIScreen.width)*0.63)
+                                }.frame(width: finderSize.width, height: finderSize.height)
                             }
                             // force controls ZStack to span screen width
                             .frame(minWidth: 0, maxWidth: .infinity)
@@ -151,6 +153,7 @@ struct ContentView: View {
                 .simultaneousGesture(
                     DragGesture()
                         .onChanged { value in
+                            appFsm.push(parameter: finderSize)
                             appFsm.push(parameter: value.translation)
                             try? appFsm.transition(event: .MOV)
                         }
@@ -160,6 +163,7 @@ struct ContentView: View {
                 .simultaneousGesture(
                     RotationGesture()
                         .onChanged { value in
+                            appFsm.push(parameter: finderSize)
                             appFsm.push(parameter: CGFloat(value.degrees))
                             try? appFsm.transition(event: .TRN)
                         }
@@ -169,6 +173,7 @@ struct ContentView: View {
                 .simultaneousGesture(
                     MagnificationGesture()
                         .onChanged { value in
+                            appFsm.push(parameter: finderSize)
                             appFsm.push(parameter: value)
                             try? appFsm.transition(event: .ZOM)
                         }

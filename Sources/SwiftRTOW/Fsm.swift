@@ -34,20 +34,22 @@ class Fsm: ObservableObject {
     @Published private(set) var vwrZomAmount = 1.0
     private var vwrZomRecall = 1.0
     private var startJumpVwrZom = CGFloat.zero
-    @Published private(set) var camMovAmount = (
-        rotationAngle: CGFloat.zero,
-        rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
-    private var camMovRecall = (
-        rotationAngle: CGFloat.zero,
-        rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
+    
+    private var camMovAmount = CGSize.zero
+    private var camMovRecall = CGSize.zero
     private var startJumpCamMov = CGSize.zero
+    @Published private(set) var camMovAngle: CameraDirection = (
+        rotationAngle: .zero,
+        rotationAxis: (x: .zero, y: .zero, z: .zero))
     private let camMovCoeff = 0.31415
     @Published private(set) var camTrnAmount = CGFloat.zero
     private var camTrnRecall = CGFloat.zero
     private var startJumpCamTrn = CGFloat.zero
-    @Published private(set) var optMovAmount = CGFloat.zero
-    private var optMovRecall = CGFloat.zero
+    
+    private var optMovAmount = CGSize.zero
+    private var optMovRecall = CGSize.zero
     private var startJumpOptMov = CGSize.zero
+    @Published private(set) var optMovAngle = CGFloat.zero
     private let optMovCoeff = 0.31415
     @Published private(set) var optTrnAmount = CGFloat.zero
     private var optTrnRecall = CGFloat.zero
@@ -112,9 +114,9 @@ class Fsm: ObservableObject {
     private func eaOptCam() { update(withState: .CAM) }
     private func eaOptOpt() { update(withState: .OPT) }
     
-    private func eaVwrRet() { update(withState: .VSC) }
-    private func eaCamRet() { update(withState: .VSC) }
-    private func eaOptRet() { update(withState: .VSC) }
+    private func eaVwrRet() { eaParam.pop() ; update(withState: .VSC) }
+    private func eaCamRet() { eaParam.pop() ; update(withState: .VSC) }
+    private func eaOptRet() { eaParam.pop() ; update(withState: .VSC) }
     
     private func eaMovRet() {
         timeoutTask = runOnTimeout(seconds: 3) {
@@ -147,20 +149,30 @@ class Fsm: ObservableObject {
     
     private func eaMovMov() {
         let movAmount = eaParam.pop() as! CGSize
+        let finderSize = eaParam.peek() as! CGSize
         let hState = self.hState.peek(.lastButOne) as! FsmState
         
         switch hState {
         case .VWR:
-            vwrMovAmount = startJumpVwrMov+vwrMovRecall+movAmount
+            vwrMovAmount = (startJumpVwrMov+vwrMovRecall+movAmount)
+                .clamped(
+                    to: -finderSize.width/2...finderSize.width/2,
+                    and: -finderSize.height/2...finderSize.height/2)
         case .CAM:
-            let camMovAmount = startJumpCamMov+movAmount
-            self.camMovAmount.0 = camMovRecall.0+(
+            camMovAmount = (startJumpCamMov+camMovRecall+movAmount)
+                .clamped(
+                    to: -finderSize.width/2...finderSize.width/2,
+                    and: -finderSize.height/2...finderSize.height/2)
+            camMovAngle.0 = (
                 camMovAmount.width*camMovAmount.width+camMovAmount.height*camMovAmount.height
             ).squareRoot()*camMovCoeff
-            self.camMovAmount.1 = camMovRecall.1+(x: -movAmount.height, y: movAmount.width, z: 0)
+            camMovAngle.1 = (x: -movAmount.height, y: movAmount.width, z: 0)
         case .OPT:
-            let optMovAmount = startJumpOptMov+movAmount
-            self.optMovAmount = optMovRecall+(
+            optMovAmount = (startJumpOptMov+optMovRecall+movAmount)
+                .clamped(
+                    to: -finderSize.width/2...0,
+                    and: -finderSize.height/2...0)
+            optMovAngle = (
                 optMovAmount.width*optMovAmount.width+optMovAmount.height*optMovAmount.height
             ).squareRoot()*optMovCoeff
         default:
@@ -202,9 +214,11 @@ class Fsm: ObservableObject {
         
         switch hState {
         case .CAM:
-            camTrnAmount = startJumpCamTrn+camTrnRecall+trnAmount
+            camTrnAmount = (startJumpCamTrn+camTrnRecall+trnAmount)
+                .clamped(to: -63.0...63.0)
         case .OPT:
-            optTrnAmount = startJumpOptTrn+optTrnRecall+trnAmount
+            optTrnAmount = (startJumpOptTrn+optTrnRecall+trnAmount)
+                .clamped(to: -63.0...63.0)
         default:
             break
         }
@@ -244,9 +258,11 @@ class Fsm: ObservableObject {
         
         switch hState {
         case .VWR:
-            vwrZomAmount = startJumpVwrZom+vwrZomRecall+zomAmount
+            vwrZomAmount = (startJumpVwrZom+vwrZomRecall+zomAmount)
+                .clamped(to: 0.31416...2.7182)
         case .OPT:
-            optZomAmount = startJumpOptZom+optZomRecall+zomAmount
+            optZomAmount = (startJumpOptZom+optZomRecall+zomAmount)
+                .clamped(to: 0.31415...2.7182)
         default:
             break
         }
@@ -330,19 +346,21 @@ class Fsm: ObservableObject {
         vwrZomAmount = 1.0
         vwrZomRecall = 1.0
         startJumpVwrZom = .zero
-        camMovAmount = (
-            rotationAngle: CGFloat.zero,
-            rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
-        camMovRecall = (
-            rotationAngle: CGFloat.zero,
-            rotationAxis: (x: CGFloat.zero, y: CGFloat.zero, z: CGFloat.zero))
+        
+        camMovAmount = .zero
+        camMovRecall = .zero
         startJumpCamMov = .zero
+        camMovAngle = (
+            rotationAngle: .zero,
+            rotationAxis: (x: .zero, y: .zero, z: .zero))
         camTrnAmount = .zero
         camTrnRecall = .zero
         startJumpCamTrn = .zero
+        
         optMovAmount = .zero
         optMovRecall = .zero
         startJumpOptMov = .zero
+        optMovAngle = .zero
         optTrnAmount = .zero
         optTrnRecall = .zero
         startJumpOptTrn = .zero
@@ -403,7 +421,7 @@ class Fsm: ObservableObject {
         }
         hState.push(state)
         
-        print("new state \(FsmStateName[state.rawValue]) (S/E history \(hState.count)/\(hEvent.count))")
+        print("new state \(FsmStateName[state.rawValue]) (S/E history \(hState.count)/\(hEvent.count), parameter \(eaParam.count))")
     }
     
     private func runOnTimeout(seconds: Int, closure: @escaping () -> Void) -> Task<Void, Never> {
