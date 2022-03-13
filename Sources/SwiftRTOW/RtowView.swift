@@ -144,18 +144,23 @@ struct ContentView: View {
                 }
                 .simultaneousGesture(TapGesture().onEnded({
                     do {
+                        appFsm.push(parameter: finderSize)
                         appFsm.push(parameter: pressedSideButton)
                         try appFsm.transition(event: .CTL)
                     } catch {
+                        appFsm.pop()
                         appFsm.pop()
                     }
                 }))
                 .simultaneousGesture(
                     DragGesture()
                         .onChanged { value in
-                            appFsm.push(parameter: finderSize)
-                            appFsm.push(parameter: value.translation)
-                            try? appFsm.transition(event: .MOV)
+                            do {
+                                appFsm.push(parameter: value.translation)
+                                try appFsm.transition(event: .MOV)
+                            } catch {
+                                appFsm.pop()
+                            }
                         }
                         .onEnded { _ in
                             if appFsm.isCad { try? appFsm.transition(event: .RET) }
@@ -163,9 +168,12 @@ struct ContentView: View {
                 .simultaneousGesture(
                     RotationGesture()
                         .onChanged { value in
-                            appFsm.push(parameter: finderSize)
-                            appFsm.push(parameter: CGFloat(value.degrees))
-                            try? appFsm.transition(event: .TRN)
+                            do {
+                                appFsm.push(parameter: CGFloat(value.degrees))
+                                try appFsm.transition(event: .TRN)
+                            } catch {
+                                appFsm.pop()
+                            }
                         }
                         .onEnded { _ in
                             if appFsm.isCad { try? appFsm.transition(event: .RET) }
@@ -173,9 +181,12 @@ struct ContentView: View {
                 .simultaneousGesture(
                     MagnificationGesture()
                         .onChanged { value in
-                            appFsm.push(parameter: finderSize)
-                            appFsm.push(parameter: value)
-                            try? appFsm.transition(event: .ZOM)
+                            do {
+                                appFsm.push(parameter: value)
+                                try appFsm.transition(event: .ZOM)
+                            } catch {
+                                appFsm.pop()
+                            }
                         }
                         .onEnded { _ in
                             if appFsm.isCad { try? appFsm.transition(event: .RET) }

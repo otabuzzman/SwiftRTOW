@@ -114,13 +114,14 @@ class Fsm: ObservableObject {
     private func eaOptCam() { update(withState: .CAM) }
     private func eaOptOpt() { update(withState: .OPT) }
     
-    private func eaVwrRet() { eaParam.pop() ; update(withState: .VSC) }
-    private func eaCamRet() { eaParam.pop() ; update(withState: .VSC) }
-    private func eaOptRet() { eaParam.pop() ; update(withState: .VSC) }
+    private func eaVwrRet() { update(withState: .VSC) }
+    private func eaCamRet() { update(withState: .VSC) }
+    private func eaOptRet() { update(withState: .VSC) }
     
     private func eaMovRet() {
         timeoutTask = runOnTimeout(seconds: 3) {
             do {
+                self.eaParam.pop()
                 try self.transition(event: .RET)
             } catch {}
         }
@@ -185,6 +186,7 @@ class Fsm: ObservableObject {
     private func eaTrnRet() {
         timeoutTask = runOnTimeout(seconds: 3) {
             do {
+                self.eaParam.pop()
                 try self.transition(event: .RET)
             } catch {}
         }
@@ -229,6 +231,7 @@ class Fsm: ObservableObject {
     private func eaZomRet() {
         timeoutTask = runOnTimeout(seconds: 3) {
             do {
+                self.eaParam.pop()
                 try self.transition(event: .RET)
             } catch {}
         }
@@ -336,6 +339,7 @@ class Fsm: ObservableObject {
     private func eaVscCtl() {
         timeoutTask = runOnTimeout(seconds: 3) {
             do {
+                self.eaParam.pop()
                 try self.transition(event: .RET)
             } catch {}
         }
