@@ -182,7 +182,7 @@ class Fsm: ObservableObject {
         update(withState: .MOV)
     }
     
-    private func eaTrnRet() {
+    private func eaTrnRet() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
             self.eaParam.pop()
             
@@ -226,7 +226,7 @@ class Fsm: ObservableObject {
         update(withState: .TRN)
     }
     
-    private func eaZomRet() {
+    private func eaZomRet() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
             self.eaParam.pop()
             
@@ -252,7 +252,7 @@ class Fsm: ObservableObject {
         update(withState: self.hState.peek() as! FsmState)
     }
     
-    private func eaZomZom() {
+    private func eaZomZom() throws {
         let zomAmount = eaParam.pop() as! CGFloat
         let hState = self.hState.peek(.lastButOne) as! FsmState
         
@@ -333,7 +333,7 @@ class Fsm: ObservableObject {
         update(withState: .ZOM, noHistory: false)
     }
     
-    private func eaVscCtl() {
+    private func eaVscCtl() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
             self.eaParam.pop()
             
