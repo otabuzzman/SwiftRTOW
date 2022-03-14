@@ -163,7 +163,7 @@ struct ContentView: View {
                             }
                         }
                         .onEnded { _ in
-                            if appFsm.isCad { try? appFsm.transition(event: .RET) }
+                            if appFsm.isCad { try! appFsm.transition(event: .RET) }
                         })
                 .simultaneousGesture(
                     RotationGesture()
@@ -176,7 +176,7 @@ struct ContentView: View {
                             }
                         }
                         .onEnded { _ in
-                            if appFsm.isCad { try? appFsm.transition(event: .RET) }
+                            if appFsm.isCad { try! appFsm.transition(event: .RET) }
                         })
                 .simultaneousGesture(
                     MagnificationGesture()
@@ -184,12 +184,14 @@ struct ContentView: View {
                             do {
                                 appFsm.push(parameter: value)
                                 try appFsm.transition(event: .ZOM)
-                            } catch {
+                            } catch FsmError.unexpectedFsmEvent {
                                 appFsm.pop()
+                            } catch {
+                                fatalError(error.localizedDescription)
                             }
                         }
                         .onEnded { _ in
-                            if appFsm.isCad { try? appFsm.transition(event: .RET) }
+                            if appFsm.isCad { try! appFsm.transition(event: .RET) }
                         })
                 
                 HStack {

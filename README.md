@@ -32,5 +32,5 @@ Apps used on iPad
 |`ButtonStyle.swift`|Base button style configurations and code.|
 |`FinderView.swift`|Finder views for viewer, camera and optics controls.|
 |`Extension.swift`|SwiftUI classes and protocols extensions.|
-|`Error.swift`|Error exceptions.|
+|`Exception.swift`|Error exceptions.|
 |`Stack.swift`|A stack implementation.|
