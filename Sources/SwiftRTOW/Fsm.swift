@@ -24,6 +24,8 @@ class EaParam: Stack {
     var stack: Array<Any>! = []
 }
 
+typealias CamMovAngle = (CGFloat, axis: (CGFloat, CGFloat, CGFloat))
+
 class Fsm: ObservableObject {
     @Published private(set) var hState = FsmHState()
     @Published private(set) var hEvent = FsmHEvent()
@@ -38,9 +40,7 @@ class Fsm: ObservableObject {
     private var camMovAmount = CGSize.zero
     private var camMovRecall = CGSize.zero
     private var startJumpCamMov = CGSize.zero
-    @Published private(set) var camMovAngle: CameraDirection = (
-        rotationAngle: .zero,
-        rotationAxis: (x: .zero, y: .zero, z: .zero))
+    @Published private(set) var camMovAngle: CamMovAngle = (.zero, axis: (x: .zero, y: .zero, z: .zero))
     private let camMovCoeff = 0.31415
     @Published private(set) var camTrnAmount = CGFloat.zero
     private var camTrnRecall = CGFloat.zero
@@ -118,12 +118,11 @@ class Fsm: ObservableObject {
     private func eaCamRet() { update(withState: .VSC) }
     private func eaOptRet() { update(withState: .VSC) }
     
-    private func eaMovRet() {
+    private func eaMovRet() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
-            do {
-                self.eaParam.pop()
-                try self.transition(event: .RET)
-            } catch {}
+            self.eaParam.pop()
+            
+            try? self.transition(event: .RET)
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
@@ -139,7 +138,7 @@ class Fsm: ObservableObject {
             optMovRecall = optMovAmount
             startJumpOptMov = .zero
         default:
-            break
+            throw FsmError.unexpectedFsmState
         }
         
         self.hState.pop()
@@ -148,7 +147,7 @@ class Fsm: ObservableObject {
         update(withState: self.hState.peek() as! FsmState)
     }
     
-    private func eaMovMov() {
+    private func eaMovMov() throws {
         let movAmount = eaParam.pop() as! CGSize
         let finderSize = eaParam.peek() as! CGSize
         let hState = self.hState.peek(.lastButOne) as! FsmState
@@ -177,7 +176,7 @@ class Fsm: ObservableObject {
                 optMovAmount.width*optMovAmount.width+optMovAmount.height*optMovAmount.height
             ).squareRoot()*optMovCoeff
         default:
-            break
+            throw FsmError.unexpectedFsmState
         }
         
         update(withState: .MOV)
@@ -185,10 +184,9 @@ class Fsm: ObservableObject {
     
     private func eaTrnRet() {
         timeoutTask = runOnTimeout(seconds: 3) {
-            do {
-                self.eaParam.pop()
-                try self.transition(event: .RET)
-            } catch {}
+            self.eaParam.pop()
+            
+            try? self.transition(event: .RET)
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
@@ -201,7 +199,7 @@ class Fsm: ObservableObject {
             optTrnRecall = optTrnAmount
             startJumpOptTrn = .zero
         default:
-            break
+            throw FsmError.unexpectedFsmState
         }
         
         self.hState.pop()
@@ -210,7 +208,7 @@ class Fsm: ObservableObject {
         update(withState: self.hState.peek() as! FsmState)
     }
     
-    private func eaTrnTrn() {
+    private func eaTrnTrn() throws {
         let trnAmount = eaParam.pop() as! CGFloat
         let hState = self.hState.peek(.lastButOne) as! FsmState
         
@@ -222,7 +220,7 @@ class Fsm: ObservableObject {
             optTrnAmount = (startJumpOptTrn+optTrnRecall+trnAmount)
                 .clamped(to: -63.0...63.0)
         default:
-            break
+            throw FsmError.unexpectedFsmState
         }
         
         update(withState: .TRN)
@@ -230,10 +228,9 @@ class Fsm: ObservableObject {
     
     private func eaZomRet() {
         timeoutTask = runOnTimeout(seconds: 3) {
-            do {
-                self.eaParam.pop()
-                try self.transition(event: .RET)
-            } catch {}
+            self.eaParam.pop()
+            
+            try? self.transition(event: .RET)
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
@@ -246,7 +243,7 @@ class Fsm: ObservableObject {
             optZomRecall = optZomAmount
             startJumpOptZom = 0
         default:
-            break
+            throw FsmError.unexpectedFsmState
         }
         
         self.hState.pop()
@@ -267,7 +264,7 @@ class Fsm: ObservableObject {
             optZomAmount = (startJumpOptZom+optZomRecall+zomAmount)
                 .clamped(to: 0.31415...2.7182)
         default:
-            break
+            throw FsmError.unexpectedFsmState
         }
         
         update(withState: .ZOM)
@@ -338,10 +335,9 @@ class Fsm: ObservableObject {
     
     private func eaVscCtl() {
         timeoutTask = runOnTimeout(seconds: 3) {
-            do {
-                self.eaParam.pop()
-                try self.transition(event: .RET)
-            } catch {}
+            self.eaParam.pop()
+            
+            try? self.transition(event: .RET)
         }
         
         vwrMovAmount = .zero
@@ -354,9 +350,7 @@ class Fsm: ObservableObject {
         camMovAmount = .zero
         camMovRecall = .zero
         startJumpCamMov = .zero
-        camMovAngle = (
-            rotationAngle: .zero,
-            rotationAxis: (x: .zero, y: .zero, z: .zero))
+        camMovAngle = (.zero, axis: (x: .zero, y: .zero, z: .zero))
         camTrnAmount = .zero
         camTrnRecall = .zero
         startJumpCamTrn = .zero
@@ -383,7 +377,7 @@ class Fsm: ObservableObject {
         case .Optics:
             nextState = .OPT
         default:
-            nextState = .CAM
+            throw FsmError.unexpectedError
         }
         
         update(withState: nextState)
@@ -403,9 +397,8 @@ class Fsm: ObservableObject {
         outbackTask = runInOutback {
             let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
             await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
-            do {
-                try self.transition(event: .RET)
-            } catch {}
+            
+            try? self.transition(event: .RET)
         }
         
         update(withState: .LOD, noHistory: false)
@@ -415,7 +408,7 @@ class Fsm: ObservableObject {
         print("rejected : ", terminator: "")
         
         update(withState: hState.peek() as! FsmState)
-        throw FsmError.unexpectedEvent
+        throw FsmError.unexpectedFsmEvent
     }
     
     private func update(withState state: FsmState, noHistory: Bool = true) {
@@ -433,6 +426,7 @@ class Fsm: ObservableObject {
             do {
                 try await Task.sleep(nanoseconds: UInt64(seconds*1_000_000_000))
                 try Task.checkCancellation()
+                
                 closure()
             } catch {}
         }

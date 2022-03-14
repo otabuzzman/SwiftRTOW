@@ -67,13 +67,10 @@ struct FinderCamera: View {
     }
 }
 
-typealias RotationAxis = (x: CGFloat, y: CGFloat, z: CGFloat)
-typealias CameraDirection = (rotationAngle: CGFloat, rotationAxis: RotationAxis)
-
 struct CameraControls: ViewModifier {
     var aspectRatio: CGFloat
     var viewerDistance: CGFloat
-    var cameraDirection: CameraDirection
+    var cameraDirection: CamMovAngle
     
     func body(content: Content) -> some View {
         GeometryReader { geometry in
@@ -99,7 +96,7 @@ struct CameraControls: ViewModifier {
 }
 
 extension FinderCamera {
-    func applyCameraControls(viewerDistance: CGFloat, cameraDirection: CameraDirection) -> some View {
+    func applyCameraControls(viewerDistance: CGFloat, cameraDirection: CamMovAngle) -> some View {
         modifier(CameraControls(aspectRatio: aspectRatio, viewerDistance: viewerDistance, cameraDirection: cameraDirection))
     }
 }
