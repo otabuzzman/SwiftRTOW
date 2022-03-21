@@ -1,7 +1,7 @@
 protocol Things: Sendable {
     var things: [Thing]! { get set }
     
-    func load()
+    @discardableResult func load() -> Things
 }
 
 extension Things {

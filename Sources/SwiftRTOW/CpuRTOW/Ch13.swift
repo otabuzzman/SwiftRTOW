@@ -1,7 +1,7 @@
 class Ch13: @unchecked Sendable, Things {
     var things: [Thing]! = []
     
-    func load() {
+    func load() -> Things {
         things.append(Sphere(center: P(x: 0, y: -1000.0, z: 0), radius: 1000.0, optics: Diffuse(albedo: C(x: 0.5, y: 0.5, z: 0.5))))
         
         for a in -11..<11 {
@@ -26,5 +26,7 @@ class Ch13: @unchecked Sendable, Things {
         things.append(Sphere(center: P(x: 0, y: 1.0, z: 0), radius: 1.0, optics: Refract(index: 1.5)))
         things.append(Sphere(center: P(x: -4.0, y: 1.0, z: 0), radius: 1.0, optics: Diffuse(albedo: C(x: 0.4, y: 0.2, z: 0.1))))
         things.append(Sphere(center: P(x: 4.0, y: 1.0, z: 0), radius: 1.0, optics: Reflect(albedo: C(x: 0.7, y: 0.6, z: 0.5), fuzz: 0)))
+        
+        return self
     }
 }

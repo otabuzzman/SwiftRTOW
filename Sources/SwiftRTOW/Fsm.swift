@@ -30,13 +30,14 @@ class Fsm: ObservableObject {
     @Published private(set) var hState = FsmHState()
     @Published private(set) var hEvent = FsmHEvent()
     
+    // viewer controls
     @Published private(set) var vwrMovAmount = CGSize.zero
     private var vwrMovRecall = CGSize.zero
     private var startJumpVwrMov = CGSize.zero
     @Published private(set) var vwrZomAmount = 1.0
     private var vwrZomRecall = 1.0
     private var startJumpVwrZom = CGFloat.zero
-    
+    // camera controls
     private var camMovAmount = CGSize.zero
     private var camMovRecall = CGSize.zero
     private var startJumpCamMov = CGSize.zero
@@ -45,7 +46,7 @@ class Fsm: ObservableObject {
     @Published private(set) var camTrnAmount = CGFloat.zero
     private var camTrnRecall = CGFloat.zero
     private var startJumpCamTrn = CGFloat.zero
-    
+    // optics controls
     private var optMovAmount = CGSize.zero
     private var optMovRecall = CGSize.zero
     private var startJumpOptMov = CGSize.zero
@@ -57,6 +58,8 @@ class Fsm: ObservableObject {
     @Published private(set) var optZomAmount = 1.0
     private var optZomRecall = 1.0
     private var startJumpOptZom = CGFloat.zero
+    
+    private var controlsUpdated = false
     
     private var timeoutTask: Task<Void, Never>!
     private var outbackTask: Task<Void, Never>!
@@ -114,14 +117,34 @@ class Fsm: ObservableObject {
     private func eaOptCam() { update(withState: .CAM) }
     private func eaOptOpt() { update(withState: .OPT) }
     
-    private func eaVwrRet() { update(withState: .VSC) }
-    private func eaCamRet() { update(withState: .VSC) }
-    private func eaOptRet() { update(withState: .VSC) }
+    private func eaCslRet() {
+        eaParam.pop() // finderSize
+        
+        if controlsUpdated {
+            let raycer = eaParam.pop() as! Rtow
+            let things = eaParam.pop() as! Things
+        
+            outbackTask = runInOutback {
+                let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
+                await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
+            
+                try? self.transition(event: .RET)
+            }
+            
+            update(withState: .LOD)
+        } else {
+            eaParam.pop() // raycer
+            eaParam.pop() // things
+            
+            update(withState: .VSC)
+        }
+    }
+    private func eaVwrRet() { eaCslRet() }
+    private func eaCamRet() { eaCslRet() }
+    private func eaOptRet() { eaCslRet() }
     
     private func eaMovRet() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
-            self.eaParam.pop()
-            
             try? self.transition(event: .RET)
         }
         
@@ -140,6 +163,8 @@ class Fsm: ObservableObject {
         default:
             throw FsmError.unexpectedFsmState
         }
+        
+        controlsUpdated = true
         
         self.hState.pop()
         hEvent.pop()
@@ -184,8 +209,6 @@ class Fsm: ObservableObject {
     
     private func eaTrnRet() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
-            self.eaParam.pop()
-            
             try? self.transition(event: .RET)
         }
         
@@ -201,6 +224,8 @@ class Fsm: ObservableObject {
         default:
             throw FsmError.unexpectedFsmState
         }
+        
+        controlsUpdated = true
         
         self.hState.pop()
         hEvent.pop()
@@ -228,8 +253,6 @@ class Fsm: ObservableObject {
     
     private func eaZomRet() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
-            self.eaParam.pop()
-            
             try? self.transition(event: .RET)
         }
         
@@ -245,6 +268,8 @@ class Fsm: ObservableObject {
         default:
             throw FsmError.unexpectedFsmState
         }
+        
+        controlsUpdated = true
         
         self.hState.pop()
         hEvent.pop()
@@ -335,8 +360,6 @@ class Fsm: ObservableObject {
     
     private func eaVscCtl() throws {
         timeoutTask = runOnTimeout(seconds: 3) {
-            self.eaParam.pop()
-            
             try? self.transition(event: .RET)
         }
         
@@ -366,6 +389,8 @@ class Fsm: ObservableObject {
         optZomRecall = 1.0
         startJumpOptZom = .zero
         
+        controlsUpdated = false
+        
         let pressedSideButton = eaParam.pop() as! ButtonType
         
         let nextState: FsmState
@@ -384,10 +409,7 @@ class Fsm: ObservableObject {
     }
     
     private func eaLodRet() {
-        hState.pop()
-        hEvent.pop()
-        
-        update(withState: hState.peek(.last) as! FsmState)
+        update(withState: .VSC)
     }
     
     private func eaVscLod() {
@@ -401,7 +423,7 @@ class Fsm: ObservableObject {
             try? self.transition(event: .RET)
         }
         
-        update(withState: .LOD, noHistory: false)
+        update(withState: .LOD)
     }
     
     private func eaReject() throws {
@@ -421,7 +443,7 @@ class Fsm: ObservableObject {
         print("new state \(FsmStateName[state.rawValue]) (S/E history \(hState.count)/\(hEvent.count), parameter \(eaParam.count))")
     }
     
-    private func runOnTimeout(seconds: Int, closure: @escaping () -> Void) -> Task<Void, Never> {
+    @discardableResult private func runOnTimeout(seconds: Int, closure: @escaping () -> Void) -> Task<Void, Never> {
         Task {
             do {
                 try await Task.sleep(nanoseconds: UInt64(seconds*1_000_000_000))
@@ -432,7 +454,7 @@ class Fsm: ObservableObject {
         }
     }
     
-    private func runInOutback(closure: @escaping () async -> Void) -> Task<Void, Never> {
+    @discardableResult private func runInOutback(closure: @escaping () async -> Void) -> Task<Void, Never> {
         Task {
             await closure()
         }

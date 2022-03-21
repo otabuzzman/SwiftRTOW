@@ -35,6 +35,8 @@ struct ContentView: View {
     @EnvironmentObject var raycer: Rtow
     @EnvironmentObject var appFsm: Fsm
     
+    @State private var things: Things = Ch10().load()
+    
     @State private var pressedBaseButton = ButtonType.None
     @State private var pressedSideButton = ButtonType.Camera
     
@@ -52,18 +54,6 @@ struct ContentView: View {
                     ZStack(alignment: .bottomLeading) {
                         RtowView()
                             .task {
-                                var things: Things
-                                if _isDebugAssertConfiguration() { // SO #24003291
-                                    raycer.imageWidth = 320
-                                    raycer.imageHeight = 240
-                                    raycer.samplesPerPixel = 1
-                                    raycer.camera.set(aspratio: 320.0/240.0)
-                                    
-                                    things = Ch10()
-                                } else {
-                                    things = Ch13()
-                                }
-                                things.load()
                                 appFsm.push(parameter: things)
                                 appFsm.push(parameter: raycer)
                                 try? appFsm.transition(event: .LOD)
@@ -144,10 +134,14 @@ struct ContentView: View {
                 }
                 .simultaneousGesture(TapGesture().onEnded({
                     do {
+                        appFsm.push(parameter: things)
+                        appFsm.push(parameter: raycer)
                         appFsm.push(parameter: finderSize)
                         appFsm.push(parameter: pressedSideButton)
                         try appFsm.transition(event: .CTL)
                     } catch {
+                        appFsm.pop()
+                        appFsm.pop()
                         appFsm.pop()
                         appFsm.pop()
                     }
@@ -196,7 +190,7 @@ struct ContentView: View {
                 
                 HStack {
                     Button("Chapter 8") {
-                        let things = Ch8()
+                        things = Ch8()
                         things.load()
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
@@ -208,7 +202,7 @@ struct ContentView: View {
                         image: "rtow-ch8-btn"))
                     
                     Button("Chapter 10") {
-                        let things = Ch10()
+                        things = Ch10()
                         things.load()
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
@@ -220,7 +214,7 @@ struct ContentView: View {
                         image: "rtow-ch10-btn"))
                     
                     Button("Chapter 13") {
-                        let things = Ch13()
+                        things = Ch13()
                         things.load()
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: raycer)
@@ -244,7 +238,14 @@ struct MyApp: App {
     @StateObject var raycer = Rtow()
     
     var body: some Scene {
-        WindowGroup {
+        if _isDebugAssertConfiguration() { // SO #24003291
+            raycer.imageWidth = 320
+            raycer.imageHeight = 240
+            raycer.samplesPerPixel = 1
+            raycer.camera.set(aspratio: 320.0/240.0)
+        }
+        
+        return WindowGroup {
             ContentView()
                 .environmentObject(appFsm)
                 .environmentObject(raycer)
