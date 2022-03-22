@@ -42,11 +42,13 @@ struct ContentView: View {
                 raycer.imageWidth = 320
                 raycer.imageHeight = 240
                 raycer.samplesPerPixel = 1
-                raycer.camera.set(aspratio: 320.0/240.0)
+                
+                let camera = Camera()
+                camera.set(aspratio: 320.0/240.0)
                 
                 let things = Ch13()
                 things.load()
-                await raycer.render(numRowsAtOnce: 12, things: things)
+                await raycer.render(numRowsAtOnce: 12, camera: camera, things: things)
                 update.toggle()
             }
             .aspectRatio(contentMode: .fill)

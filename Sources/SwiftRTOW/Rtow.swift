@@ -7,7 +7,6 @@ class Rtow: @unchecked Sendable {
     var samplesPerPixel = 10
     var traceDepth = 50
     
-    private(set) var camera = Camera()
     private(set) var imageData: [Pixel]?
     
     init() {}
@@ -79,7 +78,7 @@ class Rtow: @unchecked Sendable {
     
     #if SINGLETASK // (original RTOW)
     
-    func render(things: Things) {
+    func render(camera: Camera, things: Things) {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
@@ -106,7 +105,7 @@ class Rtow: @unchecked Sendable {
     
     #else // CONCURRENT
     
-    func render(numRowsAtOnce threads: Int, things: Things) async {
+    func render(numRowsAtOnce threads: Int, camera: Camera, things: Things) async {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
@@ -189,15 +188,17 @@ extension Rtow {
         let rtow = Rtow()
         rtow.imageWidth = w
         rtow.imageHeight = h
-        rtow.camera.set(aspratio: Float(w)/Float(h))
+        
+        let camera = Camera()
+        camera.set(aspratio: Float(w)/Float(h))
         
         let things = Ch13()
         things.load()
         
         #if SINGLETASK
-        rtow.render(things: things)
+        rtow.render(camera: camera, things: things)
         #else
-        await rtow.render(numRowsAtOnce: 4, things: things)
+        await rtow.render(numRowsAtOnce: 4, camera: camera, things: things)
         #endif
         
         print("P3")
