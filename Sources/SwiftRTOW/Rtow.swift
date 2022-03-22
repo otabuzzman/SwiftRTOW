@@ -1,7 +1,9 @@
+import SwiftUI
+
 typealias Pixel = SIMD4<UInt8>
 
 @MainActor
-class Rtow: @unchecked Sendable {
+class Rtow: @unchecked Sendable, ObservableObject {
     var imageWidth = 1200
     var imageHeight = 800
     var samplesPerPixel = 10

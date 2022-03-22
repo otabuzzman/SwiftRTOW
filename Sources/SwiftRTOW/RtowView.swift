@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RtowView: UIViewRepresentable {
-    @Binding var raycer: Rtow
+    var raycer: Rtow
     @Binding var update: Bool
     
     func makeUIView(context: Context) -> UIImageView {
@@ -33,11 +33,11 @@ struct RtowView: UIViewRepresentable {
 }
 
 struct ContentView: View {
-    @State private var raycer = Rtow()
+    @EnvironmentObject var raycer: Rtow
     @State private var update = false
     
     var body: some View {
-        RtowView(raycer: $raycer, update: $update)
+        RtowView(raycer: raycer, update: $update)
             .task {
                 raycer.imageWidth = 320
                 raycer.imageHeight = 240
@@ -57,9 +57,12 @@ struct ContentView: View {
 
 @main
 struct MyApp: App {
+    @StateObject var raycer = Rtow()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(raycer)
         }
     }
 }
