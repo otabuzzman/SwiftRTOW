@@ -1,6 +1,10 @@
+#if !os(Windows)
 import SwiftUI
+#endif
 
 typealias Pixel = SIMD4<UInt8>
+
+#if !os(Windows)
 
 @MainActor
 class Rtow: @unchecked Sendable, ObservableObject {
@@ -12,7 +16,25 @@ class Rtow: @unchecked Sendable, ObservableObject {
     private(set) var imageData: [Pixel]?
     
     init() {}
+}
+
+#else
+
+@MainActor
+class Rtow: @unchecked Sendable {
+    var imageWidth = 1200
+    var imageHeight = 800
+    var samplesPerPixel = 10
+    var traceDepth = 50
     
+    private(set) var imageData: [Pixel]?
+    
+    init() {}
+}
+
+#endif
+
+extension Rtow {
     private static nonisolated func sRGB(color: C) -> Pixel {
         var r = color.x
         var g = color.y
