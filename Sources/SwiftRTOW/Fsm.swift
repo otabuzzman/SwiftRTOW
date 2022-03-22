@@ -122,11 +122,12 @@ class Fsm: ObservableObject {
         
         if controlsUpdated {
             let raycer = eaParam.pop() as! Rtow
+            let camera = eaParam.pop() as! Camera
             let things = eaParam.pop() as! Things
         
             outbackTask = runInOutback {
                 let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
-                await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
+                await raycer.render(numRowsAtOnce: numRowsAtOnce, camera: camera, things: things)
             
                 try? self.transition(event: .RET)
             }
@@ -134,6 +135,7 @@ class Fsm: ObservableObject {
             update(withState: .LOD)
         } else {
             eaParam.pop() // raycer
+            eaParam.pop() // camera
             eaParam.pop() // things
             
             update(withState: .VSC)
@@ -414,11 +416,12 @@ class Fsm: ObservableObject {
     
     private func eaVscLod() {
         let raycer = eaParam.pop() as! Rtow
+        let camera = eaParam.pop() as! Camera
         let things = eaParam.pop() as! Things
         
         outbackTask = runInOutback {
             let numRowsAtOnce = ProcessInfo.processInfo.processorCount/2*3
-            await raycer.render(numRowsAtOnce: numRowsAtOnce, things: things)
+            await raycer.render(numRowsAtOnce: numRowsAtOnce, camera: camera, things: things)
             
             try? self.transition(event: .RET)
         }

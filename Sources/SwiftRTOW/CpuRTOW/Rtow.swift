@@ -9,13 +9,10 @@ class Rtow: @unchecked Sendable, ObservableObject {
     var samplesPerPixel = 10
     var traceDepth = 50
     
-    private(set) var camera = Camera()
     private(set) var imageData: [Pixel]?
     
     @Published private(set) var rowRenderProgress = 0
     @Published private(set) var rowRenderFinished = false
-    
-    init() {}
     
     private nonisolated static func sRGB(color: C) -> Pixel {
         var r = color.x
@@ -84,7 +81,7 @@ class Rtow: @unchecked Sendable, ObservableObject {
     
     #if SINGLETASK // (original RTOW)
     
-    func render(things: Things) {
+    func render(camera: camera, things: Things) {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)
@@ -115,7 +112,7 @@ class Rtow: @unchecked Sendable, ObservableObject {
     
     #else // CONCURRENT
     
-    func render(numRowsAtOnce threads: Int, things: Things) async {
+    func render(numRowsAtOnce threads: Int, camera: Camera, things: Things) async {
         imageData = .init(
             repeating: .init(x: 0, y: 0, z: 0, w: 255),
             count: imageWidth*imageHeight)

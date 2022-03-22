@@ -32,8 +32,9 @@ struct RtowView: UIViewRepresentable {
 }
 
 struct ContentView: View {
-    @EnvironmentObject var raycer: Rtow
     @EnvironmentObject var appFsm: Fsm
+    @EnvironmentObject var raycer: Rtow
+    @EnvironmentObject var camera: Camera
     
     @State private var things: Things = Ch10().load()
     
@@ -55,6 +56,7 @@ struct ContentView: View {
                         RtowView()
                             .task {
                                 appFsm.push(parameter: things)
+                                appFsm.push(parameter: camera)
                                 appFsm.push(parameter: raycer)
                                 try? appFsm.transition(event: .LOD)
                             }
@@ -105,18 +107,18 @@ struct ContentView: View {
                                 Group {
                                     FinderBorder()
                                     
-                                    FinderViewer(aspectRatio: CGFloat(raycer.camera.aspratio))
+                                    FinderViewer(aspectRatio: CGFloat(camera.aspratio))
                                         .applyViewerControls(
                                             fieldOfView: appFsm.optZomAmount,
                                             viewerLRUD: appFsm.vwrMovAmount,
                                             cameraLevel: appFsm.camTrnAmount)
                                 
-                                    FinderCamera(aspectRatio: CGFloat(raycer.camera.aspratio))
+                                    FinderCamera(aspectRatio: CGFloat(camera.aspratio))
                                         .applyCameraControls(
                                             viewerDistance: appFsm.vwrZomAmount,
                                             cameraDirection: appFsm.camMovAngle)
                                 
-                                    FinderOptics(aspectRatio: CGFloat(raycer.camera.aspratio))
+                                    FinderOptics(aspectRatio: CGFloat(camera.aspratio))
                                         .applyOpticsControls(
                                             fieldOfView: appFsm.optZomAmount,
                                             depthOfField: appFsm.optMovAngle,
@@ -135,11 +137,13 @@ struct ContentView: View {
                 .simultaneousGesture(TapGesture().onEnded({
                     do {
                         appFsm.push(parameter: things)
+                        appFsm.push(parameter: camera)
                         appFsm.push(parameter: raycer)
                         appFsm.push(parameter: finderSize)
                         appFsm.push(parameter: pressedSideButton)
                         try appFsm.transition(event: .CTL)
                     } catch {
+                        appFsm.pop()
                         appFsm.pop()
                         appFsm.pop()
                         appFsm.pop()
@@ -193,6 +197,7 @@ struct ContentView: View {
                         things = Ch8()
                         things.load()
                         appFsm.push(parameter: things)
+                        appFsm.push(parameter: camera)
                         appFsm.push(parameter: raycer)
                         try? appFsm.transition(event: .LOD)
                         pressedBaseButton = .Ch8
@@ -205,6 +210,7 @@ struct ContentView: View {
                         things = Ch10()
                         things.load()
                         appFsm.push(parameter: things)
+                        appFsm.push(parameter: camera)
                         appFsm.push(parameter: raycer)
                         try? appFsm.transition(event: .LOD)
                         pressedBaseButton = .Ch10
@@ -217,6 +223,7 @@ struct ContentView: View {
                         things = Ch13()
                         things.load()
                         appFsm.push(parameter: things)
+                        appFsm.push(parameter: camera)
                         appFsm.push(parameter: raycer)
                         try? appFsm.transition(event: .LOD)
                         pressedBaseButton = .Ch13
@@ -236,19 +243,22 @@ struct ContentView: View {
 struct MyApp: App {
     @StateObject var appFsm = Fsm()
     @StateObject var raycer = Rtow()
+    @StateObject var camera = Camera()
     
     var body: some Scene {
         if _isDebugAssertConfiguration() { // SO #24003291
             raycer.imageWidth = 320
             raycer.imageHeight = 240
             raycer.samplesPerPixel = 1
-            raycer.camera.set(aspratio: 320.0/240.0)
+            
+            camera.set(aspratio: 320.0/240.0)
         }
         
         return WindowGroup {
             ContentView()
                 .environmentObject(appFsm)
                 .environmentObject(raycer)
+                .environmentObject(camera)
         }
     }
 }
