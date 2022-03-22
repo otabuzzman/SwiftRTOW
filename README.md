@@ -53,6 +53,7 @@ Apps used on Winos 10
 
 ### Usage on Windows
 - Clone repository from GitHub
+- Checkout `swindows` branch
 - Run commands in top-level directory
 
   ```
