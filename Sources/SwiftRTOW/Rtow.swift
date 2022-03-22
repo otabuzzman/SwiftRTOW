@@ -14,8 +14,6 @@ class Rtow: @unchecked Sendable, ObservableObject {
     var traceDepth = 50
     
     private(set) var imageData: [Pixel]?
-    
-    init() {}
 }
 
 #else
@@ -28,8 +26,6 @@ class Rtow: @unchecked Sendable {
     var traceDepth = 50
     
     private(set) var imageData: [Pixel]?
-    
-    init() {}
 }
 
 #endif
