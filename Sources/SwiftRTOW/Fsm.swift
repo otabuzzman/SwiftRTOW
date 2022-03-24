@@ -59,7 +59,8 @@ class Fsm: ObservableObject {
     private var optZomRecall = 1.0
     private var startJumpOptZom = CGFloat.zero
     
-    private var controlsUpdated = false
+    private var cadPaddle = Paddle()
+    private var cadUpdate = false
     
     private var timeoutTask: Task<Void, Never>!
     private var outbackTask: Task<Void, Never>!
@@ -120,7 +121,7 @@ class Fsm: ObservableObject {
     private func eaCslRet() {
         eaParam.pop() // finderSize
         
-        if controlsUpdated {
+        if cadUpdate {
             let raycer = eaParam.pop() as! Rtow
             let camera = eaParam.pop() as! Camera
             let things = eaParam.pop() as! Things
@@ -151,22 +152,40 @@ class Fsm: ObservableObject {
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
+        let camera = eaParam.peek(.lastButTwo) as! Camera
         
         switch hState {
         case .VWR:
             vwrMovRecall = vwrMovAmount
             startJumpVwrMov = .zero
+            
+            let pat = camera.pat
+            let len = (camera.eye-pat).len()
+            let x = Int(vwrMovAmount.width)
+            let y = Int(vwrMovAmount.height)
+            let eye = pat+len*cadPaddle.move(x: -x, y: -y)
+            camera.set(eye: eye)
         case .CAM:
             camMovRecall = camMovAmount
             startJumpCamMov = .zero
+            
+            let eye = camera.eye
+            let len = (eye-camera.pat).len()
+            let x = Int(camMovAmount.width)
+            let y = Int(camMovAmount.height)
+            let pat = eye-len*cadPaddle.move(x: x, y: y)
+            camera.set(pat: pat)
         case .OPT:
             optMovRecall = optMovAmount
             startJumpOptMov = .zero
+            
+            let adj = Float(optMovAmount.height)
+            camera.set(aperture: adj*camera.aperture)
         default:
             throw FsmError.unexpectedFsmState
         }
         
-        controlsUpdated = true
+        cadUpdate = true
         
         self.hState.pop()
         hEvent.pop()
@@ -215,19 +234,31 @@ class Fsm: ObservableObject {
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
+        let camera = eaParam.peek(.lastButTwo) as! Camera
         
         switch hState {
         case .CAM:
             camTrnRecall = camTrnAmount
             startJumpCamTrn = .zero
+            
+            let rad = Float.pi/180.0
+            let sina = sinf(Float(camTrnAmount)*rad)
+            let cosa = cosf(Float(camTrnAmount)*rad)
+            let x = camera.vup.x
+            let y = camera.vup.y
+            let vup = V(x: x*cosa-y*sina, y: x*sina+y*cosa, z: 0)
+            camera.set(vup: vup)
         case .OPT:
             optTrnRecall = optTrnAmount
             startJumpOptTrn = .zero
+            
+            let adj = Float(optTrnAmount)
+            camera.set(fostance: adj*camera.fostance)
         default:
             throw FsmError.unexpectedFsmState
         }
         
-        controlsUpdated = true
+        cadUpdate = true
         
         self.hState.pop()
         hEvent.pop()
@@ -259,19 +290,27 @@ class Fsm: ObservableObject {
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
+        let camera = eaParam.peek(.lastButTwo) as! Camera
         
         switch hState {
         case .VWR:
             vwrZomRecall = vwrZomAmount
             startJumpVwrZom = 0
+            
+            let pat = camera.pat
+            let adj = Float(vwrZomAmount)
+            camera.set(eye: pat+adj*(camera.eye-pat))
         case .OPT:
             optZomRecall = optZomAmount
             startJumpOptZom = 0
+            
+            let adj = Float(optZomAmount)
+            camera.set(fov: adj*camera.fov)
         default:
             throw FsmError.unexpectedFsmState
         }
         
-        controlsUpdated = true
+        cadUpdate = true
         
         self.hState.pop()
         hEvent.pop()
@@ -303,6 +342,8 @@ class Fsm: ObservableObject {
         let movAmount = eaParam.pop() as! CGSize
         startJumpVwrMov = -movAmount
         
+        cadPaddle.reset(x: 0, y: 0)
+        
         update(withState: .MOV, noHistory: false)
     }
     
@@ -321,6 +362,8 @@ class Fsm: ObservableObject {
         let movAmount = eaParam.pop() as! CGSize
         startJumpCamMov = -movAmount
         
+        cadPaddle.reset(x: 0, y: 0)
+        
         update(withState: .MOV, noHistory: false)
     }
     
@@ -338,6 +381,8 @@ class Fsm: ObservableObject {
         
         let movAmount = eaParam.pop() as! CGSize
         startJumpOptMov = -movAmount
+        
+        cadPaddle.reset(x: 0, y: 0)
         
         update(withState: .MOV, noHistory: false)
     }
@@ -391,8 +436,6 @@ class Fsm: ObservableObject {
         optZomRecall = 1.0
         startJumpOptZom = .zero
         
-        controlsUpdated = false
-        
         let pressedSideButton = eaParam.pop() as! ButtonType
         
         let nextState: FsmState
@@ -406,6 +449,10 @@ class Fsm: ObservableObject {
         default:
             throw FsmError.unexpectedError
         }
+        
+        let camera = eaParam.peek(.lastButTwo) as! Camera
+        cadPaddle.gauge(eye: camera.eye, pat: camera.pat, vup: camera.vup)
+        cadUpdate = false
         
         update(withState: nextState)
     }
