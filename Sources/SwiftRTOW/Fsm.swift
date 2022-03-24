@@ -100,7 +100,9 @@ class Fsm: ObservableObject {
         let s = (hState.peek() as! FsmState).rawValue
         let e = event.rawValue
         
-        print("state \(FsmStateName[s]) received event \(FsmEventName[e]) : ", terminator: "")
+        if _isDebugAssertConfiguration() && trace {
+            print("state \(FsmStateName[s]) received event \(FsmEventName[e]) : ", terminator: "")
+        }
         
         self.hEvent.push(event)
         try eaTable[s][e]()
@@ -477,7 +479,9 @@ class Fsm: ObservableObject {
     }
     
     private func eaReject() throws {
-        print("rejected : ", terminator: "")
+        if _isDebugAssertConfiguration() && trace {
+            print("rejected : ", terminator: "")
+        }
         
         update(withState: hState.peek() as! FsmState)
         throw FsmError.unexpectedFsmEvent
@@ -490,7 +494,9 @@ class Fsm: ObservableObject {
         }
         hState.push(state)
         
-        print("new state \(FsmStateName[state.rawValue]) (S/E history \(hState.count)/\(hEvent.count), parameter \(eaParam.count))")
+        if _isDebugAssertConfiguration() && trace {
+            print("new state \(FsmStateName[state.rawValue]) (S/E history \(hState.count)/\(hEvent.count), parameter \(eaParam.count))")
+        }
     }
     
     @discardableResult private func runOnTimeout(seconds: Int, closure: @escaping () -> Void) -> Task<Void, Never> {
@@ -510,3 +516,5 @@ class Fsm: ObservableObject {
         }
     }
 }
+
+private let trace = true
