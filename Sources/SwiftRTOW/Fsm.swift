@@ -24,7 +24,7 @@ class EaParam: Stack {
     var stack: Array<Any>! = []
 }
 
-typealias CamMovAngle = (CGFloat, axis: (CGFloat, CGFloat, CGFloat))
+typealias CamMovRotate = (amount: CGFloat, axis: (CGFloat, CGFloat, CGFloat))
 
 class Fsm: ObservableObject {
     @Published private(set) var hState = FsmHState()
@@ -41,8 +41,7 @@ class Fsm: ObservableObject {
     private var camMovAmount = CGSize.zero
     private var camMovRecall = CGSize.zero
     private var startJumpCamMov = CGSize.zero
-    @Published private(set) var camMovAngle: CamMovAngle = (.zero, axis: (x: .zero, y: .zero, z: .zero))
-    private let camMovCoeff = 0.31415
+    @Published private(set) var camMovRotate: CamMovRotate = (amount: .zero, axis: (x: .zero, y: .zero, z: .zero))
     @Published private(set) var camTrnAmount = CGFloat.zero
     private var camTrnRecall = CGFloat.zero
     private var startJumpCamTrn = CGFloat.zero
@@ -209,10 +208,10 @@ class Fsm: ObservableObject {
                 .clamped(
                     to: -finderSize.width/3...finderSize.width/3,
                     and: -finderSize.height/3...finderSize.height/3)
-            camMovAngle.0 = (
+            camMovRotate.0 = (
                 camMovAmount.width*camMovAmount.width+camMovAmount.height*camMovAmount.height
-            ).squareRoot()*camMovCoeff
-            camMovAngle.1 = (x: -movAmount.height, y: movAmount.width, z: 0)
+            ).squareRoot()
+            camMovRotate.1 = (x: -movAmount.height, y: movAmount.width, z: 0)
         case .OPT:
             optMovAmount = startJumpOptMov+optMovRecall+movAmount.height
                 .clamped(to: -finderSize.height/2...finderSize.height/2)
@@ -237,8 +236,8 @@ class Fsm: ObservableObject {
             startJumpCamTrn = .zero
             
             let rad = Float.pi/180.0
-            let sina = sinf(Float(camTrnAmount)*rad)
-            let cosa = cosf(Float(camTrnAmount)*rad)
+            let sina = sinf(Float(-camTrnAmount)*rad)
+            let cosa = cosf(Float(-camTrnAmount)*rad)
             let x = camera.vup.x
             let y = camera.vup.y
             let vup = V(x: x*cosa-y*sina, y: x*sina+y*cosa, z: 0)
@@ -247,7 +246,7 @@ class Fsm: ObservableObject {
             optTrnRecall = optTrnAmount
             startJumpOptTrn = .zero
             
-            let adj = Float(optTrnAmount)
+            let adj = powf(1.25, Float(-optTrnAmount)/6.3)
             camera.set(fostance: adj*camera.fostance)
         default:
             throw FsmError.unexpectedFsmState
@@ -415,7 +414,7 @@ class Fsm: ObservableObject {
         camMovAmount = .zero
         camMovRecall = .zero
         startJumpCamMov = .zero
-        camMovAngle = (.zero, axis: (x: .zero, y: .zero, z: .zero))
+        camMovRotate = (amount: .zero, axis: (x: .zero, y: .zero, z: .zero))
         camTrnAmount = .zero
         camTrnRecall = .zero
         startJumpCamTrn = .zero

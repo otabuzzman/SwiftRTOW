@@ -116,7 +116,7 @@ struct ContentView: View {
                                     FinderCamera(aspectRatio: CGFloat(camera.aspratio))
                                         .applyCameraControls(
                                             viewerDistance: appFsm.vwrZomAmount,
-                                            cameraDirection: appFsm.camMovAngle)
+                                            cameraDirection: appFsm.camMovRotate)
                                 
                                     FinderOptics(aspectRatio: CGFloat(camera.aspratio))
                                         .applyOpticsControls(

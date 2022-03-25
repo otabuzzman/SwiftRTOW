@@ -70,7 +70,7 @@ struct FinderCamera: View {
 struct CameraControls: ViewModifier {
     var aspectRatio: CGFloat
     var viewerDistance: CGFloat
-    var cameraDirection: CamMovAngle
+    var cameraDirection: CamMovRotate
     
     func body(content: Content) -> some View {
         GeometryReader { geometry in
@@ -96,7 +96,7 @@ struct CameraControls: ViewModifier {
 }
 
 extension FinderCamera {
-    func applyCameraControls(viewerDistance: CGFloat, cameraDirection: CamMovAngle) -> some View {
+    func applyCameraControls(viewerDistance: CGFloat, cameraDirection: CamMovRotate) -> some View {
         modifier(CameraControls(aspectRatio: aspectRatio, viewerDistance: viewerDistance, cameraDirection: cameraDirection))
     }
 }
@@ -137,8 +137,8 @@ struct OpticsControls: ViewModifier {
                             gradient: Gradient(
                                 colors: [.crystal, .primaryHint, .primaryPale]),
                             center: .center,
-                            startRadius: min(width, height)/4.0+depthOfField,
-                            endRadius: min(width, height)/2.0+depthOfField))
+                            startRadius: min(width, height)/4.0+depthOfField*0.31415,
+                            endRadius: min(width, height)/2.0+depthOfField*0.31415))
                     Circle()
                     // shape
                         .strokeBorder(.primarySoft, lineWidth: 2/(scaleFactor*fieldOfView))
