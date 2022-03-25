@@ -47,11 +47,9 @@ class Fsm: ObservableObject {
     private var camTrnRecall = CGFloat.zero
     private var startJumpCamTrn = CGFloat.zero
     // optics controls
-    private var optMovAmount = CGSize.zero
-    private var optMovRecall = CGSize.zero
-    private var startJumpOptMov = CGSize.zero
-    @Published private(set) var optMovAngle = CGFloat.zero
-    private let optMovCoeff = 0.31415
+    @Published private(set) var optMovAmount = CGFloat.zero
+    private var optMovRecall = CGFloat.zero
+    private var startJumpOptMov = CGFloat.zero
     @Published private(set) var optTrnAmount = CGFloat.zero
     private var optTrnRecall = CGFloat.zero
     private var startJumpOptTrn = CGFloat.zero
@@ -181,7 +179,7 @@ class Fsm: ObservableObject {
             optMovRecall = optMovAmount
             startJumpOptMov = .zero
             
-            let adj = Float(optMovAmount.height)
+            let adj = powf(1.25, Float(-optMovAmount)/10.0)
             camera.set(aperture: adj*camera.aperture)
         default:
             throw FsmError.unexpectedFsmState
@@ -204,25 +202,20 @@ class Fsm: ObservableObject {
         case .VWR:
             vwrMovAmount = (startJumpVwrMov+vwrMovRecall+movAmount)
                 .clamped(
-                    to: -finderSize.width/2...finderSize.width/2,
-                    and: -finderSize.height/2...finderSize.height/2)
+                    to: -finderSize.width/3...finderSize.width/3,
+                    and: -finderSize.height/3...finderSize.height/3)
         case .CAM:
             camMovAmount = (startJumpCamMov+camMovRecall+movAmount)
                 .clamped(
-                    to: -finderSize.width/2...finderSize.width/2,
-                    and: -finderSize.height/2...finderSize.height/2)
+                    to: -finderSize.width/3...finderSize.width/3,
+                    and: -finderSize.height/3...finderSize.height/3)
             camMovAngle.0 = (
                 camMovAmount.width*camMovAmount.width+camMovAmount.height*camMovAmount.height
             ).squareRoot()*camMovCoeff
             camMovAngle.1 = (x: -movAmount.height, y: movAmount.width, z: 0)
         case .OPT:
-            optMovAmount = (startJumpOptMov+optMovRecall+movAmount)
-                .clamped(
-                    to: -finderSize.width/2...0,
-                    and: -finderSize.height/2...0)
-            optMovAngle = (
-                optMovAmount.width*optMovAmount.width+optMovAmount.height*optMovAmount.height
-            ).squareRoot()*optMovCoeff
+            optMovAmount = startJumpOptMov+optMovRecall+movAmount.height
+                .clamped(to: -finderSize.height/2...finderSize.height/2)
         default:
             throw FsmError.unexpectedFsmState
         }
@@ -382,7 +375,7 @@ class Fsm: ObservableObject {
         timeoutTask.cancel()
         
         let movAmount = eaParam.pop() as! CGSize
-        startJumpOptMov = -movAmount
+        startJumpOptMov = -movAmount.height
         
         cadPaddle.reset(x: 0, y: 0)
         
@@ -430,7 +423,6 @@ class Fsm: ObservableObject {
         optMovAmount = .zero
         optMovRecall = .zero
         startJumpOptMov = .zero
-        optMovAngle = .zero
         optTrnAmount = .zero
         optTrnRecall = .zero
         startJumpOptTrn = .zero
@@ -517,4 +509,4 @@ class Fsm: ObservableObject {
     }
 }
 
-private let trace = true
+private let trace = false

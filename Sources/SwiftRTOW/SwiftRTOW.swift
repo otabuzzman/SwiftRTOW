@@ -121,7 +121,7 @@ struct ContentView: View {
                                     FinderOptics(aspectRatio: CGFloat(camera.aspratio))
                                         .applyOpticsControls(
                                             fieldOfView: appFsm.optZomAmount,
-                                            depthOfField: appFsm.optMovAngle,
+                                            depthOfField: appFsm.optMovAmount,
                                             focusDistance: appFsm.optTrnAmount,
                                             viewerLRUD: appFsm.vwrMovAmount,
                                             cameraLevel: appFsm.camTrnAmount)

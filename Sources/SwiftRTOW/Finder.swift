@@ -137,8 +137,8 @@ struct OpticsControls: ViewModifier {
                             gradient: Gradient(
                                 colors: [.crystal, .primaryHint, .primaryPale]),
                             center: .center,
-                            startRadius: min(width, height)/2.0-depthOfField,
-                            endRadius: min(width, height)-depthOfField))
+                            startRadius: min(width, height)/4.0+depthOfField,
+                            endRadius: min(width, height)/2.0+depthOfField))
                     Circle()
                     // shape
                         .strokeBorder(.primarySoft, lineWidth: 2/(scaleFactor*fieldOfView))
