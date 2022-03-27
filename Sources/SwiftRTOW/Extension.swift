@@ -59,7 +59,7 @@ extension UIImage {
         
         let albumQuery = PHFetchOptions()
         albumQuery.predicate = NSPredicate(format: "title == \"\(albumTitle)\"")
-        let album = PHAssetCollection.fetchAssetCollections(
+        var album = PHAssetCollection.fetchAssetCollections(
             with: .album,
             subtype: .albumRegular,
             options: albumQuery)
@@ -68,6 +68,10 @@ extension UIImage {
             try? PHPhotoLibrary.shared().performChangesAndWait {
                 PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumTitle)
             }
+            album = PHAssetCollection.fetchAssetCollections(
+                with: .album,
+                subtype: .albumRegular,
+                options: albumQuery)
         }
         
         PHPhotoLibrary.shared().performChanges {
