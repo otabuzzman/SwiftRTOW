@@ -1,3 +1,4 @@
+import Photos
 import SwiftUI
 
 extension UIScreen {
@@ -8,21 +9,72 @@ extension UIScreen {
 
 extension UIImage {
     convenience init?(imageData: [Pixel], imageWidth: Int, imageHeight: Int) {
-        guard imageWidth>0 && imageHeight>0, imageData.count == imageWidth*imageHeight else {
+        guard
+            imageWidth>0 && imageHeight>0,
+            imageData.count == imageWidth*imageHeight
+        else {
             return nil
         }
         
-        guard let dataProvider = (imageData.withUnsafeBytes { (dataPointee: UnsafeRawBufferPointer) -> CGDataProvider? in
-            return CGDataProvider(data: Data(bytes: dataPointee.baseAddress!, count: imageData.count*MemoryLayout<Pixel>.size) as CFData)
-        }) else {
+        guard
+            let dataProvider = (imageData.withUnsafeBytes {
+                (dataPointee: UnsafeRawBufferPointer) -> CGDataProvider? in
+                
+                return CGDataProvider(
+                    data: Data(
+                        bytes: dataPointee.baseAddress!,
+                        count: imageData.count*MemoryLayout<Pixel>.size) as CFData)
+            })
+        else {
             return nil
         }
         
-        guard let image = CGImage( width: imageWidth, height: imageHeight, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: imageWidth*MemoryLayout<Pixel>.size, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue), provider: dataProvider, decode: nil, shouldInterpolate: true, intent: .defaultIntent) else {
+        guard
+            let image = CGImage( 
+                width: imageWidth,
+                height: imageHeight,
+                bitsPerComponent: 8,
+                bitsPerPixel: 32,
+                bytesPerRow: imageWidth*MemoryLayout<Pixel>.size,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+                provider: dataProvider,
+                decode: nil,
+                shouldInterpolate: true,
+                intent: .defaultIntent)
+        else {
             return nil
         }
         
         self.init(cgImage: image)
+    }
+    
+    func persist(inPhotosAlbum: String?) {
+        let albumTitle: String
+        if inPhotosAlbum == nil {
+            albumTitle = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as! String
+        } else {
+            albumTitle = inPhotosAlbum!
+        }
+        
+        let albumQuery = PHFetchOptions()
+        albumQuery.predicate = NSPredicate(format: "title == \"\(albumTitle)\"")
+        let album = PHAssetCollection.fetchAssetCollections(
+            with: .album,
+            subtype: .albumRegular,
+            options: albumQuery)
+        
+        if album.count == 0 {
+            try? PHPhotoLibrary.shared().performChangesAndWait {
+                PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumTitle)
+            }
+        }
+        
+        PHPhotoLibrary.shared().performChanges {
+            let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: self)
+            let addAssetRequest = PHAssetCollectionChangeRequest(for: album.object(at: 0))
+            addAssetRequest?.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
+        }
     }
 }
 

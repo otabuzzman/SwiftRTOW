@@ -150,6 +150,19 @@ struct ContentView: View {
                         appFsm.pop()
                     }
                 }))
+                .simultaneousGesture(LongPressGesture(minimumDuration: 2).onEnded({ _ in
+                    do {
+                        appFsm.push(parameter: raycer.imageWidth)
+                        appFsm.push(parameter: raycer.imageHeight)
+                        try raycer.imageData!.withUnsafeBufferPointer { data in
+                            appFsm.push(parameter: data)
+                            try appFsm.transition(event: .SAV)
+                        }
+                    } catch {
+                        appFsm.pop()
+                        appFsm.pop()
+                    }
+                }))
                 .simultaneousGesture(
                     DragGesture()
                         .onChanged { value in

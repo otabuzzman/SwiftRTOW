@@ -1,14 +1,14 @@
 import SwiftUI
 
 enum FsmState: Int {
-    case CAM, LOD, MOV, OPT, TRN, VSC, VWR, ZOM
+    case CAM, LOD, MOV, OPT, SAV, TRN, VSC, VWR, ZOM
 }
-let FsmStateName = ["CAM", "LOD", "MOV", "OPT", "TRN", "VSC", "VWR", "ZOM"]
+let FsmStateName = ["CAM", "LOD", "MOV", "OPT", "SAV", "TRN", "VSC", "VWR", "ZOM"]
 
 enum FsmEvent: Int {
-    case CAM, CTL, LOD, MOV, OPT, RET, TRN, VWR, ZOM
+    case CAM, CTL, LOD, MOV, OPT, RET, SAV, TRN, VWR, ZOM
 }
-let FsmEventName = ["CAM", "CTL", "LOD", "MOV", "OPT", "RET", "TRN", "VWR", "ZOM"]
+let FsmEventName = ["CAM", "CTL", "LOD", "MOV", "OPT", "RET", "SAV", "TRN", "VWR", "ZOM"]
 
 typealias FsmAction = () throws -> Void
 
@@ -78,15 +78,16 @@ class Fsm: ObservableObject {
     init(startWithState state: FsmState = .VSC) {
         self.hState.push(state)
         self.eaTable = [
-            /* S/E     CAM       CTL       LOD       MOV       OPT       RET       TRN       VWR       ZOM     */
-            /* CAM */ [eaCamCam, eaReject, eaReject, eaCamMov, eaCamOpt, eaCamRet, eaCamTrn, eaCamVwr, eaReject],
-            /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject, eaReject, eaReject],
-            /* MOV */ [eaReject, eaReject, eaReject, eaMovMov, eaReject, eaMovRet, eaReject, eaReject, eaReject],
-            /* OPT */ [eaOptCam, eaReject, eaReject, eaOptMov, eaOptOpt, eaOptRet, eaOptTrn, eaOptVwr, eaOptZom],
-            /* TRN */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaTrnRet, eaTrnTrn, eaReject, eaReject],
-            /* VSC */ [eaReject, eaVscCtl, eaVscLod, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
-            /* VWR */ [eaVwrCam, eaReject, eaReject, eaVwrMov, eaVwrOpt, eaVwrRet, eaReject, eaVwrVwr, eaVwrZom],
-            /* ZOM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaZomRet, eaReject, eaReject, eaZomZom]
+            /* S/E     CAM       CTL       LOD       MOV       OPT       RET       SAV       TRN       VWR       ZOM     */
+            /* CAM */ [eaCamCam, eaReject, eaReject, eaCamMov, eaCamOpt, eaCamRet, eaReject, eaCamTrn, eaCamVwr, eaReject],
+            /* LOD */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaLodRet, eaReject, eaReject, eaReject, eaReject],
+            /* MOV */ [eaReject, eaReject, eaReject, eaMovMov, eaReject, eaMovRet, eaReject, eaReject, eaReject, eaReject],
+            /* OPT */ [eaOptCam, eaReject, eaReject, eaOptMov, eaOptOpt, eaOptRet, eaReject, eaOptTrn, eaOptVwr, eaOptZom],
+            /* SAV */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject, eaReject],
+            /* TRN */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaTrnRet, eaReject, eaTrnTrn, eaReject, eaReject],
+            /* VSC */ [eaReject, eaVscCtl, eaVscLod, eaReject, eaReject, eaReject, eaVscSav, eaReject, eaReject, eaReject],
+            /* VWR */ [eaVwrCam, eaReject, eaReject, eaVwrMov, eaVwrOpt, eaVwrRet, eaReject, eaReject, eaVwrVwr, eaVwrZom],
+            /* ZOM */ [eaReject, eaReject, eaReject, eaReject, eaReject, eaZomRet, eaReject, eaReject, eaReject, eaZomZom]
             ]
     }
     
@@ -467,6 +468,19 @@ class Fsm: ObservableObject {
         }
         
         update(withState: .LOD)
+    }
+    
+    private func eaVscSav() {
+        let imageData = eaParam.pop() as! UnsafeBufferPointer<Pixel>
+        let imageHeight = eaParam.pop() as! Int
+        let imageWidth = eaParam.pop() as! Int
+        let image = UIImage(
+            imageData: Array(imageData),
+            imageWidth: imageWidth,
+            imageHeight: imageHeight)
+        image!.persist(inPhotosAlbum: nil)
+        
+        update(withState: .VSC)
     }
     
     private func eaReject() throws {
