@@ -57,26 +57,28 @@ extension UIImage {
             albumTitle = inPhotosAlbum!
         }
         
-        let albumQuery = PHFetchOptions()
-        albumQuery.predicate = NSPredicate(format: "title == \"\(albumTitle)\"")
-        var album = PHAssetCollection.fetchAssetCollections(
+        let albumFetchOptions = PHFetchOptions()
+        albumFetchOptions.predicate = NSPredicate(format: "title == \"\(albumTitle)\"")
+        var albumFetchResults = PHAssetCollection.fetchAssetCollections(
             with: .album,
             subtype: .albumRegular,
-            options: albumQuery)
+            options: albumFetchOptions)
         
-        if album.count == 0 {
+        if albumFetchResults.count == 0 {
             try? PHPhotoLibrary.shared().performChangesAndWait {
                 PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumTitle)
             }
-            album = PHAssetCollection.fetchAssetCollections(
+            // update fetch result
+            albumFetchResults = PHAssetCollection.fetchAssetCollections(
                 with: .album,
                 subtype: .albumRegular,
-                options: albumQuery)
+                options: albumFetchOptions)
         }
         
-        PHPhotoLibrary.shared().performChanges {
+        let album = albumFetchResults.firstObject!
+        try? PHPhotoLibrary.shared().performChangesAndWait {
             let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: self)
-            let addAssetRequest = PHAssetCollectionChangeRequest(for: album.object(at: 0))
+            let addAssetRequest = PHAssetCollectionChangeRequest(for: album)
             addAssetRequest?.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
         }
     }
