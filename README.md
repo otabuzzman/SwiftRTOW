@@ -22,7 +22,9 @@ Tap in render view to open controls view. Press the camera button to enter chang
 
 Tap in render view to open controls view. Press the lens button to enter change camera optics mode. Drag changes aperture yielding blur. The boldly outlined finder rectangle indicates the effect by gradually applying a transparent filled overlay. The magnify gesture changes the field of view. The effect is the same as changing the viewer's distance. Therefore the indication by the pale-colored finder rectangle is the same as well, that is it changes its size accordingly. Apply a rotate gesture to change depth of field (focus distance). The diameter of the thin-lined circle inside the boldly outlined rectangle reflects the set value: the smaller the diameter the farther away is the focus.
 
-A long press on the render view yields the current image to be saved in a Photos album named SwitRTOW.
+**Save image in Photos**
+
+Long press in render view to save current image in a Photos album named SwitRTOW.
 
 ### Tools
 Apps used on iPad
