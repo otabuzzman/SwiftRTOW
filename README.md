@@ -11,12 +11,15 @@ A single tap on the render view displays more buttons and a finder. This control
 The button bar in the control view is used to select viewer position, camera direction, and optics. The finder area in the control view gives a coarse indication of how the different controls will impact rendering. A small pale-colored rectangle with a bold outline represents the current image. It provides optical feedback on parameter changes using the controls.
 
 **Change viewer position**
+
 Dragging moves the viewer around. A magnify gesture changes the viewer's distance.
 
 **Change camera direction**
+
 Dragging changes the camera direction. The rotate gesture rolls the camera around its direction axis.
 
 **Change camera optics**
+
 Dragging, rotating, and magnifying change aperture, focus distance, and field of view respectively.
 
 A long press on the render view yields the current image to be saved in a Photos album named SwitRTOW.
