@@ -34,7 +34,7 @@ Apps used on iPad
 - [GitHub](https://apps.apple.com/us/app/github/id1477376905)
 
 ### Build
-- Ceate new app[^1] in SP4
+- Create new app[^1] in SP4
 
   - Set app name and color
   - Add app icon
