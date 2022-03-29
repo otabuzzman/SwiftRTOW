@@ -12,15 +12,15 @@ The button bar in the control view is used to select viewer position, camera dir
 
 **Change viewer position**
 
-Dragging moves the viewer around. A magnify gesture changes the viewer's distance.
+Tap in render view to open controls view. Press the location button to enter change viewer position mode. Apply a drag gesture to move the viewer around. The boldly outlined finder rectangle indicates the new position. Use a magnify gesture to change viewer's distance. The pale-colored finder changes its size accordingly.
 
 **Change camera direction**
 
-Dragging changes the camera direction. The rotate gesture rolls the camera around its direction axis.
+Tap in render view to open controls view. Press the camera button to enter change camera direction mode. Use drag to change  camera direction. The pale-colored finder rectangle 3D-rotates accordingly. The rotate gesture rolls the camera around its direction axis. The boldly outlined finder rectangle rotates accordingly.
 
 **Change camera optics**
 
-Dragging, rotating, and magnifying change aperture, focus distance, and field of view respectively.
+Tap in render view to open controls view. Press the lens button to enter change camera optics mode. Drag changes aperture yielding blur. The boldly outlined finder rectangle indicates the effect by gradually applying a transparent filled overlay. The magnify gesture changes the field of view. The effect is the same as changing the viewer's distance. Therefore the indication by the pale-colored finder rectangle is the same as well, that is it changes its size accordingly. Apply a rotate gesture to change depth of field (focus distance). The diameter of the thin-lined circle inside the boldly outlined rectangle reflects the set value: the smaller the diameter the farther away is the focus.
 
 A long press on the render view yields the current image to be saved in a Photos album named SwitRTOW.
 
