@@ -259,10 +259,11 @@ struct MyApp: App {
     @StateObject var camera = Camera()
     
     var body: some Scene {
+        raycer.samplesPerPixel = 1
+        
         if _isDebugAssertConfiguration() { // SO #24003291
             raycer.imageWidth = 320
             raycer.imageHeight = 240
-            raycer.samplesPerPixel = 1
             
             camera.set(aspratio: 320.0/240.0)
         }

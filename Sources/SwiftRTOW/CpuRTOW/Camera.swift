@@ -22,7 +22,7 @@ class Camera: @unchecked Sendable, ObservableObject {
         pat = P(x: 0, y: 0, z: 0)
         vup = V(x: 0, y: 1.0, z: 0)
         fov = 20.0
-        aspratio = 16.0/9.0
+        aspratio = 1.5
         aperture = 0.1
         fostance = 10.0
 
