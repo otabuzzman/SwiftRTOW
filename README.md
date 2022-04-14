@@ -60,5 +60,6 @@ Apps used on iPad
 |`Finder.swift`|Finder views for viewer, camera and optics controls.|
 |`Paddle.swift`|An abstraction of a trackball control device.|
 |`Exception.swift`|Error exceptions.|
+|`Responsive.swift`|Responsive UI support on iPad Pro 11" and iPhone Xs.|
 |`Extension.swift`|SwiftUI classes and protocols extensions.|
 |`Stack.swift`|A stack implementation.|

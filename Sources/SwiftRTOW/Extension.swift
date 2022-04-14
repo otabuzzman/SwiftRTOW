@@ -1,12 +1,6 @@
 import Photos
 import SwiftUI
 
-extension UIScreen {
-    static let width = UIScreen.main.bounds.size.width
-    static let height = UIScreen.main.bounds.size.height
-    static let aspectRatio = width/height
-}
-
 extension UIImage {
     convenience init?(imageData: [Pixel], imageWidth: Int, imageHeight: Int) {
         guard

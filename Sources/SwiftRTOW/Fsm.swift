@@ -522,4 +522,4 @@ class Fsm: ObservableObject {
     }
 }
 
-private let trace = false
+private let trace = _isDebugAssertConfiguration()

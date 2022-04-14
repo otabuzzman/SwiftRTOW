@@ -42,15 +42,22 @@ struct ContentView: View {
     @State private var pressedSideButton = ButtonType.Camera
     
     private let finderSize = CGSize(
-        width: min(UIScreen.width, UIScreen.width)*0.63,
-        height: min(UIScreen.width, UIScreen.width)*0.63)
+        width: min(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)*0.63,
+        height: min(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)*0.63)
+    
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
+    @State private var portraitOrientation = UIScreen.main.bounds.size.height>UIScreen.main.bounds.size.width
     
     var body: some View {
+        let screenWidth = UIScreen.main.bounds.size.width
+        let screenHeight = UIScreen.main.bounds.size.height
+        let screenMaxDim = max(screenWidth, screenHeight)
+        
         ZStack {
             Color.primaryPale
                 .ignoresSafeArea()
-                
-            VStack {
+            
+            HVStack(vertical: portraitOrientation) {
                 ZStack {
                     ZStack(alignment: .bottomLeading) {
                         RtowView()
@@ -62,8 +69,8 @@ struct ContentView: View {
                             }
                             .aspectRatio(contentMode: .fill)
                             .frame(
-                                maxWidth: UIScreen.width,
-                                maxHeight: UIScreen.height)
+                                maxWidth: portraitOrientation ? screenWidth : screenWidth-screenMaxDim*0.12,
+                                maxHeight: portraitOrientation ? screenHeight-screenMaxDim*0.12 : screenHeight)
                             .clipped()
                     
                         ProgressView(
@@ -76,8 +83,8 @@ struct ContentView: View {
                     }
                     
                     if appFsm.isCsl || appFsm.isCad {
-                        ZStack(alignment: .leading) {
-                            VStack {
+                        ZStack(alignment: !(portraitOrientation && horizontalSizeClass == .compact) ? .leading : .bottom) {
+                            HVStack(vertical: !(portraitOrientation && horizontalSizeClass == .compact)) {
                                 Button("Set viewer position") {
                                     pressedSideButton = .Viewer
                                     try? appFsm.transition(event: .VWR)
@@ -101,7 +108,7 @@ struct ContentView: View {
                                     pretendButton: .Optics,
                                     pressedButton: pressedSideButton,
                                     image: "camera.aperture"))
-                            }.padding(.leading)
+                            }.padding(!(portraitOrientation && horizontalSizeClass == .compact) ? .leading : .bottom)
                             
                             Group {
                                 Group {
@@ -127,8 +134,10 @@ struct ContentView: View {
                                             cameraLevel: appFsm.camTrnAmount)
                                 }.frame(width: finderSize.width, height: finderSize.height)
                             }
-                            // force controls ZStack to span screen width
-                            .frame(minWidth: 0, maxWidth: .infinity)
+                            // force controls ZStack to span available space
+                            .frame(
+                                minWidth: 0, maxWidth: .infinity,
+                                minHeight: 0, maxHeight: .infinity)
                         }
                         .zIndex(1) // SO #57730074
                         .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.63)))
@@ -205,7 +214,7 @@ struct ContentView: View {
                             if appFsm.isCad { try! appFsm.transition(event: .RET) }
                         })
                 
-                HStack {
+                HVStack(vertical: !portraitOrientation) {
                     Button("Chapter 8") {
                         things = Ch8()
                         things.load()
@@ -244,20 +253,26 @@ struct ContentView: View {
                         pretendButton: .Ch13,
                         pressedButton: pressedBaseButton,
                         image: "rtow-ch13-btn"))
-                }.disabled(!appFsm.isState(.VSC))
-                
-                Spacer()
+                }
+                .disabled(!appFsm.isState(.VSC))
+                .padding(portraitOrientation ? .bottom : .trailing)
+            }.frame(
+                maxWidth: portraitOrientation ? .infinity : screenWidth,
+                maxHeight: portraitOrientation ? screenHeight : .infinity)
+        }.onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            if UIDevice.current.orientation.isValidInterfaceOrientation {
+                portraitOrientation = UIDevice.current.orientation.isPortrait
             }
         }
     }
 }
-
+    
 @main
 struct MyApp: App {
     @StateObject var appFsm = Fsm()
     @StateObject var raycer = Rtow()
     @StateObject var camera = Camera()
-    
+        
     var body: some Scene {
         raycer.samplesPerPixel = 1
         

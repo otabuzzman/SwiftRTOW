@@ -15,7 +15,9 @@ struct BaseButton: ButtonStyle {
     @EnvironmentObject var appFsm: Fsm
     
     func makeBody(configuration: Configuration) -> some View {
-        let buttonSize = UIScreen.width*0.1
+        let buttonSize = max(
+            UIScreen.main.bounds.size.width,
+            UIScreen.main.bounds.size.height)*0.1
         
         ZStack {
             Rectangle()
@@ -44,7 +46,9 @@ struct SideButton: ButtonStyle {
     @EnvironmentObject var appFsm: Fsm
     
     func makeBody(configuration: Configuration) -> some View {
-        let buttonSize = UIScreen.width*0.1
+        let buttonSize = max(
+            UIScreen.main.bounds.size.width,
+            UIScreen.main.bounds.size.height)*0.1
         
         ZStack {
             Image(systemName: image)
