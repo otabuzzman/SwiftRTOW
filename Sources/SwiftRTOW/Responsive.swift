@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct HVStack<Content>: View where Content: View {
+struct BStack<Content>: View where Content: View {
     let vertical: Bool
     let content: () -> Content
     

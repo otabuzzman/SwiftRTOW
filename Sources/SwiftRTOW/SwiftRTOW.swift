@@ -41,23 +41,20 @@ struct ContentView: View {
     @State private var pressedBaseButton = ButtonType.None
     @State private var pressedSideButton = ButtonType.Camera
     
-    private let finderSize = CGSize(
-        width: min(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)*0.63,
-        height: min(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)*0.63)
-    
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
     @State private var portraitOrientation = UIScreen.main.bounds.size.height>UIScreen.main.bounds.size.width
     
     var body: some View {
         let screenWidth = UIScreen.main.bounds.size.width
         let screenHeight = UIScreen.main.bounds.size.height
+        let screenMinDim = min(screenWidth, screenHeight)
         let screenMaxDim = max(screenWidth, screenHeight)
         
         ZStack {
             Color.primaryPale
                 .ignoresSafeArea()
             
-            HVStack(vertical: portraitOrientation) {
+            BStack(vertical: portraitOrientation) {
                 ZStack {
                     ZStack(alignment: .bottomLeading) {
                         RtowView()
@@ -84,7 +81,7 @@ struct ContentView: View {
                     
                     if appFsm.isCsl || appFsm.isCad {
                         ZStack(alignment: !(portraitOrientation && horizontalSizeClass == .compact) ? .leading : .bottom) {
-                            HVStack(vertical: !(portraitOrientation && horizontalSizeClass == .compact)) {
+                            BStack(vertical: !(portraitOrientation && horizontalSizeClass == .compact)) {
                                 Button("Set viewer position") {
                                     pressedSideButton = .Viewer
                                     try? appFsm.transition(event: .VWR)
@@ -132,7 +129,7 @@ struct ContentView: View {
                                             focusDistance: appFsm.optTrnAmount,
                                             viewerLRUD: appFsm.vwrMovAmount,
                                             cameraLevel: appFsm.camTrnAmount)
-                                }.frame(width: finderSize.width, height: finderSize.height)
+                                }.frame(width: screenMinDim*0.63, height: screenMinDim*0.63)
                             }
                             // force controls ZStack to span available space
                             .frame(
@@ -148,6 +145,7 @@ struct ContentView: View {
                         appFsm.push(parameter: things)
                         appFsm.push(parameter: camera)
                         appFsm.push(parameter: raycer)
+                        let finderSize = CGSize(width: screenMinDim*0.63, height: screenMinDim*0.63)
                         appFsm.push(parameter: finderSize)
                         appFsm.push(parameter: pressedSideButton)
                         try appFsm.transition(event: .CTL)
@@ -214,7 +212,7 @@ struct ContentView: View {
                             if appFsm.isCad { try! appFsm.transition(event: .RET) }
                         })
                 
-                HVStack(vertical: !portraitOrientation) {
+                BStack(vertical: !portraitOrientation) {
                     Button("Chapter 8") {
                         things = Ch8()
                         things.load()
@@ -256,9 +254,7 @@ struct ContentView: View {
                 }
                 .disabled(!appFsm.isState(.VSC))
                 .padding(portraitOrientation ? .bottom : .trailing)
-            }.frame(
-                maxWidth: portraitOrientation ? .infinity : screenWidth,
-                maxHeight: portraitOrientation ? screenHeight : .infinity)
+            }
         }.onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
             if UIDevice.current.orientation.isValidInterfaceOrientation {
                 portraitOrientation = UIDevice.current.orientation.isPortrait
@@ -266,7 +262,7 @@ struct ContentView: View {
         }
     }
 }
-    
+
 @main
 struct MyApp: App {
     @StateObject var appFsm = Fsm()
