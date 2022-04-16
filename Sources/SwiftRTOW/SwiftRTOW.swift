@@ -1,3 +1,4 @@
+import Photos
 import SwiftUI
 
 struct RtowView: UIViewRepresentable {
@@ -158,16 +159,30 @@ struct ContentView: View {
                     }
                 }))
                 .simultaneousGesture(LongPressGesture(minimumDuration: 2).onEnded({ _ in
-                    do {
-                        appFsm.push(parameter: raycer.imageWidth)
-                        appFsm.push(parameter: raycer.imageHeight)
-                        try raycer.imageData!.withUnsafeBufferPointer { data in
-                            appFsm.push(parameter: data)
-                            try appFsm.transition(event: .SAV)
+                    let handler = {
+                        do {
+                            appFsm.push(parameter: raycer.imageWidth)
+                            appFsm.push(parameter: raycer.imageHeight)
+                            try raycer.imageData!.withUnsafeBufferPointer { data in
+                                appFsm.push(parameter: data)
+                                try appFsm.transition(event: .SAV)
+                            }
+                        } catch {
+                            appFsm.pop()
+                            appFsm.pop()
                         }
-                    } catch {
-                        appFsm.pop()
-                        appFsm.pop()
+                    }
+                    
+                    guard
+                        PHPhotoLibrary.authorizationStatus(for: .readWrite) != .authorized
+                    else {
+                        handler()
+                        return
+                    }
+                    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+                        if status == .authorized {
+                            handler()
+                        }
                     }
                 }))
                 .simultaneousGesture(

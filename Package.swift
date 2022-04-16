@@ -25,6 +25,7 @@ let package = Package(
                 "Finder.swift",
                 "Paddle.swift",
                 "Exception.swift",
+                "Responsive.swift",
                 "Extension.swift",
                 "Stack.swift",
                 "CpuRTOW/Rtow.swift",
