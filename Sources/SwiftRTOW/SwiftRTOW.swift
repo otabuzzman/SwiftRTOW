@@ -1,37 +1,6 @@
 import Photos
 import SwiftUI
 
-struct RtowView: UIViewRepresentable {
-    @EnvironmentObject var raycer: Rtow
-    
-    func makeUIView(context: Context) -> UIImageView {
-        let w = raycer.imageWidth
-        let h = raycer.imageHeight
-        
-        var imageData: [Pixel] = .init(repeating: .init(x: 0, y: 0, z: 0, w: 255), count: w*h)
-        for i in imageData.indices {
-            imageData[i].x = .random(in: 0...255)
-            imageData[i].y = .random(in: 0...255)
-            imageData[i].z = .random(in: 0...255)
-            imageData[i].w = 255
-        }
-        
-        let splash = UIImage(imageData: imageData, imageWidth: w, imageHeight: h)
-        return UIImageView(image: splash)
-    }
-    
-    func updateUIView(_ uiView: UIImageView, context: Context) {
-        if !raycer.rowRenderFinished {
-            return
-        }
-        
-        uiView.image = UIImage(
-            imageData: raycer.imageData!,
-            imageWidth: raycer.imageWidth,
-            imageHeight: raycer.imageHeight)!
-    }
-}
-
 struct ContentView: View {
     @EnvironmentObject var appFsm: Fsm
     @EnvironmentObject var raycer: Rtow
@@ -43,23 +12,24 @@ struct ContentView: View {
     @State private var pressedSideButton = ButtonType.Camera
     
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
-    @State private var portraitOrientation = UIScreen.main.bounds.size.height>UIScreen.main.bounds.size.width
-    
+    @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
+    @State var isPortait = UIScreen.main.bounds.size.height>UIScreen.main.bounds.size.width
+
     var body: some View {
-        let screenWidth = UIScreen.main.bounds.size.width
-        let screenHeight = UIScreen.main.bounds.size.height
-        let screenMinDim = min(screenWidth, screenHeight)
-        let screenMaxDim = max(screenWidth, screenHeight)
+        let screen = UIScreen()
+        let finderWidth = screen.minDim*0.63
+        let finderHeight = screen.minDim*0.63
         
         ZStack {
             Color.primaryPale
                 .ignoresSafeArea()
             
-            BStack(vertical: portraitOrientation) {
-                ZStack {
-                    ZStack(alignment: .bottomLeading) {
+            BStack(vertical: isPortait) {
+                ZStack { // gestures view
+                    ZStack(alignment: .bottomLeading) { // render view
                         RtowView()
                             .task {
+                                raycer.set(samplesPerPixel: 1)
                                 appFsm.push(parameter: things)
                                 appFsm.push(parameter: camera)
                                 appFsm.push(parameter: raycer)
@@ -67,8 +37,8 @@ struct ContentView: View {
                             }
                             .aspectRatio(contentMode: .fill)
                             .frame(
-                                maxWidth: portraitOrientation ? screenWidth : screenWidth-screenMaxDim*0.12,
-                                maxHeight: portraitOrientation ? screenHeight-screenMaxDim*0.12 : screenHeight)
+                                maxWidth: isPortait ? screen.width : screen.width-screen.maxDim*0.12,
+                                maxHeight: isPortait ? screen.height-screen.maxDim*0.12 : screen.height)
                             .clipped()
                     
                         ProgressView(
@@ -81,8 +51,10 @@ struct ContentView: View {
                     }
                     
                     if appFsm.isCsl || appFsm.isCad {
-                        ZStack(alignment: !(portraitOrientation && horizontalSizeClass == .compact) ? .leading : .bottom) {
-                            BStack(vertical: !(portraitOrientation && horizontalSizeClass == .compact)) {
+                        let isPortraitSmall = !(isPortait && horizontalSizeClass == .compact)
+                        
+                        ZStack(alignment: isPortraitSmall ? .leading : .bottom) { // controls view
+                            BStack(vertical: isPortraitSmall) { // side buttons
                                 Button("Set viewer position") {
                                     pressedSideButton = .Viewer
                                     try? appFsm.transition(event: .VWR)
@@ -106,9 +78,9 @@ struct ContentView: View {
                                     pretendButton: .Optics,
                                     pressedButton: pressedSideButton,
                                     image: "camera.aperture"))
-                            }.padding(!(portraitOrientation && horizontalSizeClass == .compact) ? .leading : .bottom)
+                            }.padding(isPortraitSmall ? .leading : .bottom)
                             
-                            Group {
+                            Group { // finder view
                                 Group {
                                     FinderBorder()
                                     
@@ -130,7 +102,7 @@ struct ContentView: View {
                                             focusDistance: appFsm.optTrnAmount,
                                             viewerLRUD: appFsm.vwrMovAmount,
                                             cameraLevel: appFsm.camTrnAmount)
-                                }.frame(width: screenMinDim*0.63, height: screenMinDim*0.63)
+                                }.frame(width: finderWidth, height: finderHeight)
                             }
                             // force controls ZStack to span available space
                             .frame(
@@ -141,50 +113,56 @@ struct ContentView: View {
                         .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.63)))
                     }
                 }
-                .simultaneousGesture(TapGesture().onEnded({
-                    do {
-                        appFsm.push(parameter: things)
-                        appFsm.push(parameter: camera)
-                        appFsm.push(parameter: raycer)
-                        let finderSize = CGSize(width: screenMinDim*0.63, height: screenMinDim*0.63)
-                        appFsm.push(parameter: finderSize)
-                        appFsm.push(parameter: pressedSideButton)
-                        try appFsm.transition(event: .CTL)
-                    } catch {
-                        appFsm.pop()
-                        appFsm.pop()
-                        appFsm.pop()
-                        appFsm.pop()
-                        appFsm.pop()
-                    }
-                }))
-                .simultaneousGesture(LongPressGesture(minimumDuration: 2).onEnded({ _ in
-                    let handler = {
-                        do {
-                            appFsm.push(parameter: raycer.imageWidth)
-                            appFsm.push(parameter: raycer.imageHeight)
-                            try raycer.imageData!.withUnsafeBufferPointer { data in
-                                appFsm.push(parameter: data)
-                                try appFsm.transition(event: .SAV)
+                .simultaneousGesture(
+                    TapGesture()
+                        .onEnded({
+                            do {
+                                appFsm.push(parameter: things)
+                                appFsm.push(parameter: camera)
+                                appFsm.push(parameter: raycer)
+                                appFsm.push(parameter: finderWidth)
+                                appFsm.push(parameter: finderHeight)
+                                appFsm.push(parameter: pressedSideButton)
+                                try appFsm.transition(event: .CTL)
+                            } catch {
+                                appFsm.pop()
+                                appFsm.pop()
+                                appFsm.pop()
+                                appFsm.pop()
+                                appFsm.pop()
+                                appFsm.pop()
                             }
-                        } catch {
-                            appFsm.pop()
-                            appFsm.pop()
-                        }
-                    }
+                        }))
+                .simultaneousGesture(
+                    LongPressGesture(minimumDuration: 2)
+                        .onEnded({ _ in
+                            let doFsmTransition = {
+                                do {
+                                    appFsm.push(parameter: raycer.imageWidth)
+                                    appFsm.push(parameter: raycer.imageHeight)
+                                    try raycer.imageData!.withUnsafeBufferPointer { data in
+                                        appFsm.push(parameter: data)
+                                        try appFsm.transition(event: .SAV)
+                                    }
+                                } catch {
+                                    appFsm.pop()
+                                    appFsm.pop()
+                                    appFsm.pop()
+                                }
+                            }
                     
-                    guard
-                        PHPhotoLibrary.authorizationStatus(for: .readWrite) != .authorized
-                    else {
-                        handler()
-                        return
-                    }
-                    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-                        if status == .authorized {
-                            handler()
-                        }
-                    }
-                }))
+                            guard
+                                PHPhotoLibrary.authorizationStatus(for: .readWrite) != .authorized
+                            else {
+                                doFsmTransition()
+                                return
+                            }
+                            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+                                if status == .authorized {
+                                    doFsmTransition()
+                                }
+                            }
+                        }))
                 .simultaneousGesture(
                     DragGesture()
                         .onChanged { value in
@@ -227,7 +205,7 @@ struct ContentView: View {
                             if appFsm.isCad { try! appFsm.transition(event: .RET) }
                         })
                 
-                BStack(vertical: !portraitOrientation) {
+                BStack(vertical: !isPortait) { // base buttons
                     Button("Chapter 8") {
                         things = Ch8()
                         things.load()
@@ -268,11 +246,11 @@ struct ContentView: View {
                         image: "rtow-ch13-btn"))
                 }
                 .disabled(!appFsm.isState(.VSC))
-                .padding(portraitOrientation ? .bottom : .trailing)
+                .padding(isPortait ? .bottom : .trailing)
             }
         }.onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
             if UIDevice.current.orientation.isValidInterfaceOrientation {
-                portraitOrientation = UIDevice.current.orientation.isPortrait
+                isPortait = UIDevice.current.orientation.isPortrait
             }
         }
     }
@@ -283,18 +261,9 @@ struct MyApp: App {
     @StateObject var appFsm = Fsm()
     @StateObject var raycer = Rtow()
     @StateObject var camera = Camera()
-        
+    
     var body: some Scene {
-        raycer.samplesPerPixel = 1
-        
-        if _isDebugAssertConfiguration() { // SO #24003291
-            raycer.imageWidth = 320
-            raycer.imageHeight = 240
-            
-            camera.set(aspratio: 320.0/240.0)
-        }
-        
-        return WindowGroup {
+        WindowGroup {
             ContentView()
                 .environmentObject(appFsm)
                 .environmentObject(raycer)

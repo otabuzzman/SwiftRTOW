@@ -20,6 +20,7 @@ let package = Package(
             dependencies: [],
             sources: [
                 "SwiftRTOW.swift",
+                "RtowView.swift",
                 "ButtonStyle.swift",
                 "Fsm.swift",
                 "Finder.swift",

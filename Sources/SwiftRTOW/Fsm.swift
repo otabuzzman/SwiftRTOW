@@ -119,7 +119,8 @@ class Fsm: ObservableObject {
     private func eaOptOpt() { update(withState: .OPT) }
     
     private func eaCslRet() {
-        eaParam.pop() // finderSize
+        eaParam.pop() // finderHeight
+        eaParam.pop() // finderWidth
         
         if cadUpdate {
             let raycer = eaParam.pop() as! Rtow
@@ -152,7 +153,7 @@ class Fsm: ObservableObject {
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
-        let camera = eaParam.peek(.lastButTwo) as! Camera
+        let camera = eaParam.peek(.thirdToLast) as! Camera
         
         switch hState {
         case .VWR:
@@ -195,27 +196,28 @@ class Fsm: ObservableObject {
     
     private func eaMovMov() throws {
         let movAmount = eaParam.pop() as! CGSize
-        let finderSize = eaParam.peek() as! CGSize
+        let finderHeight = eaParam.peek() as! CGFloat
+        let finderWidth = eaParam.peek(.lastButOne) as! CGFloat
         let hState = self.hState.peek(.lastButOne) as! FsmState
         
         switch hState {
         case .VWR:
             vwrMovAmount = (startJumpVwrMov+vwrMovRecall+movAmount)
                 .clamped(
-                    to: -finderSize.width/3...finderSize.width/3,
-                    and: -finderSize.height/3...finderSize.height/3)
+                    to: -finderWidth/3...finderWidth/3,
+                    and: -finderHeight/3...finderHeight/3)
         case .CAM:
             camMovAmount = (startJumpCamMov+camMovRecall+movAmount)
                 .clamped(
-                    to: -finderSize.width/3...finderSize.width/3,
-                    and: -finderSize.height/3...finderSize.height/3)
+                    to: -finderWidth/3...finderWidth/3,
+                    and: -finderHeight/3...finderHeight/3)
             camMovRotate.0 = (
                 camMovAmount.width*camMovAmount.width+camMovAmount.height*camMovAmount.height
             ).squareRoot()
             camMovRotate.1 = (x: -movAmount.height, y: movAmount.width, z: 0)
         case .OPT:
             optMovAmount = startJumpOptMov+optMovRecall+movAmount.height
-                .clamped(to: -finderSize.height/2...finderSize.height/2)
+                .clamped(to: -finderHeight/2...finderHeight/2)
         default:
             throw FsmError.unexpectedFsmState
         }
@@ -229,7 +231,7 @@ class Fsm: ObservableObject {
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
-        let camera = eaParam.peek(.lastButTwo) as! Camera
+        let camera = eaParam.peek(.thirdToLast) as! Camera
         
         switch hState {
         case .CAM:
@@ -285,7 +287,7 @@ class Fsm: ObservableObject {
         }
         
         let hState = self.hState.peek(.lastButOne) as! FsmState
-        let camera = eaParam.peek(.lastButTwo) as! Camera
+        let camera = eaParam.peek(.thirdToLast) as! Camera
         
         switch hState {
         case .VWR:
@@ -444,7 +446,7 @@ class Fsm: ObservableObject {
             throw FsmError.unexpectedError
         }
         
-        let camera = eaParam.peek(.lastButTwo) as! Camera
+        let camera = eaParam.peek(.thirdToLast) as! Camera
         cadPaddle.gauge(eye: camera.eye, pat: camera.pat, vup: camera.vup)
         cadUpdate = false
         

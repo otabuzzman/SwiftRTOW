@@ -22,7 +22,11 @@ class Camera: @unchecked Sendable, ObservableObject {
         pat = P(x: 0, y: 0, z: 0)
         vup = V(x: 0, y: 1.0, z: 0)
         fov = 20.0
-        aspratio = 1.5
+        if _isDebugAssertConfiguration() { // SO #24003291
+            aspratio = 320.0/240.0
+        } else {
+            aspratio = 1.5
+        }
         aperture = 0.1
         fostance = 10.0
 
@@ -30,26 +34,26 @@ class Camera: @unchecked Sendable, ObservableObject {
     }
 
     func set(eye: P? = nil, pat: P? = nil, vup: V? = nil, fov: Float? = nil, aspratio: Float? = nil, aperture: Float? = nil, fostance: Float? = nil) {
-        if eye != nil {
-            self.eye = eye!
+        if let eye = eye {
+            self.eye = eye
         }
-        if pat != nil {
-            self.pat = pat!
+        if let pat = pat {
+            self.pat = pat
         }
-        if vup != nil {
-            self.vup = vup!
+        if let vup = vup {
+            self.vup = vup
         }
-        if fov != nil {
-            self.fov = fov!
+        if let fov = fov {
+            self.fov = fov
         }
-        if aspratio != nil {
-            self.aspratio = aspratio!
+        if let aspratio = aspratio {
+            self.aspratio = aspratio
         }
-        if aperture != nil {
-            self.aperture = aperture!
+        if let aperture = aperture {
+            self.aperture = aperture
         }
-        if fostance != nil {
-            self.fostance = fostance!
+        if let fostance = fostance {
+            self.fostance = fostance
         }
 
         w = (self.eye-self.pat).unitV()

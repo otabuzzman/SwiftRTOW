@@ -36,8 +36,8 @@ struct ViewerControls: ViewModifier {
             let borderRatio = borderWidth/borderHeight
             
             let cornerRadius = min(borderWidth, borderHeight)*0.031415
-            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.5
-            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.5/aspectRatio
+            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.63
+            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.63/aspectRatio
             
             VStack { // https://swiftui-lab.com/geometryreader-bug/ (FB7971927)
                 RoundedRectangle(cornerRadius: cornerRadius)
@@ -79,8 +79,8 @@ struct CameraControls: ViewModifier {
             let borderRatio = borderWidth/borderHeight
             
             let cornerRadius = min(borderWidth, borderHeight)*0.031415
-            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.5
-            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.5/aspectRatio
+            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.63
+            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.63/aspectRatio
             
             VStack { // https://swiftui-lab.com/geometryreader-bug/ (FB7971927)
                 RoundedRectangle(cornerRadius: cornerRadius)
@@ -126,8 +126,8 @@ struct OpticsControls: ViewModifier {
             let borderRatio = borderWidth/borderHeight
             
             let cornerRadius = min(borderWidth, borderHeight)*0.031415
-            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.5
-            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.5/aspectRatio
+            let width = (borderRatio>aspectRatio ? borderHeight*aspectRatio : borderWidth)*0.63
+            let height = (borderRatio>aspectRatio ? borderHeight : borderWidth)*0.63/aspectRatio
             
             VStack { // https://swiftui-lab.com/geometryreader-bug/ (FB7971927)
                 ZStack {

@@ -1,6 +1,13 @@
 import Photos
 import SwiftUI
 
+extension UIScreen {
+    var width: CGFloat { get { UIScreen.main.bounds.size.width } }
+    var height: CGFloat { get { UIScreen.main.bounds.size.height } }
+    var minDim: CGFloat { get { min(width, height) } }
+    var maxDim: CGFloat { get { max(width, height) } }
+}
+
 extension UIImage {
     convenience init?(imageData: [Pixel], imageWidth: Int, imageHeight: Int) {
         guard

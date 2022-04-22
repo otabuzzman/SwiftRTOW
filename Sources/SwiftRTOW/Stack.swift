@@ -27,7 +27,8 @@ extension Stack {
 }
 
 enum StackIndex: Int {
-    case lastButTwo = -2
+    case thirdToLast = -3
+    case lastButTwo
     case lastButOne
     case last
 }

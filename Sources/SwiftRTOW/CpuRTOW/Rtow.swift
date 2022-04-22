@@ -4,15 +4,45 @@ typealias Pixel = SIMD4<UInt8>
 
 @MainActor
 class Rtow: @unchecked Sendable, ObservableObject {
-    var imageWidth = 1200
-    var imageHeight = 800
-    var samplesPerPixel = 10
-    var traceDepth = 50
+    private(set) var imageWidth: Int
+    private(set) var imageHeight: Int
+    private(set) var samplesPerPixel: Int
+    private(set) var traceDepth: Int
     
     private(set) var imageData: [Pixel]?
     
     @Published private(set) var rowRenderProgress = 0
     @Published private(set) var rowRenderFinished = false
+    
+    init() {
+        if _isDebugAssertConfiguration() { // SO #24003291
+            imageWidth = 320
+            imageHeight = 240
+            samplesPerPixel = 1
+            traceDepth = 50
+        } else {
+            // RTOW default values
+            imageWidth = 1200
+            imageHeight = 800
+            samplesPerPixel = 50
+            traceDepth = 50
+        }
+    }
+    
+    func set(imageWidth: Int? = nil, imageHeight: Int? = nil, samplesPerPixel: Int? = nil, traceDepth: Int? = nil) {
+        if let imageWidth = imageWidth {
+            self.imageWidth = imageWidth
+        }
+        if let imageHeight = imageHeight {
+            self.imageHeight = imageHeight
+        }
+        if let samplesPerPixel = samplesPerPixel {
+            self.samplesPerPixel = samplesPerPixel
+        }
+        if let traceDepth = traceDepth {
+            self.traceDepth = traceDepth
+        }
+    }
     
     private nonisolated static func sRGB(color: C) -> Pixel {
         var r = color.x

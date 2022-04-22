@@ -4,7 +4,7 @@ A SwiftUI version of Peter Shirley's ray tracer from his mini-book [Ray Tracing 
 Development happened in *Swift Playgrounds 4* on iPad except transcription of RTOW from C++ to Swift with help of *Swift on Windows*. As a side effect transcription yielded a command-line Swift version of RTOW. It's in the `swindows` branch with hints on build and usage. SwiftRTOW extends Peter's version with multi-threading and some UI controls to change render parameters using common iOS gestures.
 
 ### Concept
-After starting SwiftRTOW renders the scene from chapter 10 on all available CPU cores and displays the result. Below the render view is a button bar that allows loading scenes from chapters 8, 10 and 13. The latter is the image from the book's cover.
+On start SwiftRTOW renders the scene from chapter 10 on all available CPU cores and displays the result. Below the render view is a button bar that allows loading scenes from chapters 8, 10 and 13. The latter is the image from the book's cover.
 
 A single tap on the render view displays more buttons and a finder. This control view disappears after a few seconds when no gestures occur. On disappearing it re-renders the scene if changes were applied.
 
@@ -55,11 +55,12 @@ Apps used on iPad
 |:---|:------|
 |`CpuRTOW`<br>(folder)|A Swift implementation of RTOW. Supports Swift concurrency (multi-threading) on CPU cores and iterative ray tracing.|
 |`SwiftRTOW.swift`|The application main view.|
-|`ButtonStyle.swift`|Base and side button style configurations and code.|
-|`Fsm.swift`|The UI finite state machine.|
+|`RtowView.swift`|UIImageView wrapper to display render result.|
+|`ButtonStyle.swift`|Base and side button style configurations.|
+|`Fsm.swift`|A finite state machine to connect UI and app logic.|
 |`Finder.swift`|Finder views for viewer, camera and optics controls.|
 |`Paddle.swift`|An abstraction of a trackball control device.|
 |`Exception.swift`|Error exceptions.|
-|`Responsive.swift`|Responsive UI support on iPad Pro 11" and iPhone Xs.|
+|`BStack.swift`|A bi-functional stack view providing an HStack or a VStack.|
 |`Extension.swift`|SwiftUI classes and protocols extensions.|
-|`Stack.swift`|A stack implementation.|
+|`Stack.swift`|A stack (push/ pop) implementation.|
