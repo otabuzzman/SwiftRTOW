@@ -1,0 +1,5 @@
+"About" = "Über" ;
+"Version (Build)" = "Version (Build)" ;
+"Trace" = "Ablaufverfolgung" ;
+"Trace output on console is only available when app was compiled with debug configuration." = "Die Ablaufverfolgungsausgabe auf der Konsole ist nur verfügbar, wenn die App mit Debugkonfiguration kompiliert wurde." ;
+"Finite State Machine" = "Endlicher Automat" ;

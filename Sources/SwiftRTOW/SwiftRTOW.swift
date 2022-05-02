@@ -12,7 +12,6 @@ struct ContentView: View {
     @State private var pressedSideButton = ButtonType.Camera
     
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
-    @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @State var isPortait = UIScreen.main.bounds.size.height>UIScreen.main.bounds.size.width
 
     var body: some View {
@@ -104,7 +103,7 @@ struct ContentView: View {
                                             cameraLevel: appFsm.camTrnAmount)
                                 }.frame(width: finderWidth, height: finderHeight)
                             }
-                            // force controls ZStack to span available space
+                            // force finder view to span available space
                             .frame(
                                 minWidth: 0, maxWidth: .infinity,
                                 minHeight: 0, maxHeight: .infinity)
@@ -205,48 +204,63 @@ struct ContentView: View {
                             if appFsm.isCad { try! appFsm.transition(event: .RET) }
                         })
                 
-                BStack(vertical: !isPortait) { // base buttons
-                    Button("Chapter 8") {
-                        things = Ch8()
-                        things.load()
-                        appFsm.push(parameter: things)
-                        appFsm.push(parameter: camera)
-                        appFsm.push(parameter: raycer)
-                        try? appFsm.transition(event: .LOD)
-                        pressedBaseButton = .Ch8
-                    }.buttonStyle(BaseButton(
-                        pretendButton: .Ch8,
-                        pressedButton: pressedBaseButton,
-                        image: "rtow-ch8-btn"))
+                ZStack {
+                    BStack(vertical: !isPortait) {
+                        Button("Settings") {
+                            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [UIApplication.OpenExternalURLOptionsKey(rawValue: "universalLinksOnly") : NSNumber(value: true)])
+                        }.buttonStyle(SoloButton(
+                            image: "gearshape"))
+                    }
+                    .frame(
+                        minWidth: isPortait ? 0 : nil, maxWidth: isPortait ? .infinity : nil,
+                        minHeight: isPortait ? nil : 0, maxHeight: isPortait ? nil : .infinity,
+                        alignment: isPortait ? .trailing : .bottom)
+                    .padding(isPortait ? .bottom : .trailing)
+                    .padding(isPortait ? .trailing : .bottom)
                     
-                    Button("Chapter 10") {
-                        things = Ch10()
-                        things.load()
-                        appFsm.push(parameter: things)
-                        appFsm.push(parameter: camera)
-                        appFsm.push(parameter: raycer)
-                        try? appFsm.transition(event: .LOD)
-                        pressedBaseButton = .Ch10
-                    }.buttonStyle(BaseButton(
-                        pretendButton: .Ch10,
-                        pressedButton: pressedBaseButton,
-                        image: "rtow-ch10-btn"))
+                    BStack(vertical: !isPortait) { // base buttons
+                        Button("Chapter 8") {
+                            things = Ch8()
+                            things.load()
+                            appFsm.push(parameter: things)
+                            appFsm.push(parameter: camera)
+                            appFsm.push(parameter: raycer)
+                            try? appFsm.transition(event: .LOD)
+                            pressedBaseButton = .Ch8
+                        }.buttonStyle(BaseButton(
+                            pretendButton: .Ch8,
+                            pressedButton: pressedBaseButton,
+                            image: "rtow-ch8-btn"))
                     
-                    Button("Chapter 13") {
-                        things = Ch13()
-                        things.load()
-                        appFsm.push(parameter: things)
-                        appFsm.push(parameter: camera)
-                        appFsm.push(parameter: raycer)
-                        try? appFsm.transition(event: .LOD)
-                        pressedBaseButton = .Ch13
-                    }.buttonStyle(BaseButton(
-                        pretendButton: .Ch13,
-                        pressedButton: pressedBaseButton,
-                        image: "rtow-ch13-btn"))
+                        Button("Chapter 10") {
+                            things = Ch10()
+                            things.load()
+                            appFsm.push(parameter: things)
+                            appFsm.push(parameter: camera)
+                            appFsm.push(parameter: raycer)
+                            try? appFsm.transition(event: .LOD)
+                            pressedBaseButton = .Ch10
+                        }.buttonStyle(BaseButton(
+                            pretendButton: .Ch10,
+                            pressedButton: pressedBaseButton,
+                            image: "rtow-ch10-btn"))
+                    
+                        Button("Chapter 13") {
+                            things = Ch13()
+                            things.load()
+                            appFsm.push(parameter: things)
+                            appFsm.push(parameter: camera)
+                            appFsm.push(parameter: raycer)
+                            try? appFsm.transition(event: .LOD)
+                            pressedBaseButton = .Ch13
+                        }.buttonStyle(BaseButton(
+                            pretendButton: .Ch13,
+                            pressedButton: pressedBaseButton,
+                            image: "rtow-ch13-btn"))
+                    }
+                    .disabled(!appFsm.isState(.VSC))
+                    .padding(isPortait ? .bottom : .trailing)
                 }
-                .disabled(!appFsm.isState(.VSC))
-                .padding(isPortait ? .bottom : .trailing)
             }
         }.onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
             if UIDevice.current.orientation.isValidInterfaceOrientation {
@@ -262,6 +276,19 @@ struct MyApp: App {
     @StateObject var raycer = Rtow()
     @StateObject var camera = Camera()
     
+    init() {
+        if !UserDefaults.standard.bool(forKey: "launchedBefore") {
+            registerDefaultSettings()
+            
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"]
+            let build = Bundle.main.infoDictionary?["CFBundleVersion"]
+            let versionInfo = "\(version!) (\(build!))"
+            UserDefaults.standard.set( versionInfo, forKey: "versionInfo")
+            
+            UserDefaults.standard.set(true, forKey: "launchedBefore")
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -270,4 +297,25 @@ struct MyApp: App {
                 .environmentObject(camera)
         }
     }
+}
+
+private func registerDefaultSettings() {
+    guard
+        let settingsBundle = Bundle.main.url(forResource: "Settings", withExtension:"bundle"),
+        let settings = NSDictionary(contentsOf: settingsBundle.appendingPathComponent("Root.plist")),
+        let keyValues = settings.object(forKey: "PreferenceSpecifiers") as? [[String: AnyObject]]
+    else {
+        return
+    }
+    
+    var defaultSettings = [String : AnyObject]()
+    for keyValue in keyValues {
+        if
+            let key = keyValue["Key"] as? String,
+            let value = keyValue["DefaultValue"] {
+            defaultSettings[key] = value
+        }
+    }
+    
+    UserDefaults.standard.register(defaults: defaultSettings)
 }

@@ -27,6 +27,12 @@ class EaParam: Stack {
 typealias CamMovRotate = (amount: CGFloat, axis: (CGFloat, CGFloat, CGFloat))
 
 class Fsm: ObservableObject {
+    private var trace: Bool {
+        get {
+            _isDebugAssertConfiguration() && UserDefaults.standard.bool(forKey: "traceFsm")
+        }
+    }
+    
     @Published private(set) var hState = FsmHState()
     @Published private(set) var hEvent = FsmHEvent()
     
@@ -98,7 +104,8 @@ class Fsm: ObservableObject {
         let s = (hState.peek() as! FsmState).rawValue
         let e = event.rawValue
         
-        if _isDebugAssertConfiguration() && trace {
+        
+        if trace {
             print("state \(FsmStateName[s]) received event \(FsmEventName[e]) : ", terminator: "")
         }
         
@@ -486,7 +493,7 @@ class Fsm: ObservableObject {
     }
     
     private func eaReject() throws {
-        if _isDebugAssertConfiguration() && trace {
+        if trace {
             print("rejected : ", terminator: "")
         }
         
@@ -501,7 +508,7 @@ class Fsm: ObservableObject {
         }
         hState.push(state)
         
-        if _isDebugAssertConfiguration() && trace {
+        if trace {
             print("new state \(FsmStateName[state.rawValue]) (S/E history \(hState.count)/\(hEvent.count), parameter \(eaParam.count))")
         }
     }
@@ -523,5 +530,3 @@ class Fsm: ObservableObject {
         }
     }
 }
-
-private let trace = _isDebugAssertConfiguration()

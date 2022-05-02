@@ -43,7 +43,31 @@ struct SideButton: ButtonStyle {
     var pressedButton: ButtonType
     var image: String
     
-    @EnvironmentObject var appFsm: Fsm
+    func makeBody(configuration: Configuration) -> some View {
+        let buttonSize = max(
+            UIScreen.main.bounds.size.width,
+            UIScreen.main.bounds.size.height)*0.1
+        
+        ZStack {
+            Image(systemName: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .scaleEffect(0.91)
+                .foregroundColor(.buttonEnabled)
+                .background(.buttonHinted)
+                .cornerRadius(buttonSize*0.15)
+                .overlay(
+                    RoundedRectangle(cornerRadius: buttonSize*0.15*0.91)
+                        .fill(pretendButton == pressedButton ?
+                              .buttonPressed : .crystal))
+        }
+        .frame(width: buttonSize, height: buttonSize)
+        .scaleEffect(configuration.isPressed ? 0.98 : 1)
+    }
+}
+
+struct SoloButton: ButtonStyle {
+    var image: String
     
     func makeBody(configuration: Configuration) -> some View {
         let buttonSize = max(
@@ -54,15 +78,10 @@ struct SideButton: ButtonStyle {
             Image(systemName: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .cornerRadius(buttonSize*0.15*0.91)
                 .scaleEffect(0.91)
                 .foregroundColor(.buttonEnabled)
                 .background(.buttonHinted)
                 .cornerRadius(buttonSize*0.15)
-                .overlay(
-                    RoundedRectangle(cornerRadius: buttonSize*0.15*0.91)
-                        .fill(pretendButton == pressedButton ?
-                              .buttonPressed : .crystal))
         }
         .frame(width: buttonSize, height: buttonSize)
         .scaleEffect(configuration.isPressed ? 0.98 : 1)
