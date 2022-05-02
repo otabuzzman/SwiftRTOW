@@ -51,6 +51,7 @@ struct SideButton: ButtonStyle {
         ZStack {
             Image(systemName: image)
                 .resizable()
+                .font(Font.title.weight(.thin))
                 .aspectRatio(contentMode: .fit)
                 .scaleEffect(0.91)
                 .foregroundColor(.buttonEnabled)
@@ -77,6 +78,7 @@ struct SoloButton: ButtonStyle {
         ZStack {
             Image(systemName: image)
                 .resizable()
+                .font(Font.title.weight(.thin))
                 .aspectRatio(contentMode: .fit)
                 .scaleEffect(0.91)
                 .foregroundColor(.buttonEnabled)
