@@ -23,7 +23,7 @@ struct BaseButton: ButtonStyle {
             Rectangle()
                 .fill(enabled ? .buttonEnabled : .buttonDisabled)
                 .cornerRadius(buttonSize*0.15)
-            Image(forPngResource: image)
+            Image(forResourcePng: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(buttonSize*0.15*0.91)

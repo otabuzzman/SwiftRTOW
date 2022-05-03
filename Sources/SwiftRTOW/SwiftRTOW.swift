@@ -23,7 +23,7 @@ struct ContentView: View {
             Color.primaryPale
                 .ignoresSafeArea()
             
-            BStack(vertical: isPortait) {
+            BStack(upright: isPortait) {
                 ZStack { // gestures view
                     ZStack(alignment: .bottomLeading) { // render view
                         RtowView()
@@ -53,7 +53,7 @@ struct ContentView: View {
                         let isPortraitSmall = !(isPortait && horizontalSizeClass == .compact)
                         
                         ZStack(alignment: isPortraitSmall ? .leading : .bottom) { // controls view
-                            BStack(vertical: isPortraitSmall) { // side buttons
+                            BStack(upright: isPortraitSmall) { // side buttons
                                 Button("Set viewer position") {
                                     pressedSideButton = .Viewer
                                     try? appFsm.transition(event: .VWR)
@@ -205,7 +205,7 @@ struct ContentView: View {
                         })
                 
                 ZStack {
-                    BStack(vertical: !isPortait) {
+                    BStack(upright: !isPortait) {
                         Button("Settings") {
                             UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [UIApplication.OpenExternalURLOptionsKey(rawValue: "universalLinksOnly") : NSNumber(value: true)])
                         }.buttonStyle(SoloButton(
@@ -218,7 +218,7 @@ struct ContentView: View {
                     .padding(isPortait ? .bottom : .trailing)
                     .padding(isPortait ? .trailing : .bottom)
                     
-                    BStack(vertical: !isPortait) { // base buttons
+                    BStack(upright: !isPortait) { // base buttons
                         Button("Chapter 8") {
                             things = Ch8()
                             things.load()

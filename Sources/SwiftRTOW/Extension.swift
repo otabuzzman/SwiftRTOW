@@ -86,7 +86,7 @@ extension UIImage {
 }
 
 extension Image {
-    init(forPngResource name: String) {
+    init(forResourcePng name: String) {
         guard
             let path = Bundle.module.path(forResource: name, ofType: "png"),
             let image = UIImage(contentsOfFile: path)

@@ -1,17 +1,17 @@
 import SwiftUI
 
 struct BStack<Content>: View where Content: View {
-    let vertical: Bool
+    let upright: Bool
     let content: () -> Content
     
-    init(vertical: Bool, @ViewBuilder content: @escaping () -> Content) {
-        self.vertical = vertical
+    init(upright: Bool, @ViewBuilder content: @escaping () -> Content) {
+        self.upright = upright
         self.content = content
     }
     
     var body: some View {
         Group {
-            if vertical {
+            if upright {
                 VStack(content: content)
             } else {
                 HStack(content: content)
