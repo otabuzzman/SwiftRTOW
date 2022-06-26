@@ -38,7 +38,7 @@ Apps used on iPad
 
   - Set app name and color
   - Add app icon
-  - Add *Photo Library (Add Only)* capability
+  - Add *Photo Library* capability
 
 - Delete predefined `*.swift` files in app
 - Copy&paste Swift files from repository to app
