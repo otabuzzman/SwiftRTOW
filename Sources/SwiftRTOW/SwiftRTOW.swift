@@ -215,7 +215,7 @@ struct ContentView: View {
                         minWidth: isPortait ? 0 : nil, maxWidth: isPortait ? .infinity : nil,
                         minHeight: isPortait ? nil : 0, maxHeight: isPortait ? nil : .infinity,
                         alignment: isPortait ? .trailing : .bottom)
-                    .padding(isPortait ? .bottom : .trailing)
+                    .padding(isPortait ? .bottom : .trailing) // bottom AND trailing paddings
                     .padding(isPortait ? .trailing : .bottom)
                     
                     BStack(upright: !isPortait) { // base buttons
