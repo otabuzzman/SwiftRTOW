@@ -277,16 +277,7 @@ struct MyApp: App {
     @StateObject var camera = Camera()
     
     init() {
-        if !UserDefaults.standard.bool(forKey: "launchedBefore") {
-            registerDefaultSettings()
-            
-            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"]
-            let build = Bundle.main.infoDictionary?["CFBundleVersion"]
-            let versionInfo = "\(version!) (\(build!))"
-            UserDefaults.standard.set( versionInfo, forKey: "versionInfo")
-            
-            UserDefaults.standard.set(true, forKey: "launchedBefore")
-        }
+        UserDefaults.registerSettingsBundle()
     }
     
     var body: some Scene {
@@ -299,23 +290,37 @@ struct MyApp: App {
     }
 }
 
-private func registerDefaultSettings() {
-    guard
-        let settingsBundle = Bundle.main.url(forResource: "Settings", withExtension:"bundle"),
-        let settings = NSDictionary(contentsOf: settingsBundle.appendingPathComponent("Root.plist")),
-        let keyValues = settings.object(forKey: "PreferenceSpecifiers") as? [[String: AnyObject]]
-    else {
-        return
-    }
-    
-    var defaultSettings = [String : AnyObject]()
-    for keyValue in keyValues {
-        if
-            let key = keyValue["Key"] as? String,
-            let value = keyValue["DefaultValue"] {
-            defaultSettings[key] = value
+extension UserDefaults {
+    static func registerSettingsBundle() {
+        if !UserDefaults.standard.bool(forKey: "firstLaunch") {
+            UserDefaults.registerDefaultSettings()
+            
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"]
+            let build = Bundle.main.infoDictionary?["CFBundleVersion"]
+            let versionInfo = "\(version!) (\(build!))"
+            UserDefaults.standard.set(versionInfo, forKey: "versionInfo")
+            
+            UserDefaults.standard.set(true, forKey: "firstLaunch")
         }
     }
     
-    UserDefaults.standard.register(defaults: defaultSettings)
+    static func registerDefaultSettings() {
+        guard
+            let settingsBundleFile = Bundle.main.url(forResource: "Root.plist", withExtension: nil),
+            let settingsBundleData = NSDictionary(contentsOf: settingsBundleFile),
+            let preferenceDictionaries = settingsBundleData.object(
+                forKey: "PreferenceSpecifiers") as? [[String: AnyObject]]
+        else { return }
+        
+        var defaultSettings = [String : AnyObject]()
+        for preferenceDictionary in preferenceDictionaries {
+            if
+                let key = preferenceDictionary["Key"] as? String,
+                let value = preferenceDictionary["DefaultValue"] {
+                defaultSettings[key] = value
+            }
+        }
+        
+        UserDefaults.standard.register(defaults: defaultSettings)
+    }
 }
