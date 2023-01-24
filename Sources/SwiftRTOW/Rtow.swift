@@ -6,7 +6,6 @@ typealias Pixel = SIMD4<UInt8>
 
 #if !os(Windows)
 
-@MainActor
 class Rtow: @unchecked Sendable, ObservableObject {
     var imageWidth = 1200
     var imageHeight = 800
@@ -18,7 +17,6 @@ class Rtow: @unchecked Sendable, ObservableObject {
 
 #else
 
-@MainActor
 class Rtow: @unchecked Sendable {
     var imageWidth = 1200
     var imageHeight = 800

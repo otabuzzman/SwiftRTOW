@@ -1,7 +1,7 @@
 # SwiftRTOW
 Peter Shirley's ray tracer from his mini-book [Ray Tracing in One Weekend](https://github.com/RayTracing/raytracing.github.io/) (RTOW). Versions for *Swift on Windows* and *Swift Playgrounds 4*.
 
-### Galery
+### Gallery
 
 |RTOW samples|To reproduce see [below](#usage-on-windows)|   |
 |:---|:---|:---|
