@@ -61,8 +61,10 @@ Apps used on Winos 10
   rem default configuration is debug
   swift run >rtow-ch13.ppm
 
-  rem foreground run
-  .build\debug\SwiftRTOW.exe >rtow-ch13.ppm
+  rem foreground run (debug)
+  .build\x86_64-unknown-windows-msvc\debug\SwiftRTOW.exe >rtow-ch13.ppm
+  rem foreground run (release)
+  .build\x86_64-unknown-windows-msvc\release\SwiftRTOW.exe >rtow-ch13.ppm
 
   rem build for production
   swift build --configuration release
