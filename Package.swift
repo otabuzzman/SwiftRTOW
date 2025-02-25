@@ -9,7 +9,7 @@ import AppleProductTypes
 
 let package = Package(
     name: "SwiftRTOW",
-	defaultLocalization: "en",
+    defaultLocalization: "en",
     platforms: [
         .iOS("15.2")
     ],
@@ -19,8 +19,8 @@ let package = Package(
             targets: ["AppModule"],
             bundleIdentifier: "com.otabuzzman.swiftrtow.ios",
             teamIdentifier: "28FV44657B",
-            displayVersion: "1.0.3",
-            bundleVersion: "19",
+            displayVersion: "1.0.4",
+            bundleVersion: "20",
             appIcon: .asset("AppIcon"),
             accentColor: .asset("AccentColor"),
             supportedDeviceFamilies: [
